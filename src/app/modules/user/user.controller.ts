@@ -2,8 +2,9 @@ import httpStatus from 'http-status';
 import catchAsync from '../../utils/catchAsync';
 import sendResponse from '../../utils/sendResponse';
 import { UserServices } from './user.service';
+
 const createResearchMembar = catchAsync(async (req, res) => {
-  const { password, ResearchMembar: ResearchMembarData} = req.body;
+  const { password, ResearchMembar: ResearchMembarData } = req.body;
   console.log(ResearchMembarData);
   const result = await UserServices.createResearchMembar(
     req.file,
@@ -20,9 +21,7 @@ const createResearchMembar = catchAsync(async (req, res) => {
 });
 
 const createResearchMembars = catchAsync(async (req, res) => {
-  const result = await UserServices.createResearchMembars(
-    req.body,
-  );
+  const result = await UserServices.createResearchMembars(req.body);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
@@ -67,7 +66,7 @@ const AllInfo = catchAsync(async (req, res) => {
 });
 
 const AllInfoForPersonal = catchAsync(async (req, res) => {
-  const {id}=req.user
+  const { id } = req.user;
   const result = await UserServices.AllInfoForPersonal(id);
 
   sendResponse(res, {
@@ -78,7 +77,7 @@ const AllInfoForPersonal = catchAsync(async (req, res) => {
   });
 });
 const userToadmin = catchAsync(async (req, res) => {
-  const {id}=req.params
+  const { id } = req.params;
   const result = await UserServices.userToadmin(id);
 
   sendResponse(res, {
@@ -96,5 +95,5 @@ export const UserControllers = {
   userToadmin,
   createResearchMembars,
   AllInfo,
-  AllInfoForPersonal
+  AllInfoForPersonal,
 };

@@ -1,11 +1,12 @@
 import { Router } from 'express';
 import { AuthRoutes } from '../modules/Auth/auth.route';
-import { UserRoutes } from '../modules/User/user.route';
+
 import { ResearchPaperRoutes } from '../modules/ResearchPaper/ResearchPaper.route';
 import { AssociateRoutes } from '../modules/ResearchMembar/ResearchMembar.router';
 import { CourseRouter } from '../modules/Course/Course.router';
 import { eventRouter } from '../modules/Event/event.router';
 import { blogRouter } from '../modules/Blog/blog.router';
+import { UserRoutes } from '../modules/user/user.route';
 const router = Router();
 const moduleRoutes = [
   {
@@ -35,7 +36,7 @@ const moduleRoutes = [
   {
     path: '/blog',
     route: blogRouter,
-  }
+  },
 ];
 
 moduleRoutes.forEach((route) => router.use(route.path, route.route));

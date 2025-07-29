@@ -2,7 +2,7 @@ import { Icourse } from "./Course.Interface"
 import { courseModel } from "./Course.model"
 import { io } from "../../utils/socket";  // Socket emitter
 import AppError from "../../errors/AppError";
-import { sendImageToCloudinary } from "../../utils/sendImageToCloudinary";
+import { sendImageToCloudinary } from "../../utils/upload";
 
 const GetCourse= async()=>{
     const result = await courseModel.find()

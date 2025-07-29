@@ -13,4 +13,17 @@ const validateRequest = (schema: AnyZodObject) => {
   });
 };
 
+// const validateRequest = (schema: AnyZodObject) => {
+//   return (req: Request, res: Response, next: NextFunction) => {
+//     try {
+//       schema.parse(req.body);
+//       next();
+//     } catch (err) {
+//       console.error('Validation failed:', err);
+//       next(err);
+//     }
+//   };
+// };
+
+
 export default validateRequest;

@@ -5,7 +5,7 @@ import httpStatus from 'http-status';
 import mongoose from 'mongoose';
 import config from '../../config';
 import AppError from '../../errors/AppError';
-import { sendImageToCloudinary } from '../../utils/sendImageToCloudinary';
+import { sendImageToCloudinary } from '../../utils/upload';
 import { TUser } from './user.interface';
 import { sendEmail } from '../../utils/sendEmail';
 import { IResearchMembar } from '../ResearchMembar/ResearchMembar.interface';

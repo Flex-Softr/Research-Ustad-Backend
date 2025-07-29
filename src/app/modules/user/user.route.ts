@@ -2,7 +2,7 @@
 import express, { NextFunction, Request, Response } from 'express';
 import auth from '../../middlewares/auth';
 import validateRequest from '../../middlewares/validateRequest';
-import { upload } from '../../utils/sendImageToCloudinary';
+import { upload } from '../../utils/upload';
 import { USER_ROLE } from './user.constant';
 import { ResearchAssociateValidation } from '../ResearchMembar/ResearchMembar.validation';
 import { UserControllers } from './user.controller';

@@ -3,21 +3,20 @@ interface Speaker {
     bio: string;
     imageUrl: string;
 }
-// import mongoose from "mongoose";
 
-// }
 export interface IEvent {
+    id:string;
+    _id?: string;
     title: string;
     description: string;
     startDate: Date;
     endDate: Date;
     location: string;
     maxAttendees: number;
-    speakers:Speaker [];  // Array of ObjectId
+    speakers: Speaker[];
     imageUrl: string;
     registrationLink: string;
     category: string;
-    status:'upcoming'|'ongoing'| 'finished'
-    eventDuration:number
-
+    status: 'upcoming' | 'ongoing' | 'finished';
+    eventDuration: number;
 }

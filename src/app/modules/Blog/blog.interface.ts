@@ -3,8 +3,9 @@ import mongoose from "mongoose";
 export interface IBlog {
   title: string;
   author: mongoose.Types.ObjectId;
-  image: string;
-  shortDescription: string
+  category: string;
+  imageUrl?: string;
+  content: string;
   publishedDate: Date;
 }
 

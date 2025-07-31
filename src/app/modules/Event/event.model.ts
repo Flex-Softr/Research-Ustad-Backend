@@ -5,7 +5,7 @@ const speakerSchema = new Schema(
   {
     name: { type: String, required: true },
     bio: { type: String, required: true },
-    imageUrl: { type: String, required: true },
+    imageUrl: { type: String },
   },
   { _id: false },
 );

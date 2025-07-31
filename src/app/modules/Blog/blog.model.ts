@@ -5,8 +5,9 @@ const SchemaBlog = new Schema<IBlog>(
   {
     title: { type: String, required: true },
     author: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
-    image: { type: String, required: true },
-    shortDescription: { type: String, required: true },
+    imageUrl: { type: String, required: false },
+    category: { type: String, required: true },
+    content: { type: String, required: true },
     publishedDate: { type: Date, default: () => new Date() } 
   },
   { timestamps: true }

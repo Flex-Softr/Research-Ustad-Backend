@@ -4,9 +4,7 @@ import sendResponse from '../../utils/sendResponse';
 import { blogService } from './blog.service';
 
 const Getblog = catchAsync(async (req, res) => {
-  console.log('Getblog - Request received');
   const result = await blogService.Getblog();
-  console.log('Getblog - Result:', result);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
@@ -28,9 +26,6 @@ const Authorblog = catchAsync(async (req, res) => {
 const Postblog = catchAsync(async (req, res) => {
   const body = req.body;
   const { id } = req.user;
-  
-  console.log('Postblog - Body:', body);
-  console.log('Postblog - User ID:', id);
   
   const result = await blogService.Postblog(body, id);
   
@@ -72,10 +67,8 @@ const Deletedblog = catchAsync(async (req, res) => {
 });
 const Getblogsingle = catchAsync(async (req, res) => {
   const { id } = req.params;
-  console.log('Getblogsingle - Request received for ID:', id);
   
   const result = await blogService.Getblogsingle(id);
-  console.log('Getblogsingle - Result:', result);
   
   sendResponse(res, {
     statusCode: httpStatus.OK,

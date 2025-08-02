@@ -9,7 +9,19 @@ const GetCourse = catchAsync(async (req, res) => {
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: 'Course is retrieved succesfully',
+    message: 'Course is retrieved successfully',
+    data: result,
+  });
+});
+
+// get single course
+const GetSingleCourse = catchAsync(async (req, res) => {
+  const { id } = req.params;
+  const result = await courseService.GetSingleCourse(id);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Course is retrieved successfully',
     data: result,
   });
 });
@@ -17,11 +29,12 @@ const GetCourse = catchAsync(async (req, res) => {
 //   Post Courses
 const PostCourse = catchAsync(async (req, res) => {
   const body = req.body;
-  const result = await courseService.PostCourse(body, req.file);
+  const files = req.files;
+  const result = await courseService.PostCourse(body, files);
   sendResponse(res, {
-    statusCode: httpStatus.OK,
+    statusCode: httpStatus.CREATED,
     success: true,
-    message: 'Course is Post succesfully',
+    message: 'Course is created successfully',
     data: result,
   });
 });
@@ -30,11 +43,12 @@ const PostCourse = catchAsync(async (req, res) => {
 const UpdateCourse = catchAsync(async (req, res) => {
   const body = req.body;
   const { id } = req.params;
-  const result = await courseService.UpdateCourse(id, body);
+  const files = req.files;
+  const result = await courseService.UpdateCourse(id, body, files);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: 'Course is Update succesfully',
+    message: 'Course is updated successfully',
     data: result,
   });
 });
@@ -46,12 +60,14 @@ const DeletedCourse = catchAsync(async (req, res) => {
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: 'Course is Deleted succesfully',
+    message: 'Course is deleted successfully',
     data: result,
   });
 });
+
 export const courseController = {
   GetCourse,
+  GetSingleCourse,
   PostCourse,
   UpdateCourse,
   DeletedCourse,

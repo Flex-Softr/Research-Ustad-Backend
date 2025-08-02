@@ -6,7 +6,6 @@ export interface Icourse {
   level: string;
   category: string;
   fee: number;
-  originalFee: number;
   enrolled: number;
   capacity: number;
   rating: number;

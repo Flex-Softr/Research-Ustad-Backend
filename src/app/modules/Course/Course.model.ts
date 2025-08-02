@@ -45,11 +45,6 @@ const courseSchema = new Schema<Icourse>({
     required: [true, "Fee is required"], 
     min: [0, "Fee cannot be negative"] 
   },
-  originalFee: { 
-    type: Number, 
-    required: [true, "Original fee is required"], 
-    min: [0, "Original fee cannot be negative"] 
-  },
   enrolled: { 
     type: Number, 
     default: 0, 

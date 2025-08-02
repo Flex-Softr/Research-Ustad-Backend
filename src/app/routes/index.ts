@@ -7,6 +7,8 @@ import { CourseRouter } from '../modules/Course/Course.router';
 import { eventRouter } from '../modules/Event/event.router';
 import { blogRouter } from '../modules/Blog/blog.router';
 import { UserRoutes } from '../modules/user/user.route';
+import { CategoryRouter } from '../modules/Category/Category.router';
+
 const router = Router();
 const moduleRoutes = [
   {
@@ -36,6 +38,10 @@ const moduleRoutes = [
   {
     path: '/blog',
     route: blogRouter,
+  },
+  {
+    path: '/category',
+    route: CategoryRouter,
   },
 ];
 

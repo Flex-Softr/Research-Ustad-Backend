@@ -2,7 +2,7 @@ import { Router } from "express";
 import { categoryController } from "./Category.controller";
 import validateRequest from "../../middlewares/validateRequest";
 import { ValidationCategory } from "./Category.validation";
-import { USER_ROLE } from "../User/user.constant";
+import { USER_ROLE } from "../user/user.constant";
 import auth from "../../middlewares/auth";
 
 const router = Router();

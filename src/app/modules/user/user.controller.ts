@@ -7,7 +7,7 @@ const createResearchMembar = catchAsync(async (req, res) => {
   const { password, ResearchMembar: ResearchMembarData } = req.body;
   console.log(ResearchMembarData);
   const result = await UserServices.createResearchMembar(
-    req.file,
+    null, // No longer passing file since router handles it
     password,
     ResearchMembarData,
   );

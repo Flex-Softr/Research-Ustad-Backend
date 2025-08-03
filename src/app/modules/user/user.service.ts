@@ -5,16 +5,16 @@ import httpStatus from 'http-status';
 import mongoose from 'mongoose';
 import config from '../../config';
 import AppError from '../../errors/AppError';
-import { sendImageToCloudinary } from '../../utils/upload';
-import { TUser } from './user.interface';
+// import { TUser } from './user.interface';
 import { sendEmail } from '../../utils/sendEmail';
 import { IResearchMembar } from '../ResearchMembar/ResearchMembar.interface';
 import { User } from './user.model';
 import { ResearchMembar } from '../ResearchMembar/ResearchMembar.model';
 import { ResearchPaper } from '../ResearchPaper/ResearchPaper.model';
 import { Blog } from '../Blog/blog.model';
+import { TUser } from './user.interface';
 const createResearchMembar = async (
-  file: any,
+  file: any | null,
   password: string,
   payload: IResearchMembar,
 ) => {
@@ -22,18 +22,17 @@ const createResearchMembar = async (
   userData.password = password || (config.default_password as string);
   userData.designation = payload.designation;
   userData.email = payload.email;
-  userData.fullName =payload.fullName
+  userData.fullName = payload.fullName;
   const session = await mongoose.startSession();
 
   try {
-   await session.startTransaction();
-    if (file) {
-      const imageName = `${userData.email}${payload?.fullName}`;
-      const path = file?.path;
-      const { secure_url } = await sendImageToCloudinary(imageName, path);
-      payload.profileImg = secure_url as string;
-      userData.image=secure_url as string
+    await session.startTransaction();
+    
+    // Handle file upload - the router already sets payload.profileImg
+    if (payload.profileImg) {
+      userData.image = payload.profileImg;
     }
+    
     const newUser = await User.create([userData], { session });
  
     if (!newUser.length) {
@@ -70,13 +69,11 @@ const createResearchMembar = async (
 
     await sendEmail(newUser[0].email, emailContent, subject);
     await session.commitTransaction();
-    // await session.endSession();
     return newStudent;
   } catch (err: any) {
     await session.abortTransaction();
-    // await session.endSession();
     throw err
-  }finally{
+  } finally {
     await session.endSession()
   }
 };

@@ -2,7 +2,7 @@ import { NextFunction, Request, Response, Router } from 'express';
 import { eventController } from './event.controller';
 // import { upload } from "../../utils/upload ";
 import validateRequest from '../../middlewares/validateRequest';
-import { USER_ROLE } from '../User/user.constant';
+import { USER_ROLE } from '../user/user.constant';
 import auth from '../../middlewares/auth';
 import { Validationevent } from './event.validation';
 import { upload } from '../../utils/upload';

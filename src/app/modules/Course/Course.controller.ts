@@ -29,7 +29,7 @@ const GetSingleCourse = catchAsync(async (req, res) => {
 //   Post Courses
 const PostCourse = catchAsync(async (req, res) => {
   const body = req.body;
-  const files = req.files;
+  const files = req.files as any;
   const result = await courseService.PostCourse(body, files);
   sendResponse(res, {
     statusCode: httpStatus.CREATED,
@@ -43,7 +43,7 @@ const PostCourse = catchAsync(async (req, res) => {
 const UpdateCourse = catchAsync(async (req, res) => {
   const body = req.body;
   const { id } = req.params;
-  const files = req.files;
+  const files = req.files as any;
   const result = await courseService.UpdateCourse(id, body, files);
   sendResponse(res, {
     statusCode: httpStatus.OK,

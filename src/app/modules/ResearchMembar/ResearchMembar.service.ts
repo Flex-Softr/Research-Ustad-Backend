@@ -2,7 +2,7 @@
 import httpStatus from 'http-status';
 import mongoose from 'mongoose';
 import AppError from '../../errors/AppError';
-import { User } from '../User/user.model';
+import { User } from '../user/user.model';
 import { IResearchMembar } from './ResearchMembar.interface';
 import { ResearchMembar } from './ResearchMembar.model';
 const getAllMembar = async () => {

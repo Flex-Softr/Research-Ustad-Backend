@@ -1,11 +1,11 @@
 import { NextFunction, Request, Response, Router } from "express";
 import { courseController } from "./Course.controller";
-import { upload } from "../../utils/upload";
 import validateRequest from "../../middlewares/validateRequest";
 import { ValidationCourse } from "./Course.validation";
-import { USER_ROLE } from "../User/user.constant";
+import { USER_ROLE } from "../user/user.constant";
 import auth from "../../middlewares/auth";
 import config from "../../config";
+import { upload } from "../../utils/upload";
 
 // Define instructor interface
 interface Instructor {

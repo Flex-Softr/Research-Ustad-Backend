@@ -13,7 +13,15 @@ router.post(
   auth(USER_ROLE.superAdmin, USER_ROLE.admin),
   upload.single('file'),
   (req: Request, res: Response, next: NextFunction) => {
-    req.body = JSON.parse(req.body.data);
+    if (req.body.data) {
+      req.body = JSON.parse(req.body.data);
+      
+      // Handle file upload like event module
+      if (req.file) {
+        const baseUrl = `http://localhost:${process.env.PORT || 5000}`;
+        req.body.profileImg = `${baseUrl}/upload/${req.file.filename}`;
+      }
+    }
     next();
   },
   validateRequest(ResearchAssociateValidation.createValidationSchema),

@@ -81,14 +81,14 @@ router.patch(
       // Handle main course image
       const files = req.files as { [fieldname: string]: { filename: string }[] };
       if (files && files['file'] && files['file'][0]) {
-        const baseUrl = `http://localhost:${config.port}`;
+        const baseUrl = config.backend_url;
         req.body.imageUrl = `${baseUrl}/upload/${files['file'][0].filename}`;
       }
       
       // Handle instructor images
       if (files && files['instructorFiles']) {
         const instructorFiles = files['instructorFiles'];
-        const baseUrl = `http://localhost:${config.port}`;
+        const baseUrl = config.backend_url;
         
         // Update instructors array with image URLs
         if (req.body.instructors && Array.isArray(req.body.instructors)) {

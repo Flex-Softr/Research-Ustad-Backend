@@ -23,7 +23,7 @@ router.post(
       
       if (req.file) {
         // Set the full URL for the uploaded image
-        const baseUrl = `http://localhost:${config.port}`;
+        const baseUrl = `${config.backend_url}`;
         req.body.imageUrl = `${baseUrl}/upload/${req.file.filename}`;
       }
     }
@@ -41,7 +41,7 @@ router.patch(
       req.body = JSON.parse(req.body.data);
       if (req.file) {
         // Set the full URL for the uploaded image
-        const baseUrl = `http://localhost:${config.port}`;
+        const baseUrl = `${config.backend_url}`;
         req.body.imageUrl = `${baseUrl}/upload/${req.file.filename}`;
       }
     }

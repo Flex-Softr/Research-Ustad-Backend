@@ -32,14 +32,14 @@ router.post(
       // Handle main event image
       const files = req.files as { [fieldname: string]: { filename: string }[] };
       if (files && files['file'] && files['file'][0]) {
-        const baseUrl = `http://localhost:${config.port}`;
+        const baseUrl = config.backend_url;
         req.body.imageUrl = `${baseUrl}/upload/${files['file'][0].filename}`;
       }
       
       // Handle speaker images
       if (files && files['speakerFiles']) {
         const speakerFiles = files['speakerFiles'];
-        const baseUrl = `http://localhost:${config.port}`;
+        const baseUrl = config.backend_url;
         
         // Update speakers array with image URLs
         if (req.body.speakers && Array.isArray(req.body.speakers)) {
@@ -72,14 +72,14 @@ router.patch(
       // Handle main event image
       const files = req.files as { [fieldname: string]: { filename: string }[] };
       if (files && files['file'] && files['file'][0]) {
-        const baseUrl = `http://localhost:${config.port}`;
+        const baseUrl = config.backend_url;
         req.body.imageUrl = `${baseUrl}/upload/${files['file'][0].filename}`;
       }
       
       // Handle speaker images
       if (files && files['speakerFiles']) {
         const speakerFiles = files['speakerFiles'];
-        const baseUrl = `http://localhost:${config.port}`;
+        const baseUrl = config.backend_url;
         
         // Update speakers array with image URLs
         if (req.body.speakers && Array.isArray(req.body.speakers)) {

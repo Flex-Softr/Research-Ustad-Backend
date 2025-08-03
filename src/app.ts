@@ -1,4 +1,3 @@
-
 import cors from 'cors'; // ✅ ADD THIS
 import cookieParser from 'cookie-parser';
 import cron from "node-cron";
@@ -12,6 +11,7 @@ import { courseModel } from './app/modules/Course/Course.model';
 import { eventModel } from './app/modules/Event/event.model';
 import { updateStatus } from './app/utils/RealtimeUpdate';
 import path from 'path';
+import config from './app/config/index';
 
 
 const app: Application = express();
@@ -19,7 +19,7 @@ const server = http.createServer(app);
 
 io.attach(server, {
   cors: {
-    origin: "http://localhost:3000",  
+    origin: config.frontend_url,  
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true
   }
@@ -27,7 +27,7 @@ io.attach(server, {
 
 // ✅ Add this before any routes
 app.use(cors({
-  origin: "http://localhost:3000",
+  origin: config.frontend_url,
   credentials: true,
 }));
 

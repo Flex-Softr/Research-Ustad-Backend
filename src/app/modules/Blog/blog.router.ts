@@ -23,7 +23,10 @@ router.post(
         // Handle main blog image
       if (req.file) {
         const baseUrl = config.backend_url;
+        console.log("Blog Upload - Base URL:", baseUrl);
+        console.log("Blog Upload - Filename:", req.file.filename);
         req.body.imageUrl = `${baseUrl}/upload/${req.file.filename}`;
+        console.log("Blog Upload - Final Image URL:", req.body.imageUrl);
       }
     }
     next();
@@ -41,7 +44,10 @@ router.patch(
       if (req.file) {
         // Set the full URL for the uploaded image
         const baseUrl = `${config.backend_url}`;
+        console.log("Blog Update - Base URL:", baseUrl);
+        console.log("Blog Update - Filename:", req.file.filename);
         req.body.imageUrl = `${baseUrl}/upload/${req.file.filename}`;
+        console.log("Blog Update - Final Image URL:", req.body.imageUrl);
       }
     }
     next();

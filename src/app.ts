@@ -18,6 +18,7 @@ const app: Application = express();
 const server = http.createServer(app);
 
 console.log("envvvv",config.frontend_url)
+console.log("envvvv backend_url",config.backend_url)
 
 io.attach(server, {
   cors: {

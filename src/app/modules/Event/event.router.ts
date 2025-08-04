@@ -36,7 +36,10 @@ router.post(
       const files = req.files as { [fieldname: string]: { filename: string }[] };
       if (files && files['file'] && files['file'][0]) {
         const baseUrl = config.backend_url;
+        console.log("Event Upload - Base URL:", baseUrl);
+        console.log("Event Upload - Filename:", files['file'][0].filename);
         req.body.imageUrl = `${baseUrl}/upload/${files['file'][0].filename}`;
+        console.log("Event Upload - Final Image URL:", req.body.imageUrl);
       }
       
       // Handle speaker images

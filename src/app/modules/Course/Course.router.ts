@@ -40,8 +40,11 @@ router.post(
       // Handle main course image
       const files = req.files as { [fieldname: string]: { filename: string }[] };
       if (files && files['file'] && files['file'][0]) {
-       const baseUrl = config.backend_url;
+        const baseUrl = config.backend_url;
+        console.log("Course Upload - Base URL:", baseUrl);
+        console.log("Course Upload - Filename:", files['file'][0].filename);
         req.body.imageUrl = `${baseUrl}/upload/${files['file'][0].filename}`;
+        console.log("Course Upload - Final Image URL:", req.body.imageUrl);
       }
       
       // Handle instructor images

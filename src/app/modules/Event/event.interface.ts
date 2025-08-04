@@ -5,12 +5,11 @@ interface Speaker {
 }
 
 export interface IEvent {
-    id:string;
     _id?: string;
     title: string;
     description: string;
-    startDate: Date;
-    endDate: Date;
+    startDate: Date | string;
+    endDate: Date | string;
     location: string;
     maxAttendees: number;
     speakers: Speaker[];

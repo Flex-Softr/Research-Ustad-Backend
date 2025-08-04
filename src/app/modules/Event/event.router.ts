@@ -29,6 +29,9 @@ router.post(
     if (req.body.data) {
       req.body = JSON.parse(req.body.data);
       
+      // Debug: Log the parsed body
+      console.log("POST - Parsed request body:", req.body);
+      
       // Handle main event image
       const files = req.files as { [fieldname: string]: { filename: string }[] };
       if (files && files['file'] && files['file'][0]) {

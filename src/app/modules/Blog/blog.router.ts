@@ -20,11 +20,10 @@ router.post(
     
     if (req.body.data) {
       req.body = JSON.parse(req.body.data);
-        // Handle main course image
-        const files = req.files as { [fieldname: string]: { filename: string }[] };
-      if (files && files['file'] && files['file'][0]) {
+        // Handle main blog image
+      if (req.file) {
         const baseUrl = config.backend_url;
-        req.body.imageUrl = `${baseUrl}/upload/${files['file'][0].filename}`;
+        req.body.imageUrl = `${baseUrl}/upload/${req.file.filename}`;
       }
     }
     next();

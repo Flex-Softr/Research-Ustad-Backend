@@ -20,11 +20,11 @@ router.post(
     
     if (req.body.data) {
       req.body = JSON.parse(req.body.data);
-      
-      if (req.file) {
-        // Set the full URL for the uploaded image
-        const baseUrl = `${config.backend_url}`;
-        req.body.imageUrl = `${baseUrl}/upload/${req.file.filename}`;
+        // Handle main course image
+        const files = req.files as { [fieldname: string]: { filename: string }[] };
+      if (files && files['file'] && files['file'][0]) {
+        const baseUrl = config.backend_url;
+        req.body.imageUrl = `${baseUrl}/upload/${files['file'][0].filename}`;
       }
     }
     next();

@@ -30,14 +30,16 @@ const GetSingleCourse = async (id: string) => {
 const PostCourse = async (body: Icourse, files: MulterFiles) => {
   // Handle main course image
   if (files && files['file'] && files['file'][0]) {
-    const baseUrl = `http://localhost:${config.port}`;
+    const backendUrl = config.backend_url || '';
+    const baseUrl = backendUrl.endsWith('/') ? backendUrl.slice(0, -1) : backendUrl;
     body.imageUrl = `${baseUrl}/upload/${files['file'][0].filename}`;
   }
 
   // Handle instructor images
   if (files && files['instructorFiles'] && body.instructors) {
     const instructorFiles = files['instructorFiles'];
-    const baseUrl = `http://localhost:${config.port}`;
+    const backendUrl = config.backend_url || '';
+    const baseUrl = backendUrl.endsWith('/') ? backendUrl.slice(0, -1) : backendUrl;
     
     body.instructors = body.instructors.map((instructor, index) => ({
       ...instructor,
@@ -64,14 +66,16 @@ const PostCourse = async (body: Icourse, files: MulterFiles) => {
 const UpdateCourse = async (id: string, body: Partial<Icourse>, files?: MulterFiles) => {
   // Handle main course image update
   if (files && files['file'] && files['file'][0]) {
-    const baseUrl = `http://localhost:${config.port}`;
+    const backendUrl = config.backend_url || '';
+    const baseUrl = backendUrl.endsWith('/') ? backendUrl.slice(0, -1) : backendUrl;
     body.imageUrl = `${baseUrl}/upload/${files['file'][0].filename}`;
   }
 
   // Handle instructor images update
   if (files && files['instructorFiles'] && body.instructors) {
     const instructorFiles = files['instructorFiles'];
-    const baseUrl = `http://localhost:${config.port}`;
+    const backendUrl = config.backend_url || '';
+    const baseUrl = backendUrl.endsWith('/') ? backendUrl.slice(0, -1) : backendUrl;
     
     body.instructors = body.instructors.map((instructor, index) => ({
       ...instructor,

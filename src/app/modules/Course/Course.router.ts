@@ -37,10 +37,28 @@ router.post(
     if (req.body.data) {
       req.body = JSON.parse(req.body.data);
       
+      // Ensure numeric fields are properly converted
+      if (req.body.totalReviews !== undefined) {
+        req.body.totalReviews = Number(req.body.totalReviews) || 0;
+      }
+      if (req.body.rating !== undefined) {
+        req.body.rating = Number(req.body.rating) || 0;
+      }
+      if (req.body.fee !== undefined) {
+        req.body.fee = Number(req.body.fee) || 0;
+      }
+      if (req.body.enrolled !== undefined) {
+        req.body.enrolled = Number(req.body.enrolled) || 0;
+      }
+      if (req.body.capacity !== undefined) {
+        req.body.capacity = Number(req.body.capacity) || 1;
+      }
+      
       // Handle main course image
       const files = req.files as { [fieldname: string]: { filename: string }[] };
       if (files && files['file'] && files['file'][0]) {
-        const baseUrl = config.backend_url;
+        const backendUrl = config.backend_url || '';
+        const baseUrl = backendUrl.endsWith('/') ? backendUrl.slice(0, -1) : backendUrl;
         console.log("Course Upload - Base URL:", baseUrl);
         console.log("Course Upload - Filename:", files['file'][0].filename);
         req.body.imageUrl = `${baseUrl}/upload/${files['file'][0].filename}`;
@@ -50,7 +68,8 @@ router.post(
       // Handle instructor images
       if (files && files['instructorFiles']) {
         const instructorFiles = files['instructorFiles'];
-       const baseUrl = config.backend_url;
+        const backendUrl = config.backend_url || '';
+        const baseUrl = backendUrl.endsWith('/') ? backendUrl.slice(0, -1) : backendUrl;
         
         // Update instructors array with image URLs
         if (req.body.instructors && Array.isArray(req.body.instructors)) {
@@ -81,17 +100,36 @@ router.patch(
     if (req.body.data) {
       req.body = JSON.parse(req.body.data);
       
+      // Ensure numeric fields are properly converted
+      if (req.body.totalReviews !== undefined) {
+        req.body.totalReviews = Number(req.body.totalReviews) || 0;
+      }
+      if (req.body.rating !== undefined) {
+        req.body.rating = Number(req.body.rating) || 0;
+      }
+      if (req.body.fee !== undefined) {
+        req.body.fee = Number(req.body.fee) || 0;
+      }
+      if (req.body.enrolled !== undefined) {
+        req.body.enrolled = Number(req.body.enrolled) || 0;
+      }
+      if (req.body.capacity !== undefined) {
+        req.body.capacity = Number(req.body.capacity) || 1;
+      }
+      
       // Handle main course image
       const files = req.files as { [fieldname: string]: { filename: string }[] };
       if (files && files['file'] && files['file'][0]) {
-        const baseUrl = config.backend_url;
+        const backendUrl = config.backend_url || '';
+        const baseUrl = backendUrl.endsWith('/') ? backendUrl.slice(0, -1) : backendUrl;
         req.body.imageUrl = `${baseUrl}/upload/${files['file'][0].filename}`;
       }
       
       // Handle instructor images
       if (files && files['instructorFiles']) {
         const instructorFiles = files['instructorFiles'];
-        const baseUrl = config.backend_url;
+        const backendUrl = config.backend_url || '';
+        const baseUrl = backendUrl.endsWith('/') ? backendUrl.slice(0, -1) : backendUrl;
         
         // Update instructors array with image URLs
         if (req.body.instructors && Array.isArray(req.body.instructors)) {

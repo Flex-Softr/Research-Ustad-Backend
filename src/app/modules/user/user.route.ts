@@ -18,7 +18,8 @@ router.post(
       
       // Handle file upload like event module
       if (req.file) {
-        const baseUrl = `http://localhost:${process.env.PORT || 5000}`;
+        const backendUrl = process.env.BACKEND_URL || '';
+        const baseUrl = backendUrl.endsWith('/') ? backendUrl.slice(0, -1) : backendUrl;
         req.body.profileImg = `${baseUrl}/upload/${req.file.filename}`;
       }
     }

@@ -2,10 +2,12 @@ export interface Icourse {
   title: string;
   description: string;
   location: string;
+  offlineLocation?: string; // New field for exact offline location
   duration: string;
   level: string;
   category: string;
-  fee: number;
+  fee?: number; // Made optional for free courses
+  isFree: boolean; // New field to indicate if course is free
   enrolled: number;
   capacity: number;
   rating: number;

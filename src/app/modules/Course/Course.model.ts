@@ -22,7 +22,26 @@ const courseSchema = new Schema<Icourse>({
   },
   location: { 
     type: String, 
-    required: [true, "Location is required"] 
+    required: [true, "Location is required"],
+    enum: {
+      values: ["Online", "Offline"],
+      message: "Location must be Online or Offline"
+    }
+  },
+  offlineLocation: { 
+    type: String,
+    required: function(this: any) {
+      return this.location === "Offline";
+    },
+    validate: {
+      validator: function(this: any, value: string) {
+        if (this.location === "Offline") {
+          return value && value.trim().length > 0;
+        }
+        return true;
+      },
+      message: "Offline location is required when location is Offline"
+    }
   },
   duration: { 
     type: String, 
@@ -42,8 +61,23 @@ const courseSchema = new Schema<Icourse>({
   },
   fee: { 
     type: Number, 
-    required: [true, "Fee is required"], 
-    min: [0, "Fee cannot be negative"] 
+    required: function(this: any) {
+      return !this.isFree;
+    },
+    min: [0, "Fee cannot be negative"],
+    validate: {
+      validator: function(this: any, value: number) {
+        if (!this.isFree && (value === undefined || value === null)) {
+          return false;
+        }
+        return true;
+      },
+      message: "Fee is required when course is not free"
+    }
+  },
+  isFree: { 
+    type: Boolean, 
+    default: false 
   },
   enrolled: { 
     type: Number, 
@@ -53,7 +87,13 @@ const courseSchema = new Schema<Icourse>({
   capacity: { 
     type: Number, 
     required: [true, "Capacity is required"], 
-    min: [1, "Capacity must be at least 1"] 
+    min: [1, "Capacity must be at least 1"],
+    validate: {
+      validator: function(this: any, value: number): boolean {
+        return value >= this.enrolled;
+      },
+      message: "Capacity cannot be less than enrolled students"
+    }
   },
   rating: { 
     type: Number, 

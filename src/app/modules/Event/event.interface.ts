@@ -18,4 +18,5 @@ export interface IEvent {
     category: string;
     status: 'upcoming' | 'ongoing' | 'finished';
     eventDuration: number;
+    registrationFee: number; // 0 for free events, positive number for paid events
 }

@@ -19,6 +19,7 @@ const eventValidationPost = z.object({
   status: z.enum(['upcoming', 'ongoing', 'finished']).default('upcoming'),
   eventDuration: z.number().min(1, { message: 'Event duration is required' }),
   maxAttendees: z.number().min(1, { message: 'Max attendees is required' }),
+  registrationFee: z.number().min(0, { message: 'Registration fee must be 0 or greater' }),
 });
 
 const eventValidationUpdate = z.object({

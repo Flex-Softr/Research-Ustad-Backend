@@ -29,5 +29,5 @@ export interface Icourse {
   requirements: string[];
   startDate?: Date;
   endDate?: Date;
-  status?: 'upcoming' | 'ongoing' | 'completed';
+  status?: 'upcoming' | 'ongoing';
 }

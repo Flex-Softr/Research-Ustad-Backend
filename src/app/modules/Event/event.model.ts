@@ -28,6 +28,7 @@ export const eventSchema = new Schema<IEvent>(
     },
     eventDuration: { type: Number, required: true },
     maxAttendees: { type: Number, default: 100 },
+    registrationFee: { type: Number, default: 0, min: 0 }, // 0 for free events
   },
   { timestamps: true },
 );

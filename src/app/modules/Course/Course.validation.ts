@@ -39,7 +39,7 @@ const courseValidationPost = z.object({
     requirements: z.array(z.string()).optional().default([]),
     startDate: z.string().optional(),
     endDate: z.string().optional(),
-    status: z.enum(["upcoming", "ongoing", "completed"]).optional().default("upcoming")
+    status: z.enum(["upcoming", "ongoing"]).optional()
   }).refine((data) => {
     if (data.location === "Offline" && (!data.offlineLocation || data.offlineLocation.trim() === "")) {
       return false;
@@ -84,7 +84,7 @@ const courseValidationUpdate = z.object({
     requirements: z.array(z.string()).optional(),
     startDate: z.string().optional(),
     endDate: z.string().optional(),
-    status: z.enum(["upcoming", "ongoing", "completed"]).optional()
+    status: z.enum(["upcoming", "ongoing"]).optional()
   }).refine((data) => {
     if (data.location === "Offline" && (!data.offlineLocation || data.offlineLocation.trim() === "")) {
       return false;

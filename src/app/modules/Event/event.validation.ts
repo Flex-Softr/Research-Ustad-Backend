@@ -9,6 +9,7 @@ const speakerSchema = z.object({
 const eventValidationPost = z.object({
   title: z.string().min(1, { message: 'Title is required' }),
   description: z.string().min(1, { message: 'Description is required' }),
+  agenda: z.string().min(1, { message: 'Agenda is required' }),
   startDate: z.string().min(1, { message: 'Start date is required' }),
   endDate: z.string().min(1, { message: 'End date is required' }),
   location: z.string().min(1, { message: 'Location is required' }),
@@ -25,6 +26,7 @@ const eventValidationPost = z.object({
 const eventValidationUpdate = z.object({
   title: z.string().min(1, { message: 'Title is required' }).optional(),
   description: z.string().min(1, { message: 'Description is required' }).optional(),
+  agenda: z.string().min(1, { message: 'Agenda is required' }).optional(),
   startDate: z.string().min(1, { message: 'Start date is required' }).optional(),
   endDate: z.string().min(1, { message: 'End date is required' }).optional(),
   location: z.string().min(1, { message: 'Location is required' }).optional(),

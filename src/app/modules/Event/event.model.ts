@@ -14,6 +14,7 @@ export const eventSchema = new Schema<IEvent>(
   {
     title: { type: String, required: true },
     description: { type: String, required: true },
+    agenda: { type: String, required: true },
     startDate: { type: Date, required: true },
     endDate: { type: Date, required: true },
     location: { type: String, required: true },

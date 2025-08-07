@@ -1,6 +1,7 @@
 export interface Icourse {
   title: string;
   description: string;
+  curriculum: string;
   location: string;
   offlineLocation?: string; // New field for exact offline location
   duration: string;

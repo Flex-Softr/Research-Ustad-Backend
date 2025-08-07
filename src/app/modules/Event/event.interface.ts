@@ -8,6 +8,7 @@ export interface IEvent {
     _id?: string;
     title: string;
     description: string;
+    agenda: string;
     startDate: Date | string;
     endDate: Date | string;
     location: string;

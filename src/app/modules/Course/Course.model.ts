@@ -20,6 +20,10 @@ const courseSchema = new Schema<Icourse>({
     type: String, 
     required: [true, "Description is required"] 
   },
+  curriculum: { 
+    type: String, 
+    required: [true, "Curriculum is required"] 
+  },
   location: { 
     type: String, 
     required: [true, "Location is required"],

@@ -15,6 +15,7 @@ export interface Icourse {
   language: string;
   certificate: boolean;
   lifetimeAccess: boolean;
+  enrollLink: string; // New field for enrollment link
   imageUrl: string;
   instructors: Array<{
     name: string;

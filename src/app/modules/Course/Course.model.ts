@@ -118,6 +118,21 @@ const courseSchema = new Schema<Icourse>({
     type: Boolean, 
     default: true 
   },
+  enrollLink: { 
+    type: String, 
+    required: [true, "Enroll link is required"],
+    validate: {
+      validator: function(value: string) {
+        try {
+          new URL(value);
+          return true;
+        } catch {
+          return false;
+        }
+      },
+      message: "Enroll link must be a valid URL"
+    }
+  },
   imageUrl: { 
     type: String, 
     required: [true, "Image URL is required"] 

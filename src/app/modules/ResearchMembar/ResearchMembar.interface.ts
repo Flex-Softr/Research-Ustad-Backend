@@ -22,8 +22,8 @@ export interface IResearchMembar {
     research?: string[]; 
     shortBio?: string; 
     socialLinks?: {
-      facebook?: string;
-      twitter?: string;
+      google_scholar?: string;
+      researchgate?: string;
       linkedin?: string;
     },
     isDeleted:boolean;

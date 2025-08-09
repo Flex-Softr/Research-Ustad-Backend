@@ -42,8 +42,8 @@ const ResearchMembarSchema = new Schema<IResearchMembar>(
     research: [{ type: String }],
     shortBio: { type: String,default:'' }, 
     socialLinks: {
-      facebook: { type: String,default:'' },
-      twitter: { type: String, default:'' },
+      researchgate: { type: String,default:'' },
+      google_scholar: { type: String, default:'' },
       linkedin: { type: String,default:'' },
     },
 

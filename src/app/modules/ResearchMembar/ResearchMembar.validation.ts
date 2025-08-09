@@ -61,8 +61,8 @@ const UpdateValidationSchema = z.object({
       
         socialLinks: z
           .object({
-            facebook: z.string().url({ message: "Invalid Facebook URL." }).optional(),
-            twitter: z.string().url({ message: "Invalid Twitter URL." }).optional(),
+            google_scholar: z.string().url({ message: "Invalid Facebook URL." }).optional(),
+            researchgate: z.string().url({ message: "Invalid Twitter URL." }).optional(),
             linkedin: z.string().url({ message: "Invalid LinkedIn URL." }).optional(),
           })
           .optional(),

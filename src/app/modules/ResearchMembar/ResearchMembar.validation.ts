@@ -21,11 +21,13 @@ const createValidationSchemaJson = z.object({
         password: z.string().max(20),
           email: z.string().email({ message: "Invalid email format." }),
     
-          contactNo: z.string().min(10, { message: "Contact number must be at least 10 digits." }),
+          contactNo: z.string().min(10, { message: "Contact number must be at least 10 digits." }).optional(),
         
           fullName: z.string().min(1, { message: "Full name is required." }),
         
-          designation: z.string().min(1, { message: "Role is required." })
+          designation: z.string().min(1, { message: "Designation is required." }),
+          
+          role: z.enum(["admin", "user", "superAdmin"], { message: "Role must be admin, user, or superAdmin" }).optional()
       })
 });
 const UpdateValidationSchema = z.object({

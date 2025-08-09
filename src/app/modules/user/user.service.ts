@@ -79,14 +79,15 @@ const createResearchMembar = async (
 };
 
 const createResearchMembars = async (
-  payload: IResearchMembar,
+  payload: IResearchMembar & { role?: string },
 ) => {
   const userData: Partial<TUser> = {};
   userData.password = payload.password || (config.default_password as string);
   userData.designation = payload.designation;
   userData.email = payload.email;
-  userData.fullName =payload.fullName
-  userData.image=payload.profileImg as string
+  userData.fullName = payload.fullName;
+  userData.role = payload.role || "user";
+  userData.image = payload.profileImg || "https://via.placeholder.com/300x300?text=User";
   const session = await mongoose.startSession();
 
   try {

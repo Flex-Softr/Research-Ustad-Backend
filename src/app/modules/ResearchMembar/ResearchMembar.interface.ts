@@ -5,8 +5,9 @@ export interface IResearchMembar {
       profileImg?: string;
       fullName: string; 
     email: string;
-    contactNo: string;
-    designation: "Advisor" | "Lead" | "Mentor_Panel" | "Lead_Research_Associate" | "Research_Associate"; 
+    contactNo?: string;
+    designation: "Advisor" | "Lead" | "Mentor_Panel" | "Lead_Research_Associate" | "Research_Associate";
+    role?: "admin" | "user" | "superAdmin"; 
     current?: {
       institution?: string;
       department?: string;

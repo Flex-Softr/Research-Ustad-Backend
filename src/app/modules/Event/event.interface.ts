@@ -13,6 +13,7 @@ export interface IEvent {
     endDate: Date | string;
     location: string;
     maxAttendees: number;
+    registered: number; // Number of people currently registered
     speakers: Speaker[];
     imageUrl: string;
     registrationLink: string;

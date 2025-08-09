@@ -59,10 +59,7 @@ router.post(
       if (files && files['file'] && files['file'][0]) {
         const backendUrl = config.backend_url || '';
         const baseUrl = backendUrl.endsWith('/') ? backendUrl.slice(0, -1) : backendUrl;
-        console.log("Course Upload - Base URL:", baseUrl);
-        console.log("Course Upload - Filename:", files['file'][0].filename);
         req.body.imageUrl = `${baseUrl}/upload/${files['file'][0].filename}`;
-        console.log("Course Upload - Final Image URL:", req.body.imageUrl);
       }
       
       // Handle instructor images

@@ -88,6 +88,18 @@ const userToadmin = catchAsync(async (req, res) => {
   });
 });
 
+const deleteUser = catchAsync(async (req, res) => {
+  const { id } = req.params;
+  const result = await UserServices.deleteUser(id);
+  
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'User deleted successfully',
+    data: result,
+  });
+});
+
 export const UserControllers = {
   getMe,
   createResearchMembar,
@@ -96,4 +108,5 @@ export const UserControllers = {
   createResearchMembars,
   AllInfo,
   AllInfoForPersonal,
+  deleteUser,
 };

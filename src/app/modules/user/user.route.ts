@@ -64,4 +64,10 @@ router.put(
   UserControllers.userToadmin,
 );
 
+router.delete(
+  '/:id',
+  auth(USER_ROLE.superAdmin, USER_ROLE.admin),
+  UserControllers.deleteUser,
+);
+
 export const UserRoutes = router;

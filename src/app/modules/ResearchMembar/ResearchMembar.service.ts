@@ -10,15 +10,18 @@ const getAllMembar = async () => {
   return result
   
 };
+
 const getSingleMembar = async (id:string) => {
   const result = await ResearchMembar.findById(id)
   return result;
 };
+// get single membar for user
 const singleGetMembarForUser = async (email:string) => {
   const result = await ResearchMembar.findOne({email:email})
   return result;
 };
 
+// update membar
 const updateMembar = async (id: string, payload: Partial<IResearchMembar>) => {
   const { current, education, socialLinks, ...remainingMembarData } = payload;
 
@@ -46,6 +49,7 @@ if(education && Object.keys(education).length){
   });
   return result;
 };
+// update user membar
 const updateUserMembar = async (email: string, payload: Partial<IResearchMembar>) => {
   const { current, education, socialLinks, ...remainingMembarData } = payload;
 

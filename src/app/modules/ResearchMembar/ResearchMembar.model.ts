@@ -28,6 +28,7 @@ const ResearchMembarSchema = new Schema<IResearchMembar>(
         institution: { type: String, default: '' },
         department: { type: String, default: '' },
         degree: { type: String, default: '' },
+        inst_designation: { type: String, default: '' },
       },
 
     education: 
@@ -46,6 +47,16 @@ const ResearchMembarSchema = new Schema<IResearchMembar>(
       google_scholar: { type: String, default:'' },
       linkedin: { type: String,default:'' },
     },
+    
+    expertise: [{ type: String, default: [] }],
+    
+    awards: [{ type: String, default: [] }],
+    
+    conferences: [{
+      name: { type: String, default: '' },
+      role: { type: String, default: '' },
+      topic: { type: String, default: '' },
+    }],
 
     isDeleted: {
       type: Boolean,

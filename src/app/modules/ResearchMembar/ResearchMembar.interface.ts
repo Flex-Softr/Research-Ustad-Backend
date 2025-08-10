@@ -12,6 +12,7 @@ export interface IResearchMembar {
       institution?: string;
       department?: string;
       degree?: string;
+      inst_designation?: string;
     }; 
     education?: {
       degree?: string;
@@ -27,6 +28,13 @@ export interface IResearchMembar {
       researchgate?: string;
       linkedin?: string;
     },
+    expertise?: string[];
+    awards?: string[];
+    conferences?: Array<{
+      name?: string;
+      role?: string;
+      topic?: string;
+    }>;
     isDeleted:boolean;
   }
   

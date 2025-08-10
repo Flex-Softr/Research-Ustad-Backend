@@ -14,7 +14,7 @@ const ResearchMembarSchema = new Schema<IResearchMembar>(
         required: [true, 'Email is required'],
         unique: true,
       },
-      contactNo: { type: String, required: [true, 'Contact number is required'] },
+      contactNo: { type: String, default: '' },
     fullName: { type: String, default: '' }, 
     designation:  { 
       type: String, 

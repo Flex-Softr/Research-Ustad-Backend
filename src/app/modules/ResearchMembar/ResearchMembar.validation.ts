@@ -7,7 +7,7 @@ const createValidationSchema = z.object({
         ResearchMembar:z.object({
             email: z.string().email({ message: "Invalid email format." }),
       
-            contactNo: z.string().min(10, { message: "Contact number must be at least 10 digits." }),
+            contactNo: z.string().min(10, { message: "Contact number must be at least 10 digits." }).optional(),
           
             fullName: z.string().min(1, { message: "Full name is required." }),
           

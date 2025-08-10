@@ -140,6 +140,9 @@ const createResearchMembars = async (
 };
 const getMe = async (email: string) => {
    const result = await User.findOne({ email: email });
+   if (!result) {
+     throw new AppError(httpStatus.NOT_FOUND, 'User not found');
+   }
    return result
 };
 const Alluser = async () => {

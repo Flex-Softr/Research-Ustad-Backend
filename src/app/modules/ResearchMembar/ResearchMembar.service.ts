@@ -18,6 +18,9 @@ const getSingleMembar = async (id:string) => {
 // get single membar for user
 const singleGetMembarForUser = async (email:string) => {
   const result = await ResearchMembar.findOne({email:email})
+  if (!result) {
+    throw new AppError(httpStatus.NOT_FOUND, 'Research member not found');
+  }
   return result;
 };
 

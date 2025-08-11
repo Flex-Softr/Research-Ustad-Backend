@@ -79,14 +79,15 @@ const createResearchMembar = async (
 };
 
 const createResearchMembars = async (
-  payload: IResearchMembar,
+  payload: IResearchMembar & { role?: string },
 ) => {
   const userData: Partial<TUser> = {};
   userData.password = payload.password || (config.default_password as string);
   userData.designation = payload.designation;
   userData.email = payload.email;
-  userData.fullName =payload.fullName
-  userData.image=payload.profileImg as string
+  userData.fullName = payload.fullName;
+  userData.role = payload.role || "user";
+  userData.image = payload.profileImg || "https://via.placeholder.com/300x300?text=User";
   const session = await mongoose.startSession();
 
   try {
@@ -139,6 +140,9 @@ const createResearchMembars = async (
 };
 const getMe = async (email: string) => {
    const result = await User.findOne({ email: email });
+   if (!result) {
+     throw new AppError(httpStatus.NOT_FOUND, 'User not found');
+   }
    return result
 };
 const Alluser = async () => {
@@ -206,6 +210,50 @@ const userToadmin = async (id:string) => {
   );
   return result
 }
+
+const deleteUser = async (id: string) => {
+  const session = await mongoose.startSession();
+
+  try {
+    session.startTransaction();
+
+    // First check if the user exists
+    const existingUser = await User.findById(id);
+    if (!existingUser) {
+      throw new AppError(httpStatus.NOT_FOUND, 'User not found');
+    }
+
+    // Prevent deletion of superAdmin users
+    if (existingUser.role === 'superAdmin') {
+      throw new AppError(httpStatus.FORBIDDEN, 'SuperAdmin users cannot be deleted');
+    }
+
+    // Delete the user
+    const deletedUser = await User.findByIdAndDelete(id);
+    if (!deletedUser) {
+      throw new AppError(httpStatus.BAD_REQUEST, 'Failed to delete user');
+    }
+
+    // If there's an associated research member, delete it too
+    const deletedResearchMember = await ResearchMembar.findOneAndDelete({ user: id });
+    if (!deletedResearchMember) {
+      console.warn('User deleted but associated research member not found');
+    }
+
+    await session.commitTransaction();
+    await session.endSession();
+
+    return deletedUser;
+  } catch (err: any) {
+    await session.abortTransaction();
+    await session.endSession();
+    if (err instanceof AppError) {
+      throw err;
+    }
+    throw new AppError(httpStatus.INTERNAL_SERVER_ERROR, 'Failed to delete user');
+  }
+};
+
 export const UserServices = {
   getMe,
   createResearchMembar,
@@ -213,5 +261,6 @@ export const UserServices = {
   userToadmin,
   createResearchMembars,
   AllInfo,
-  AllInfoForPersonal
+  AllInfoForPersonal,
+  deleteUser
 };

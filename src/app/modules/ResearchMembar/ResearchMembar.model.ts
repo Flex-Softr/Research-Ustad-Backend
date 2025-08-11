@@ -14,7 +14,7 @@ const ResearchMembarSchema = new Schema<IResearchMembar>(
         required: [true, 'Email is required'],
         unique: true,
       },
-      contactNo: { type: String, required: [true, 'Contact number is required'] },
+      contactNo: { type: String, default: '' },
     fullName: { type: String, default: '' }, 
     designation:  { 
       type: String, 
@@ -28,6 +28,7 @@ const ResearchMembarSchema = new Schema<IResearchMembar>(
         institution: { type: String, default: '' },
         department: { type: String, default: '' },
         degree: { type: String, default: '' },
+        inst_designation: { type: String, default: '' },
       },
 
     education: 
@@ -42,10 +43,20 @@ const ResearchMembarSchema = new Schema<IResearchMembar>(
     research: [{ type: String }],
     shortBio: { type: String,default:'' }, 
     socialLinks: {
-      facebook: { type: String,default:'' },
-      twitter: { type: String, default:'' },
+      researchgate: { type: String,default:'' },
+      google_scholar: { type: String, default:'' },
       linkedin: { type: String,default:'' },
     },
+    
+    expertise: [{ type: String, default: [] }],
+    
+    awards: [{ type: String, default: [] }],
+    
+    conferences: [{
+      name: { type: String, default: '' },
+      role: { type: String, default: '' },
+      topic: { type: String, default: '' },
+    }],
 
     isDeleted: {
       type: Boolean,

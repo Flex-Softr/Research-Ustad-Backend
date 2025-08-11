@@ -9,6 +9,7 @@ const speakerSchema = z.object({
 const eventValidationPost = z.object({
   title: z.string().min(1, { message: 'Title is required' }),
   description: z.string().min(1, { message: 'Description is required' }),
+  agenda: z.string().min(1, { message: 'Agenda is required' }),
   startDate: z.string().min(1, { message: 'Start date is required' }),
   endDate: z.string().min(1, { message: 'End date is required' }),
   location: z.string().min(1, { message: 'Location is required' }),
@@ -19,11 +20,22 @@ const eventValidationPost = z.object({
   status: z.enum(['upcoming', 'ongoing', 'finished']).default('upcoming'),
   eventDuration: z.number().min(1, { message: 'Event duration is required' }),
   maxAttendees: z.number().min(1, { message: 'Max attendees is required' }),
+  registered: z.number().min(0, { message: 'Registered count cannot be negative' }).default(0),
+  registrationFee: z.number().min(0, { message: 'Registration fee must be 0 or greater' }),
+}).superRefine((data, ctx) => {
+  if (data.maxAttendees < data.registered) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: 'Max attendees cannot be less than current registered attendees',
+      path: ['maxAttendees'],
+    });
+  }
 });
 
 const eventValidationUpdate = z.object({
   title: z.string().min(1, { message: 'Title is required' }).optional(),
   description: z.string().min(1, { message: 'Description is required' }).optional(),
+  agenda: z.string().min(1, { message: 'Agenda is required' }).optional(),
   startDate: z.string().min(1, { message: 'Start date is required' }).optional(),
   endDate: z.string().min(1, { message: 'End date is required' }).optional(),
   location: z.string().min(1, { message: 'Location is required' }).optional(),
@@ -34,6 +46,18 @@ const eventValidationUpdate = z.object({
   status: z.enum(['upcoming', 'ongoing', 'finished']).optional(),
   eventDuration: z.number().min(1, { message: 'Event duration is required' }).optional(),
   maxAttendees: z.number().min(1, { message: 'Max attendees is required' }).optional(),
+  registered: z.number().min(0, { message: 'Registered count cannot be negative' }).optional(),
+}).superRefine((data, ctx) => {
+  // Only validate if both fields are present
+  if (data.maxAttendees !== undefined && data.registered !== undefined) {
+    if (data.maxAttendees < data.registered) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'Max attendees cannot be less than current registered attendees',
+        path: ['maxAttendees'],
+      });
+    }
+  }
 });
 
 export const Validationevent = {

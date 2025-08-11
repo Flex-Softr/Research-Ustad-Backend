@@ -9,7 +9,7 @@ export interface IResearchPaper{
     impactFactor?: number; 
     journalRank?: string; 
     visitLink: string;
-    journalType?: string; 
+    paperType?: "journal" | "conference"; 
     isApproved: boolean;
     createdAt?: Date;
     updatedAt?: Date;

@@ -27,7 +27,8 @@ const userSchema = new Schema<TUser, UserModel>(
     },
     image: {
       type: String,
-      required: true,
+      required: false,
+      default: "https://via.placeholder.com/300x300?text=User",
     },
     passwordChangedAt: {
       type: Date,

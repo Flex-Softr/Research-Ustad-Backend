@@ -20,6 +20,10 @@ const courseSchema = new Schema<Icourse>({
     type: String, 
     required: [true, "Description is required"] 
   },
+  curriculum: { 
+    type: String, 
+    required: [true, "Curriculum is required"] 
+  },
   location: { 
     type: String, 
     required: [true, "Location is required"],
@@ -118,6 +122,21 @@ const courseSchema = new Schema<Icourse>({
     type: Boolean, 
     default: true 
   },
+  enrollLink: { 
+    type: String, 
+    required: [true, "Enroll link is required"],
+    validate: {
+      validator: function(value: string) {
+        try {
+          new URL(value);
+          return true;
+        } catch {
+          return false;
+        }
+      },
+      message: "Enroll link must be a valid URL"
+    }
+  },
   imageUrl: { 
     type: String, 
     required: [true, "Image URL is required"] 
@@ -154,8 +173,8 @@ const courseSchema = new Schema<Icourse>({
   status: { 
     type: String, 
     enum: {
-      values: ["upcoming", "ongoing", "completed"], 
-      message: "Status must be upcoming, ongoing, or completed"
+      values: ["upcoming", "ongoing"], 
+      message: "Status must be upcoming or ongoing"
     },
     default: "upcoming" 
   }
@@ -164,15 +183,60 @@ const courseSchema = new Schema<Icourse>({
 // Pre-save middleware to set status based on dates
 courseSchema.pre("save", function(next) {
   const now = new Date();
-  if (this.startDate && this.endDate) {
-    if (now < this.startDate) {
-      this.status = "upcoming";
-    } else if (now >= this.startDate && now <= this.endDate) {
-      this.status = "ongoing";
+  
+  // If we have startDate, calculate status
+  if (this.startDate) {
+    const startDate = new Date(this.startDate);
+    
+    // If no endDate is provided, calculate it based on duration
+    if (!this.endDate && this.duration) {
+      // Parse duration string (e.g., "3 months", "6 weeks", "30 days")
+      const durationMatch = this.duration.match(/(\d+)\s*(day|days|week|weeks|month|months|year|years)/i);
+      if (durationMatch) {
+        const amount = parseInt(durationMatch[1]);
+        const unit = durationMatch[2].toLowerCase();
+        
+        const endDate = new Date(startDate);
+        switch (unit) {
+          case 'day':
+          case 'days':
+            endDate.setDate(endDate.getDate() + amount);
+            break;
+          case 'week':
+          case 'weeks':
+            endDate.setDate(endDate.getDate() + (amount * 7));
+            break;
+          case 'month':
+          case 'months':
+            endDate.setMonth(endDate.getMonth() + amount);
+            break;
+          case 'year':
+          case 'years':
+            endDate.setFullYear(endDate.getFullYear() + amount);
+            break;
+        }
+        this.endDate = endDate;
+      }
+    }
+    
+    // Calculate status based on dates - only upcoming and ongoing
+    if (this.endDate) {
+      const endDate = new Date(this.endDate);
+      if (now < startDate) {
+        this.status = "upcoming";
+      } else {
+        this.status = "ongoing";
+      }
     } else {
-      this.status = "completed";
+      // If no endDate, just compare with startDate
+      if (now < startDate) {
+        this.status = "upcoming";
+      } else {
+        this.status = "ongoing";
+      }
     }
   }
+  
   next();
 });
 
@@ -182,13 +246,57 @@ courseSchema.pre("findOneAndUpdate", function(next) {
   if (!update) return next();
 
   const now = new Date();
-  if (update.startDate && update.endDate) {
-    if (now < update.startDate) {
-      update.status = "upcoming";
-    } else if (now >= update.startDate && now <= update.endDate) {
-      update.status = "ongoing";
+  
+  // If we have startDate, calculate status
+  if (update.startDate) {
+    const startDate = new Date(update.startDate);
+    
+    // If no endDate is provided, calculate it based on duration
+    if (!update.endDate && update.duration) {
+      // Parse duration string (e.g., "3 months", "6 weeks", "30 days")
+      const durationMatch = update.duration.match(/(\d+)\s*(day|days|week|weeks|month|months|year|years)/i);
+      if (durationMatch) {
+        const amount = parseInt(durationMatch[1]);
+        const unit = durationMatch[2].toLowerCase();
+        
+        const endDate = new Date(startDate);
+        switch (unit) {
+          case 'day':
+          case 'days':
+            endDate.setDate(endDate.getDate() + amount);
+            break;
+          case 'week':
+          case 'weeks':
+            endDate.setDate(endDate.getDate() + (amount * 7));
+            break;
+          case 'month':
+          case 'months':
+            endDate.setMonth(endDate.getMonth() + amount);
+            break;
+          case 'year':
+          case 'years':
+            endDate.setFullYear(endDate.getFullYear() + amount);
+            break;
+        }
+        update.endDate = endDate;
+      }
+    }
+    
+    // Calculate status based on dates - only upcoming and ongoing
+    if (update.endDate) {
+      const endDate = new Date(update.endDate);
+      if (now < startDate) {
+        update.status = "upcoming";
+      } else {
+        update.status = "ongoing";
+      }
     } else {
-      update.status = "completed";
+      // If no endDate, just compare with startDate
+      if (now < startDate) {
+        update.status = "upcoming";
+      } else {
+        update.status = "ongoing";
+      }
     }
   }
 

@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import express, { NextFunction, Request, Response } from 'express';
 import auth from '../../middlewares/auth';
 import validateRequest from '../../middlewares/validateRequest';
@@ -31,6 +30,7 @@ router.post(
 
 router.post(
   '/create-ResearchMembars',
+  auth(USER_ROLE.superAdmin, USER_ROLE.admin),
   validateRequest(ResearchAssociateValidation.createValidationSchemaJson),
   UserControllers.createResearchMembars,
 );
@@ -62,6 +62,12 @@ router.put(
   '/userToadmin/:id',
   auth(USER_ROLE.superAdmin, USER_ROLE.admin),
   UserControllers.userToadmin,
+);
+
+router.delete(
+  '/:id',
+  auth(USER_ROLE.superAdmin, USER_ROLE.admin),
+  UserControllers.deleteUser,
 );
 
 export const UserRoutes = router;

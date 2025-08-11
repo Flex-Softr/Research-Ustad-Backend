@@ -7,7 +7,7 @@ const createValidationSchema = z.object({
         ResearchMembar:z.object({
             email: z.string().email({ message: "Invalid email format." }),
       
-            contactNo: z.string().min(10, { message: "Contact number must be at least 10 digits." }),
+            contactNo: z.string().min(10, { message: "Contact number must be at least 10 digits." }).optional(),
           
             fullName: z.string().min(1, { message: "Full name is required." }),
           
@@ -21,51 +21,64 @@ const createValidationSchemaJson = z.object({
         password: z.string().max(20),
           email: z.string().email({ message: "Invalid email format." }),
     
-          contactNo: z.string().min(10, { message: "Contact number must be at least 10 digits." }),
+          contactNo: z.string().min(10, { message: "Contact number must be at least 10 digits." }).optional(),
         
           fullName: z.string().min(1, { message: "Full name is required." }),
         
-          designation: z.string().min(1, { message: "Role is required." })
+          designation: z.string().min(1, { message: "Designation is required." }),
+          
+          role: z.enum(["admin", "user", "superAdmin"], { invalid_type_error: "Role must be admin, user, or superAdmin" }).optional()
       })
 });
 const UpdateValidationSchema = z.object({
    body:z.object({
     ResearchMembar:z.object({
-        email: z.string().email({ message: "Invalid email format." }).optional(),
+        email: z.string().email({ message: "Invalid email format." }).optional().or(z.literal("")),
   
-        contactNo: z.string().min(10, { message: "Contact number must be at least 10 digits." }).optional(),
+        contactNo: z.string().optional().or(z.literal("")),
       
-        fullName: z.string().min(1, { message: "Full name is required." }).optional(),
+        fullName: z.string().optional().or(z.literal("")),
       
-        designation: z.string().min(1, { message: "Role is required." }).optional(),
+        designation: z.string().optional().or(z.literal("")),
       
         current: 
           z.object({
-            institution: z.string().min(1, { message: "Institution name is required." }).optional(),
-            department: z.string().min(1, { message: "Department name is required." }).optional(),
-            degree: z.string().min(1, { message: "Degree is required." }).optional(),
+            institution: z.string().optional().or(z.literal("")),
+            department: z.string().optional().or(z.literal("")),
+            degree: z.string().optional().or(z.literal("")),
+            inst_designation: z.string().optional().or(z.literal("")),
           }).optional(),
       
         education: 
           z.object({
-            degree: z.string().min(1, { message: "Degree is required." }).optional(),
-            field: z.string().min(1, { message: "Field of study is required." }).optional(),
-            institution: z.string().min(1, { message: "Institution name is required." }).optional(),
+            degree: z.string().optional().or(z.literal("")),
+            field: z.string().optional().or(z.literal("")),
+            institution: z.string().optional().or(z.literal("")),
             status: z.enum(["Ongoing", "Completed"], { invalid_type_error: "Status must be 'Ongoing' or 'Completed'." }).optional(),
-            scholarship: z.string().optional(),
+            scholarship: z.string().optional().or(z.literal("")),
           }).optional(),
       
-        research: z.array(z.string().min(1, { message: "Research field cannot be empty." })).optional(),
+        research: z.array(z.string()).optional(),
       
-        shortBio: z.string().min(1, { message: "Short bio is required." }).optional(),
+        shortBio: z.string().optional().or(z.literal("")),
       
         socialLinks: z
           .object({
-            facebook: z.string().url({ message: "Invalid Facebook URL." }).optional(),
-            twitter: z.string().url({ message: "Invalid Twitter URL." }).optional(),
-            linkedin: z.string().url({ message: "Invalid LinkedIn URL." }).optional(),
+            google_scholar: z.string().url({ message: "Invalid google_scholar URL." }).optional().or(z.literal("")),
+            researchgate: z.string().url({ message: "Invalid researchgate URL." }).optional().or(z.literal("")),
+            linkedin: z.string().url({ message: "Invalid LinkedIn URL." }).optional().or(z.literal("")),
           })
           .optional(),
+        
+        expertise: z.array(z.string()).optional(),
+        
+        awards: z.array(z.string()).optional(),
+        
+        conferences: z.array(z.object({
+          name: z.string().optional().or(z.literal("")),
+          role: z.string().optional().or(z.literal("")),
+          topic: z.string().optional().or(z.literal("")),
+        })).optional(),
     })
   
    

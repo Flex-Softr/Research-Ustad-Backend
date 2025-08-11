@@ -1,6 +1,7 @@
 export interface Icourse {
   title: string;
   description: string;
+  curriculum: string;
   location: string;
   offlineLocation?: string; // New field for exact offline location
   duration: string;
@@ -15,6 +16,7 @@ export interface Icourse {
   language: string;
   certificate: boolean;
   lifetimeAccess: boolean;
+  enrollLink: string; // New field for enrollment link
   imageUrl: string;
   instructors: Array<{
     name: string;
@@ -29,5 +31,5 @@ export interface Icourse {
   requirements: string[];
   startDate?: Date;
   endDate?: Date;
-  status?: 'upcoming' | 'ongoing' | 'completed';
+  status?: 'upcoming' | 'ongoing';
 }

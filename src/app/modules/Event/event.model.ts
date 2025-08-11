@@ -14,6 +14,7 @@ export const eventSchema = new Schema<IEvent>(
   {
     title: { type: String, required: true },
     description: { type: String, required: true },
+    agenda: { type: String, required: true },
     startDate: { type: Date, required: true },
     endDate: { type: Date, required: true },
     location: { type: String, required: true },
@@ -27,7 +28,19 @@ export const eventSchema = new Schema<IEvent>(
       default: 'upcoming',
     },
     eventDuration: { type: Number, required: true },
-    maxAttendees: { type: Number, default: 100 },
+    maxAttendees: { 
+      type: Number, 
+      default: 100,
+      validate: {
+        validator: function(value: number) {
+          // Ensure maxAttendees is greater than or equal to registered
+          return value >= (this as any).registered;
+        },
+        message: 'Max attendees cannot be less than current registered attendees'
+      }
+    },
+    registered: { type: Number, default: 0, min: 0 }, // Number of people currently registered
+    registrationFee: { type: Number, default: 0, min: 0 }, // 0 for free events
   },
   { timestamps: true },
 );

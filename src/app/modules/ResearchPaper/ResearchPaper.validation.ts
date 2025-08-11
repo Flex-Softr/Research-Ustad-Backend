@@ -10,7 +10,7 @@ export const researchPaperSchema = z.object({
         impactFactor: z.number().min(0).max(50).optional(), 
         journalRank: z.string().optional(),
         visitLink: z.string().url("Invalid URL format"),
-        journalType: z.string().optional(),
+        paperType: z.enum(["journal", "conference"]).optional(),
         isApproved: z.boolean().optional(),
     })
  

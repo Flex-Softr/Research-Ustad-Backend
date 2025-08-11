@@ -3,11 +3,13 @@ import AppError from '../../errors/AppError';
 import { IEvent } from './event.interface';
 import { eventModel } from './event.model';
 
+// get all event
 const Getevent = async () => {
   const result = await eventModel.find();
   return result;
 };
 
+// get single event
 const GetSingleEvent = async (id: string) => {
   const result = await eventModel.findById(id);
   if (!result) {
@@ -16,8 +18,8 @@ const GetSingleEvent = async (id: string) => {
   return result;
 };
 
+// create event
 const Postevent = async (body: IEvent) => {
-  // Convert string dates to Date objects
   const eventData = {
     ...body,
     startDate: new Date(body.startDate),
@@ -30,6 +32,7 @@ const Postevent = async (body: IEvent) => {
   return result;
 };
 
+// update event
 const Updateevent = async (id: string, body: IEvent) => {
   // Convert string dates to Date objects if they exist
   const updateData: any = { ...body };
@@ -45,6 +48,8 @@ const Updateevent = async (id: string, body: IEvent) => {
   io.emit('eventUpdate', events);
   return result;
 };
+
+// delete event
 const Deletedevent = async (id: string) => {
   const result = await eventModel.findByIdAndDelete(id);
   if (!result) {

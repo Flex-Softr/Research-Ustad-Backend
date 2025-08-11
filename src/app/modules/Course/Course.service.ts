@@ -53,9 +53,10 @@ const PostCourse = async (body: Icourse, files: MulterFiles) => {
   if (!body.startDate) {
     body.startDate = new Date();
   }
-  if (!body.status) {
-    body.status = 'upcoming';
-  }
+  // Remove manual status setting - let the pre-save middleware handle it
+  // if (!body.status) {
+  //   body.status = 'upcoming';
+  // }
 
   const result = await courseModel.create(body);
   const courses = await courseModel.find().sort({ createdAt: -1 });

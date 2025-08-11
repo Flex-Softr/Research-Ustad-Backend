@@ -24,10 +24,7 @@ router.post(
       if (req.file) {
         const backendUrl = config.backend_url || '';
         const baseUrl = backendUrl.endsWith('/') ? backendUrl.slice(0, -1) : backendUrl;
-        console.log("Blog Upload - Base URL:", baseUrl);
-        console.log("Blog Upload - Filename:", req.file.filename);
         req.body.imageUrl = `${baseUrl}/upload/${req.file.filename}`;
-        console.log("Blog Upload - Final Image URL:", req.body.imageUrl);
       }
     }
     next();
@@ -46,10 +43,7 @@ router.patch(
         // Set the full URL for the uploaded image
         const backendUrl = config.backend_url || '';
         const baseUrl = backendUrl.endsWith('/') ? backendUrl.slice(0, -1) : backendUrl;
-        console.log("Blog Update - Base URL:", baseUrl);
-        console.log("Blog Update - Filename:", req.file.filename);
         req.body.imageUrl = `${baseUrl}/upload/${req.file.filename}`;
-        console.log("Blog Update - Final Image URL:", req.body.imageUrl);
       }
     }
     next();

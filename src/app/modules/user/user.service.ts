@@ -217,50 +217,66 @@ const deleteUser = async (id: string) => {
   try {
     session.startTransaction();
 
-    // First check if the user exists
-    const existingUser = await User.findById(id);
-    if (!existingUser) {
+    const deletedUser = await User.findByIdAndUpdate(
+      id,
+      { isDeleted: true },
+      { new: true, session }
+    );
+
+    if (!deletedUser) {
       throw new AppError(httpStatus.NOT_FOUND, 'User not found');
     }
 
-    // Prevent deletion of superAdmin users
-    if (existingUser.role === 'superAdmin') {
-      throw new AppError(httpStatus.FORBIDDEN, 'SuperAdmin users cannot be deleted');
-    }
-
-    // Delete the user
-    const deletedUser = await User.findByIdAndDelete(id);
-    if (!deletedUser) {
-      throw new AppError(httpStatus.BAD_REQUEST, 'Failed to delete user');
-    }
-
-    // If there's an associated research member, delete it too
-    const deletedResearchMember = await ResearchMembar.findOneAndDelete({ user: id });
-    if (!deletedResearchMember) {
-      console.warn('User deleted but associated research member not found');
-    }
+    // const deletedResearchMember = await ResearchMembar.findOneAndDelete({ user: id });
 
     await session.commitTransaction();
-    await session.endSession();
-
     return deletedUser;
   } catch (err: any) {
     await session.abortTransaction();
+    throw err;
+  } finally {
     await session.endSession();
-    if (err instanceof AppError) {
-      throw err;
-    }
-    throw new AppError(httpStatus.INTERNAL_SERVER_ERROR, 'Failed to delete user');
   }
 };
 
+const searchUsers = async (query: string) => {
+  if (!query || query.trim().length < 2) {
+    return [];
+  }
+
+  const searchRegex = new RegExp(query.trim(), 'i');
+  
+  const users = await User.find({
+    fullName: { $regex: searchRegex },
+    isDeleted: false,
+  })
+  .select('fullName email designation')
+  .limit(10)
+  .sort({ fullName: 1 });
+
+  return users;
+};
+
+const getAllUsers = async () => {
+  const users = await User.find({
+    isDeleted: false,
+  })
+  .select('fullName email designation')
+  .limit(50) // Limit to 50 users to prevent performance issues
+  .sort({ fullName: 1 });
+
+  return users;
+};
+
 export const UserServices = {
-  getMe,
   createResearchMembar,
-  Alluser,
-  userToadmin,
   createResearchMembars,
+  getMe,
+  Alluser,
   AllInfo,
   AllInfoForPersonal,
-  deleteUser
+  userToadmin,
+  deleteUser,
+  searchUsers,
+  getAllUsers,
 };

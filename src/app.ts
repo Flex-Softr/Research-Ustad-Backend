@@ -17,9 +17,6 @@ import config from './app/config/index';
 const app: Application = express();
 const server = http.createServer(app);
 
-console.log("envvvv",config.frontend_url)
-console.log("envvvv backend_url",config.backend_url)
-
 io.attach(server, {
   cors: {
     origin: config.frontend_url,  

@@ -70,4 +70,16 @@ router.delete(
   UserControllers.deleteUser,
 );
 
+router.get(
+  '/search',
+  auth(USER_ROLE.superAdmin, USER_ROLE.admin, USER_ROLE.user),
+  UserControllers.searchUsers,
+);
+
+router.get(
+  '/all-users',
+  auth(USER_ROLE.superAdmin, USER_ROLE.admin, USER_ROLE.user),
+  UserControllers.getAllUsers,
+);
+
 export const UserRoutes = router;

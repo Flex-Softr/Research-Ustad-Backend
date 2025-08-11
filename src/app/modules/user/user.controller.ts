@@ -100,13 +100,38 @@ const deleteUser = catchAsync(async (req, res) => {
   });
 });
 
+const searchUsers = catchAsync(async (req, res) => {
+  const { query } = req.query;
+  const result = await UserServices.searchUsers(query as string);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Users searched successfully',
+    data: result,
+  });
+});
+
+const getAllUsers = catchAsync(async (req, res) => {
+  const result = await UserServices.getAllUsers();
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'All users retrieved successfully',
+    data: result,
+  });
+});
+
 export const UserControllers = {
-  getMe,
   createResearchMembar,
-  Alluser,
-  userToadmin,
   createResearchMembars,
+  getMe,
+  Alluser,
   AllInfo,
   AllInfoForPersonal,
+  userToadmin,
   deleteUser,
+  searchUsers,
+  getAllUsers,
 };

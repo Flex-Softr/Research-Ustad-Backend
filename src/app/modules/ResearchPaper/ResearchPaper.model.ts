@@ -11,7 +11,7 @@ const ResearchPaperSchema = new Schema<IResearchPaper>(
     impactFactor: { type: Number },
     journalRank: { type: String },
     visitLink: { type: String, required: true },
-    journalType: { type: String },
+    paperType: { type: String, enum: ["journal", "conference"] },
     isApproved: { type: Boolean, default: false },
     user: { type: Schema.Types.ObjectId, ref: 'User', required: true }, 
   },

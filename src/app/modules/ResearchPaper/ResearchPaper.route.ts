@@ -46,6 +46,11 @@ router.put(
   auth(USER_ROLE.superAdmin,USER_ROLE.admin),
   ResearchPaperControllers.approveResearchUstad,
 );
+router.put(
+  '/reject/:id',
+  auth(USER_ROLE.superAdmin,USER_ROLE.admin),
+  ResearchPaperControllers.rejectResearchUstad,
+);
 router.delete(
     '/delete/:id',
     auth(USER_ROLE.superAdmin,USER_ROLE.admin,USER_ROLE.user),   

@@ -75,11 +75,23 @@ if(education && Object.keys(education).length){
     }
   }
   console.log(email, modifiedUpdatedData);
-  const result = await ResearchMembar.updateOne({email}, modifiedUpdatedData, {
-    new: true,
-    runValidators: true,
-  });
-  return result;
+  
+  // Update both ResearchMembar and User collections
+  const [researchMembarResult, userResult] = await Promise.all([
+    ResearchMembar.updateOne({email}, modifiedUpdatedData, {
+      new: true,
+      runValidators: true,
+    }),
+    // Also update the User collection with fullName if it's provided
+    remainingMembarData.fullName ? 
+      User.updateOne({email}, { fullName: remainingMembarData.fullName }, {
+        new: true,
+        runValidators: true,
+      }) : 
+      Promise.resolve(null)
+  ]);
+  
+  return researchMembarResult;
 };
 
 const deleteMembar = async (id: string) => {

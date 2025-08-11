@@ -14,7 +14,7 @@ const getPublicResearchUstad= async()=>{
     return result
 }
 const getOngingResearchUstad= async()=>{
-    const result = await ResearchPaper.find({ isApproved: false });
+    const result = await ResearchPaper.find({ isApproved: false }).populate('user', 'fullName email');
     return result
 }
 const getpersonalPaperResearchUstad= async(id:string)=>{
@@ -30,16 +30,16 @@ const getpersonalPaperResearchUstadforid= async(id:string)=>{
     return result
 }
 const getAllResearchUstad= async()=>{
-    const result = await ResearchPaper.find();
+    const result = await ResearchPaper.find().populate('user', 'fullName email');
     return result
 }
 const approveResearchUstad= async(id:string)=>{
     const paper = await ResearchPaper.findById(id);
     if (!paper) {
-    throw new AppError(httpStatus.NOT_FOUND, "user not found")
+    throw new AppError(httpStatus.NOT_FOUND, "Research paper not found")
     }
 
-    paper.isApproved = !paper.isApproved;
+    paper.isApproved = true;
     const result =  await paper.save();
   return result
 
@@ -47,16 +47,28 @@ const approveResearchUstad= async(id:string)=>{
 const deleteResearchUstad= async(id:string)=>{
     const paper = await ResearchPaper.findById(id);
     if (!paper) {
-    throw new AppError(httpStatus.NOT_FOUND, "user not found")
+    throw new AppError(httpStatus.NOT_FOUND, "Research paper not found")
     }
   const result=  await ResearchPaper.findByIdAndDelete(id);
     return result
+}
+
+const rejectResearchUstad= async(id:string)=>{
+    const paper = await ResearchPaper.findById(id);
+    if (!paper) {
+    throw new AppError(httpStatus.NOT_FOUND, "Research paper not found")
+    }
+
+    paper.isApproved = false;
+    const result =  await paper.save();
+  return result
 }
 export const ResearchPaperService ={
     postResearchUstad,
     getPublicResearchUstad,
     getAllResearchUstad,
     approveResearchUstad,
+    rejectResearchUstad,
     deleteResearchUstad,
     getOngingResearchUstad,
     getpersonalPaperResearchUstad,

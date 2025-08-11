@@ -77,7 +77,17 @@ const postResearchUstad = catchAsync(async (req, res) => {
     sendResponse(res, {
       statusCode: httpStatus.OK,
       success: true,
-      message: 'ResearchPaper Approve succesfully',
+      message: 'ResearchPaper Approved successfully',
+      data: result,
+    });
+  });
+
+  const rejectResearchUstad = catchAsync(async (req, res) => {
+    const result = await ResearchPaperService.rejectResearchUstad(req.params.id);
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: 'ResearchPaper Rejected successfully',
       data: result,
     });
   });
@@ -95,6 +105,7 @@ export const ResearchPaperControllers={
     getPublicResearchUstad,
     getAllResearchUstad,
     approveResearchUstad,
+    rejectResearchUstad,
     deleteResearchUstad,
     getOngingResearchUstad,
     getpersonalPaperResearchUstad,

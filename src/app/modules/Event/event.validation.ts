@@ -22,9 +22,14 @@ const eventValidationPost = z.object({
   maxAttendees: z.number().min(1, { message: 'Max attendees is required' }),
   registered: z.number().min(0, { message: 'Registered count cannot be negative' }).default(0),
   registrationFee: z.number().min(0, { message: 'Registration fee must be 0 or greater' }),
-}).refine((data) => data.maxAttendees >= data.registered, {
-  message: 'Max attendees cannot be less than current registered attendees',
-  path: ['maxAttendees'],
+}).superRefine((data, ctx) => {
+  if (data.maxAttendees < data.registered) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: 'Max attendees cannot be less than current registered attendees',
+      path: ['maxAttendees'],
+    });
+  }
 });
 
 const eventValidationUpdate = z.object({
@@ -42,15 +47,17 @@ const eventValidationUpdate = z.object({
   eventDuration: z.number().min(1, { message: 'Event duration is required' }).optional(),
   maxAttendees: z.number().min(1, { message: 'Max attendees is required' }).optional(),
   registered: z.number().min(0, { message: 'Registered count cannot be negative' }).optional(),
-}).refine((data) => {
+}).superRefine((data, ctx) => {
   // Only validate if both fields are present
   if (data.maxAttendees !== undefined && data.registered !== undefined) {
-    return data.maxAttendees >= data.registered;
+    if (data.maxAttendees < data.registered) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'Max attendees cannot be less than current registered attendees',
+        path: ['maxAttendees'],
+      });
+    }
   }
-  return true;
-}, {
-  message: 'Max attendees cannot be less than current registered attendees',
-  path: ['maxAttendees'],
 });
 
 export const Validationevent = {

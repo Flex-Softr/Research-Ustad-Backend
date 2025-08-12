@@ -95,7 +95,7 @@ const createResearchMembars = async (
   userData.email = payload.email;
   userData.fullName = payload.fullName;
   userData.role = payload.role || "user";
-  userData.image = payload.image || "https://via.placeholder.com/300x300?text=User";
+  userData.image = payload.image || "https://www.shutterstock.com/image-vector/default-avatar-profile-icon-social-600nw-1906669723.jpg";
   
   // Include research member specific fields
   if (payload.contactNo) userData.contactNo = payload.contactNo;

@@ -28,7 +28,7 @@ const userSchema = new Schema<TUser, UserModel>(
     image: {
       type: String,
       required: false,
-      default: "https://via.placeholder.com/300x300?text=User",
+      default: "https://www.shutterstock.com/image-vector/default-avatar-profile-icon-social-600nw-1906669723.jpg",
     },
     passwordChangedAt: {
       type: Date,

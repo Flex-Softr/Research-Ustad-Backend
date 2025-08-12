@@ -1,40 +1,30 @@
-import express, { NextFunction, Request, Response } from 'express';
+import express from 'express';
 import auth from '../../middlewares/auth';
 import validateRequest from '../../middlewares/validateRequest';
-import { upload } from '../../utils/upload';
+import { handleFileUpload } from '../../middlewares/fileUpload';
 import { USER_ROLE } from './user.constant';
-import { ResearchAssociateValidation } from '../ResearchMembar/ResearchMembar.validation';
+import { UserValidation } from './user.validation';
 import { UserControllers } from './user.controller';
 
 const router = express.Router();
+
+// Research member creation routes
 router.post(
   '/create-ResearchMembar',
   auth(USER_ROLE.superAdmin, USER_ROLE.admin),
-  upload.single('file'),
-  (req: Request, res: Response, next: NextFunction) => {
-    if (req.body.data) {
-      req.body = JSON.parse(req.body.data);
-      
-      // Handle file upload like event module
-      if (req.file) {
-        const backendUrl = process.env.BACKEND_URL || '';
-        const baseUrl = backendUrl.endsWith('/') ? backendUrl.slice(0, -1) : backendUrl;
-        req.body.profileImg = `${baseUrl}/upload/${req.file.filename}`;
-      }
-    }
-    next();
-  },
-  validateRequest(ResearchAssociateValidation.createValidationSchema),
+  ...handleFileUpload('file'),
+  validateRequest(UserValidation.createResearchMemberValidationSchema),
   UserControllers.createResearchMembar,
 );
 
 router.post(
   '/create-ResearchMembars',
   auth(USER_ROLE.superAdmin, USER_ROLE.admin),
-  validateRequest(ResearchAssociateValidation.createValidationSchemaJson),
+  validateRequest(UserValidation.createResearchMemberJsonValidationSchema),
   UserControllers.createResearchMembars,
 );
 
+// User management routes
 router.get(
   '/me',
   auth(USER_ROLE.superAdmin, USER_ROLE.admin, USER_ROLE.user),
@@ -58,6 +48,7 @@ router.get(
   auth(USER_ROLE.superAdmin, USER_ROLE.admin, USER_ROLE.user),
   UserControllers.AllInfoForPersonal,
 );
+
 router.put(
   '/userToadmin/:id',
   auth(USER_ROLE.superAdmin, USER_ROLE.admin),
@@ -80,6 +71,44 @@ router.get(
   '/all-users',
   auth(USER_ROLE.superAdmin, USER_ROLE.admin, USER_ROLE.user),
   UserControllers.getAllUsers,
+);
+
+// Research member specific routes (maintaining backward compatibility)
+router.get(
+  '/research-members',
+  UserControllers.getAllResearchMembers,
+);
+
+router.get(
+  '/research-members/:id',
+  UserControllers.getSingleResearchMember,
+);
+
+router.get(
+  '/research-members/me',
+  auth(USER_ROLE.superAdmin, USER_ROLE.admin, USER_ROLE.user),
+  UserControllers.getSingleResearchMemberByEmail,
+);
+
+router.patch(
+  '/research-members/:id',
+  auth(USER_ROLE.superAdmin, USER_ROLE.admin),
+  validateRequest(UserValidation.updateResearchMemberValidationSchema),
+  UserControllers.updateResearchMember,
+);
+
+router.put(
+  '/research-members/me',
+  auth(USER_ROLE.superAdmin, USER_ROLE.admin, USER_ROLE.user),
+  ...handleFileUpload('file'),
+  validateRequest(UserValidation.updateResearchMemberValidationSchema),
+  UserControllers.updateResearchMemberByEmail,
+);
+
+router.delete(
+  '/research-members/:id',
+  auth(USER_ROLE.superAdmin, USER_ROLE.admin),
+  UserControllers.deleteResearchMember,
 );
 
 export const UserRoutes = router;

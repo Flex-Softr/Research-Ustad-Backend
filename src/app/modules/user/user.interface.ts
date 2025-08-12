@@ -3,7 +3,7 @@ import { Model, Types } from 'mongoose';
 import { USER_ROLE } from './user.constant'
 
 export interface TUser {
-  _id:Types.ObjectId,
+  _id: Types.ObjectId,
   email: string;
   password: string;
   needsPasswordChange: boolean;
@@ -12,8 +12,37 @@ export interface TUser {
   status: 'in-progress' | 'blocked';
   role:"admin"|'user'|'superAdmin'
   isDeleted: boolean;
-  fullName:string,
-  image:string
+  fullName: string;
+  image: string;
+  // Research member specific fields
+  contactNo?: string;
+  current?: {
+    institution?: string;
+    department?: string;
+    degree?: string;
+    inst_designation?: string;
+  };
+  education?: {
+    degree?: string;
+    field?: string;
+    institution?: string;
+    status?: "Ongoing" | "Completed";
+    scholarship?: string;
+  };
+  research?: string[];
+  shortBio?: string;
+  socialLinks?: {
+    google_scholar?: string;
+    researchgate?: string;
+    linkedin?: string;
+  };
+  expertise?: string[];
+  awards?: string[];
+  conferences?: Array<{
+    name?: string;
+    role?: string;
+    topic?: string;
+  }>;
 }
 
 export interface UserModel extends Model<TUser> {

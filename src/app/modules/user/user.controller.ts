@@ -4,12 +4,11 @@ import sendResponse from '../../utils/sendResponse';
 import { UserServices } from './user.service';
 
 const createResearchMembar = catchAsync(async (req, res) => {
-  const { password, ResearchMembar: ResearchMembarData } = req.body;
-  console.log(ResearchMembarData);
+  const { password, ...userData } = req.body;
   const result = await UserServices.createResearchMembar(
     null, // No longer passing file since router handles it
     password,
-    ResearchMembarData,
+    userData,
   );
 
   sendResponse(res, {
@@ -76,6 +75,7 @@ const AllInfoForPersonal = catchAsync(async (req, res) => {
     data: result,
   });
 });
+
 const userToadmin = catchAsync(async (req, res) => {
   const { id } = req.params;
   const result = await UserServices.userToadmin(id);
@@ -123,6 +123,78 @@ const getAllUsers = catchAsync(async (req, res) => {
   });
 });
 
+// Research member specific controllers
+const getAllResearchMembers = catchAsync(async (req, res) => {
+  const result = await UserServices.getAllResearchMembers();
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Research members are retrieved successfully',
+    data: result
+  });
+});
+
+const getSingleResearchMember = catchAsync(async (req, res) => {
+  const { id } = req.params;
+  const result = await UserServices.getSingleResearchMember(id);
+  
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Research member is retrieved successfully',
+    data: result,
+  });
+});
+
+const getSingleResearchMemberByEmail = catchAsync(async (req, res) => {
+  const { email } = req.user;
+  const result = await UserServices.getSingleResearchMemberByEmail(email);
+  
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Research member is retrieved successfully',
+    data: result,
+  });
+});
+
+const updateResearchMember = catchAsync(async (req, res) => {
+  const { id } = req.params;
+  const result = await UserServices.updateResearchMember(id, req.body);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Research member is updated successfully',
+    data: result,
+  });
+});
+
+const updateResearchMemberByEmail = catchAsync(async (req, res) => {
+  const { email } = req.user;
+  const result = await UserServices.updateResearchMemberByEmail(email, req.body);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Research member is updated successfully',
+    data: result,
+  });
+});
+
+const deleteResearchMember = catchAsync(async (req, res) => {
+  const { id } = req.params;
+  const result = await UserServices.deleteResearchMember(id);
+  
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Research member is deleted successfully',
+    data: result,
+  });
+});
+
 export const UserControllers = {
   createResearchMembar,
   createResearchMembars,
@@ -134,4 +206,11 @@ export const UserControllers = {
   deleteUser,
   searchUsers,
   getAllUsers,
+  // Research member specific controllers
+  getAllResearchMembers,
+  getSingleResearchMember,
+  getSingleResearchMemberByEmail,
+  updateResearchMember,
+  updateResearchMemberByEmail,
+  deleteResearchMember,
 };

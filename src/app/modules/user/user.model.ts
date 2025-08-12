@@ -57,9 +57,41 @@ const userSchema = new Schema<TUser, UserModel>(
       type: Boolean,
       default: false,
     },
+    // Research member specific fields
+    contactNo: { type: String, default: '' },
+    current: {
+      institution: { type: String, default: '' },
+      department: { type: String, default: '' },
+      degree: { type: String, default: '' },
+      inst_designation: { type: String, default: '' },
+    },
+    education: {
+      degree: { type: String, default: '' },
+      field: { type: String, default: '' },
+      institution: { type: String, default: '' },
+      status: { type: String, enum: ["Ongoing", "Completed"] },
+      scholarship: { type: String, default: '' },
+    },
+    research: [{ type: String }],
+    shortBio: { type: String, default: '' }, 
+    socialLinks: {
+      researchgate: { type: String, default: '' },
+      google_scholar: { type: String, default: '' },
+      linkedin: { type: String, default: '' },
+    },
+    expertise: [{ type: String, default: [] }],
+    awards: [{ type: String, default: [] }],
+    conferences: [{
+      name: { type: String, default: '' },
+      role: { type: String, default: '' },
+      topic: { type: String, default: '' },
+    }],
   },
   {
     timestamps: true,
+    toJSON: {
+      virtuals: true,
+    },
   },
 );
 
@@ -77,6 +109,21 @@ userSchema.pre('save', async function (next) {
 // set '' after saving password
 userSchema.post('save', function (doc, next) {
   doc.password = '';
+  next();
+});
+
+userSchema.pre('find', function (next) {
+  this.find({ isDeleted: { $ne: true } });
+  next();
+});
+
+userSchema.pre('findOne', function (next) {
+  this.find({ isDeleted: { $ne: true } });
+  next();
+});
+
+userSchema.pre('aggregate', function (next) {
+  this.pipeline().unshift({ $match: { isDeleted: { $ne: true } } });
   next();
 });
 

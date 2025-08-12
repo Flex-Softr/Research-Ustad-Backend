@@ -13,6 +13,19 @@ const postResearchUstad = catchAsync(async (req, res) => {
       data: result,
     });
   });
+
+  const updateResearchUstad = catchAsync(async (req, res) => {
+    const { id } = req.params;
+    const { id: userId } = req.user;
+    const result = await ResearchPaperService.updateResearchUstad(id, req.body, userId);
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: 'ResearchPaper Updated successfully',
+      data: result,
+    });
+  });
+
   const getPublicResearchUstad = catchAsync(async (req, res) => {
     const result = await ResearchPaperService.getPublicResearchUstad();
     sendResponse(res, {
@@ -102,6 +115,7 @@ const postResearchUstad = catchAsync(async (req, res) => {
   })
 export const ResearchPaperControllers={
     postResearchUstad,
+    updateResearchUstad,
     getPublicResearchUstad,
     getAllResearchUstad,
     approveResearchUstad,

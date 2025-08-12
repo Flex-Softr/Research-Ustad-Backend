@@ -5,45 +5,53 @@ import httpStatus from 'http-status';
 import mongoose from 'mongoose';
 import config from '../../config';
 import AppError from '../../errors/AppError';
-// import { TUser } from './user.interface';
 import { sendEmail } from '../../utils/sendEmail';
-import { IResearchMembar } from '../ResearchMembar/ResearchMembar.interface';
 import { User } from './user.model';
-import { ResearchMembar } from '../ResearchMembar/ResearchMembar.model';
 import { ResearchPaper } from '../ResearchPaper/ResearchPaper.model';
 import { Blog } from '../Blog/blog.model';
 import { TUser } from './user.interface';
+
+// ===== USER CREATION FUNCTIONS =====
+
 const createResearchMembar = async (
   file: any | null,
   password: string,
-  payload: IResearchMembar,
+  payload: Partial<TUser>,
 ) => {
   const userData: Partial<TUser> = {};
   userData.password = password || (config.default_password as string);
   userData.designation = payload.designation;
   userData.email = payload.email;
   userData.fullName = payload.fullName;
+  userData.role = payload.role || "user";
+  
+  // Handle file upload - the router already sets payload.image
+  if (payload.image) {
+    userData.image = payload.image;
+  }
+  
+  // Include research member specific fields
+  if (payload.contactNo) userData.contactNo = payload.contactNo;
+  if (payload.current) userData.current = payload.current;
+  if (payload.education) userData.education = payload.education;
+  if (payload.research) userData.research = payload.research;
+  if (payload.shortBio) userData.shortBio = payload.shortBio;
+  if (payload.socialLinks) userData.socialLinks = payload.socialLinks;
+  if (payload.expertise) userData.expertise = payload.expertise;
+  if (payload.awards) userData.awards = payload.awards;
+  if (payload.conferences) userData.conferences = payload.conferences;
+
   const session = await mongoose.startSession();
 
   try {
     await session.startTransaction();
-    
-    // Handle file upload - the router already sets payload.profileImg
-    if (payload.profileImg) {
-      userData.image = payload.profileImg;
-    }
     
     const newUser = await User.create([userData], { session });
  
     if (!newUser.length) {
       throw new AppError(httpStatus.BAD_REQUEST, 'Failed to create user');
     }
-    payload.email = newUser[0].email;
-    payload.user = newUser[0]._id;
-    const newStudent = await ResearchMembar.create([payload], { session });
-    if (!newStudent.length) {
-      throw new AppError(httpStatus.BAD_REQUEST, 'Failed to create Membar');
-    }
+
     const plainPassword = password || (config.default_password as string);
 
     const subject = 'Welcome to ResearchUstad'
@@ -69,7 +77,7 @@ const createResearchMembar = async (
 
     await sendEmail(newUser[0].email, emailContent, subject);
     await session.commitTransaction();
-    return newStudent;
+    return newUser;
   } catch (err: any) {
     await session.abortTransaction();
     throw err
@@ -79,7 +87,7 @@ const createResearchMembar = async (
 };
 
 const createResearchMembars = async (
-  payload: IResearchMembar & { role?: string },
+  payload: Partial<TUser> & { role?: string },
 ) => {
   const userData: Partial<TUser> = {};
   userData.password = payload.password || (config.default_password as string);
@@ -87,7 +95,19 @@ const createResearchMembars = async (
   userData.email = payload.email;
   userData.fullName = payload.fullName;
   userData.role = payload.role || "user";
-  userData.image = payload.profileImg || "https://via.placeholder.com/300x300?text=User";
+  userData.image = payload.image || "https://via.placeholder.com/300x300?text=User";
+  
+  // Include research member specific fields
+  if (payload.contactNo) userData.contactNo = payload.contactNo;
+  if (payload.current) userData.current = payload.current;
+  if (payload.education) userData.education = payload.education;
+  if (payload.research) userData.research = payload.research;
+  if (payload.shortBio) userData.shortBio = payload.shortBio;
+  if (payload.socialLinks) userData.socialLinks = payload.socialLinks;
+  if (payload.expertise) userData.expertise = payload.expertise;
+  if (payload.awards) userData.awards = payload.awards;
+  if (payload.conferences) userData.conferences = payload.conferences;
+
   const session = await mongoose.startSession();
 
   try {
@@ -97,12 +117,7 @@ const createResearchMembars = async (
     if (!newUser.length) {
       throw new AppError(httpStatus.BAD_REQUEST, 'Failed to create user');
     }
-    payload.email = newUser[0].email;
-    payload.user = newUser[0]._id;
-    const newStudent = await ResearchMembar.create([payload], { session });
-    if (!newStudent.length) {
-      throw new AppError(httpStatus.BAD_REQUEST, 'Failed to create Membar');
-    }
+    
     const plainPassword = payload.password || (config.default_password as string);
 
     const subject = 'Welcome to ResearchUstad'
@@ -128,27 +143,134 @@ const createResearchMembars = async (
 
     await sendEmail(newUser[0].email, emailContent, subject);
     await session.commitTransaction();
-    // await session.endSession();
-    return newStudent;
+    return newUser;
   } catch (err: any) {
     await session.abortTransaction();
-    // await session.endSession();
     throw err
   }finally{
     await session.endSession()
   }
 };
-const getMe = async (email: string) => {
-   const result = await User.findOne({ email: email });
-   if (!result) {
-     throw new AppError(httpStatus.NOT_FOUND, 'User not found');
-   }
-   return result
+
+// ===== CONSOLIDATED USER RETRIEVAL FUNCTIONS =====
+
+/**
+ * Get user by email (consolidated function)
+ * Used for: getMe, getSingleResearchMemberByEmail
+ */
+const getUserByEmail = async (email: string) => {
+  const result = await User.findOne({ email: email });
+  if (!result) {
+    throw new AppError(httpStatus.NOT_FOUND, 'User not found');
+  }
+  
+  // If user exists but doesn't have research member data, return basic user info
+  // This handles the case where data hasn't been migrated yet
+  if (!result.contactNo && !result.current && !result.education) {
+    // Return basic user info without research member fields
+    return {
+      _id: result._id,
+      email: result.email,
+      fullName: result.fullName,
+      designation: result.designation,
+      image: result.image,
+      role: result.role,
+      status: result.status,
+      // Add empty research member fields for compatibility
+      contactNo: '',
+      current: {
+        institution: '',
+        department: '',
+        degree: '',
+        inst_designation: '',
+      },
+      education: {
+        degree: '',
+        field: '',
+        institution: '',
+        status: '',
+        scholarship: '',
+      },
+      research: [],
+      shortBio: '',
+      socialLinks: {
+        researchgate: '',
+        google_scholar: '',
+        linkedin: '',
+      },
+      expertise: [],
+      awards: [],
+      conferences: [],
+    };
+  }
+  
+  return result;
 };
-const Alluser = async () => {
-  const result = await User.find();
-  return result
+
+/**
+ * Get user by ID (consolidated function)
+ * Used for: getSingleResearchMember
+ */
+const getUserById = async (id: string) => {
+  const result = await User.findById(id);
+  if (!result) {
+    throw new AppError(httpStatus.NOT_FOUND, 'User not found');
+  }
+  return result;
 };
+
+// ===== CONSOLIDATED USER LISTING FUNCTIONS =====
+
+/**
+ * Get all users with filtering options (consolidated function)
+ * Used for: Alluser, getAllResearchMembers, getAllUsers
+ */
+const getUsers = async (options: {
+  excludeSuperAdmin?: boolean;
+  excludeDeleted?: boolean;
+  selectFields?: string;
+  limit?: number;
+  sort?: { [key: string]: 1 | -1 };
+} = {}) => {
+  const {
+    excludeSuperAdmin = false,
+    excludeDeleted = true,
+    selectFields,
+    limit,
+    sort = { fullName: 1 }
+  } = options;
+
+  const query: any = {};
+  
+  // Build query based on options
+  if (excludeSuperAdmin) {
+    query.role = { $ne: 'superAdmin' };
+  }
+  
+  if (excludeDeleted) {
+    query.isDeleted = false;
+  }
+
+  let userQuery = User.find(query);
+  
+  // Apply field selection
+  if (selectFields) {
+    userQuery = userQuery.select(selectFields);
+  }
+  
+  // Apply limit
+  if (limit) {
+    userQuery = userQuery.limit(limit);
+  }
+  
+  // Apply sorting
+  userQuery = userQuery.sort(sort);
+
+  return await userQuery.exec();
+};
+
+// ===== STATISTICS FUNCTIONS =====
+
 const AllInfo = async () => {
   const [
     totalUsers,
@@ -159,7 +281,7 @@ const AllInfo = async () => {
     totalBlogs
   ] = await Promise.all([
     User.countDocuments(),
-    ResearchMembar.countDocuments(),
+    User.countDocuments({ role: { $ne: 'superAdmin' } }), // Count research members
     ResearchPaper.countDocuments({ isApproved: true }),
     ResearchPaper.countDocuments({ isApproved: false }),
     ResearchPaper.countDocuments(),
@@ -197,6 +319,8 @@ const AllInfoForPersonal = async (id:string) => {
   };
 };
 
+// ===== USER MANAGEMENT FUNCTIONS =====
+
 const userToadmin = async (id:string) => {
   const user = await User.findById(id);
   if (!user) {
@@ -227,8 +351,6 @@ const deleteUser = async (id: string) => {
       throw new AppError(httpStatus.NOT_FOUND, 'User not found');
     }
 
-    // const deletedResearchMember = await ResearchMembar.findOneAndDelete({ user: id });
-
     await session.commitTransaction();
     return deletedUser;
   } catch (err: any) {
@@ -257,26 +379,117 @@ const searchUsers = async (query: string) => {
   return users;
 };
 
-const getAllUsers = async () => {
-  const users = await User.find({
-    isDeleted: false,
-  })
-  .select('fullName email designation')
-  .limit(50) // Limit to 50 users to prevent performance issues
-  .sort({ fullName: 1 });
+// ===== USER UPDATE FUNCTIONS =====
 
-  return users;
+const updateResearchMember = async (id: string, payload: Partial<TUser>) => {
+  const { current, education, socialLinks, ...remainingData } = payload;
+
+  const modifiedUpdatedData: Record<string, unknown> = {
+    ...remainingData,
+  };
+  
+  if (current && Object.keys(current).length) {
+    for (const [key, value] of Object.entries(current)) {
+      modifiedUpdatedData[`current.${key}`] = value;
+    }
+  }
+  
+  if(education && Object.keys(education).length){
+    for(const[key, value] of Object.entries(education)){
+      modifiedUpdatedData[`education.${key}`]=value
+    }
+  }
+  
+  if (socialLinks && Object.keys(socialLinks).length) {
+    for (const [key, value] of Object.entries(socialLinks)) {
+      modifiedUpdatedData[`socialLinks.${key}`] = value;
+    }
+  }
+  
+  const result = await User.findByIdAndUpdate(id, modifiedUpdatedData, {
+    new: true,
+    runValidators: true,
+  });
+  
+  if (!result) {
+    throw new AppError(httpStatus.NOT_FOUND, 'Research member not found');
+  }
+  
+  return result;
 };
 
+const updateResearchMemberByEmail = async (email: string, payload: Partial<TUser>) => {
+  const { current, education, socialLinks, ...remainingData } = payload;
+
+  const modifiedUpdatedData: Record<string, unknown> = {
+    ...remainingData,
+  };
+  
+  if (current && Object.keys(current).length) {
+    for (const [key, value] of Object.entries(current)) {
+      modifiedUpdatedData[`current.${key}`] = value;
+    }
+  }
+  
+  if(education && Object.keys(education).length){
+    for(const[key, value] of Object.entries(education)){
+      modifiedUpdatedData[`education.${key}`]=value
+    }
+  }
+  
+  if (socialLinks && Object.keys(socialLinks).length) {
+    for (const [key, value] of Object.entries(socialLinks)) {
+      modifiedUpdatedData[`socialLinks.${key}`] = value;
+    }
+  }
+  
+  const result = await User.findOneAndUpdate({ email }, modifiedUpdatedData, {
+    new: true,
+    runValidators: true,
+  });
+  
+  if (!result) {
+    throw new AppError(httpStatus.NOT_FOUND, 'Research member not found');
+  }
+  
+  return result;
+};
+
+// ===== EXPORT CONSOLIDATED SERVICES =====
+
 export const UserServices = {
+  // User creation
   createResearchMembar,
   createResearchMembars,
-  getMe,
-  Alluser,
+  
+  // Consolidated user retrieval (replaces duplicates)
+  getUserByEmail,        // Replaces: getMe, getSingleResearchMemberByEmail
+  getUserById,          // Replaces: getSingleResearchMember
+  getUsers,             // Replaces: Alluser, getAllResearchMembers, getAllUsers
+  
+  // Statistics
   AllInfo,
   AllInfoForPersonal,
+  
+  // User management
   userToadmin,
   deleteUser,
   searchUsers,
-  getAllUsers,
+  
+  // User updates
+  updateResearchMember,
+  updateResearchMemberByEmail,
+  
+  // Legacy aliases for backward compatibility
+  getMe: getUserByEmail,
+  getSingleResearchMemberByEmail: getUserByEmail,
+  getSingleResearchMember: getUserById,
+  Alluser: () => getUsers(),
+  getAllResearchMembers: () => getUsers({ excludeSuperAdmin: true }),
+  getAllUsers: () => getUsers({ 
+    excludeDeleted: true, 
+    selectFields: 'fullName email designation',
+    limit: 50 
+  }),
+  deleteResearchMember: deleteUser,
 };

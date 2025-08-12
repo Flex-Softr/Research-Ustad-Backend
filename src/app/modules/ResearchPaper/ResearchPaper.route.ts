@@ -42,6 +42,13 @@ router.get(
 );
 
 router.put(
+  '/update/:id',
+  auth(USER_ROLE.superAdmin, USER_ROLE.user, USER_ROLE.admin),
+  validateRequest(researchPaperSchema),
+  ResearchPaperControllers.updateResearchUstad,
+);
+
+router.put(
   '/approve/:id',
   auth(USER_ROLE.superAdmin,USER_ROLE.admin),
   ResearchPaperControllers.approveResearchUstad,

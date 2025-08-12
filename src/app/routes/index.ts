@@ -1,7 +1,6 @@
 import { Router } from 'express';
 import { AuthRoutes } from '../modules/Auth/auth.route';
 import { ResearchPaperRoutes } from '../modules/ResearchPaper/ResearchPaper.route';
-import { AssociateRoutes } from '../modules/ResearchMembar/ResearchMembar.router';
 import { CourseRouter } from '../modules/Course/Course.router';
 import { eventRouter } from '../modules/Event/event.router';
 import { blogRouter } from '../modules/Blog/blog.router';
@@ -22,10 +21,7 @@ const moduleRoutes = [
     path: '/paper',
     route: ResearchPaperRoutes,
   },
-  {
-    path: '/researchAssociate',
-    route: AssociateRoutes,
-  },
+
   {
     path: '/course',
     route: CourseRouter,

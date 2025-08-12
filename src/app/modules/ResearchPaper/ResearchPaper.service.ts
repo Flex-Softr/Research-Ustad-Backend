@@ -9,6 +9,28 @@ const postResearchUstad= async(body:IResearchPaper, id:Types.ObjectId)=>{
     const result = await ResearchPaper.create(body)
     return result
 }
+
+const updateResearchUstad = async (id: string, body: Partial<IResearchPaper>, userId: Types.ObjectId) => {
+    const paper = await ResearchPaper.findById(id);
+    if (!paper) {
+        throw new AppError(httpStatus.NOT_FOUND, "Research paper not found");
+    }
+
+    // Check if the user owns this paper or is an admin
+    if (paper.user.toString() !== userId.toString()) {
+        throw new AppError(httpStatus.FORBIDDEN, "You can only update your own research papers");
+    }
+
+    // Update the paper
+    const result = await ResearchPaper.findByIdAndUpdate(
+        id,
+        { ...body, user: userId },
+        { new: true, runValidators: true }
+    );
+
+    return result;
+};
+
 const getPublicResearchUstad= async()=>{
     const result = await ResearchPaper.find({ isApproved: true });
     return result
@@ -65,6 +87,7 @@ const rejectResearchUstad= async(id:string)=>{
 }
 export const ResearchPaperService ={
     postResearchUstad,
+    updateResearchUstad,
     getPublicResearchUstad,
     getAllResearchUstad,
     approveResearchUstad,

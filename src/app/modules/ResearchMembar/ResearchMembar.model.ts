@@ -36,7 +36,7 @@ const ResearchMembarSchema = new Schema<IResearchMembar>(
         degree: { type: String, default: '' },
         field: { type: String, default: '' },
         institution: { type: String, default: '' },
-        status: { type: String, enum: ["Ongoing", "Completed"], default: 'Ongoing' },
+        status: { type: String, enum: ["Ongoing", "Completed"] },
         scholarship: { type: String , default:''},
       },
   

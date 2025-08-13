@@ -111,4 +111,21 @@ router.delete(
   UserControllers.deleteResearchMember,
 );
 
+// ===== SUPERADMIN MANAGEMENT ROUTES =====
+
+// Get current superAdmin information
+router.get(
+  '/superadmin/current',
+  auth(USER_ROLE.superAdmin, USER_ROLE.admin, USER_ROLE.user),
+  UserControllers.getCurrentSuperAdmin,
+);
+
+// Replace current superAdmin with a new one
+router.post(
+  '/superadmin/replace',
+  auth(USER_ROLE.superAdmin), // Only current superAdmin can replace themselves
+  validateRequest(UserValidation.replaceSuperAdminValidationSchema),
+  UserControllers.replaceSuperAdmin,
+);
+
 export const UserRoutes = router;

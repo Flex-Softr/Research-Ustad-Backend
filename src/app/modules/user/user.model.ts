@@ -53,10 +53,7 @@ const userSchema = new Schema<TUser, UserModel>(
       },
       default: "user" 
   },
-    isDeleted: {
-      type: Boolean,
-      default: false,
-    },
+
     // Research member specific fields
     contactNo: { type: String, default: '' },
     current: {
@@ -112,20 +109,7 @@ userSchema.post('save', function (doc, next) {
   next();
 });
 
-userSchema.pre('find', function (next) {
-  this.find({ isDeleted: { $ne: true } });
-  next();
-});
 
-userSchema.pre('findOne', function (next) {
-  this.find({ isDeleted: { $ne: true } });
-  next();
-});
-
-userSchema.pre('aggregate', function (next) {
-  this.pipeline().unshift({ $match: { isDeleted: { $ne: true } } });
-  next();
-});
 
 userSchema.statics.isUserExistsByCustomId = async function (email: string) {
   return await User.findOne({ email }).select('+password');

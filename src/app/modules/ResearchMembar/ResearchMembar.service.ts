@@ -94,7 +94,7 @@ if(education && Object.keys(education).length){
   return researchMembarResult;
 };
 
-const deleteMembar = async (id: string) => {
+const deleteMembar = async (id: string, requestingUserId?: string) => {
   const session = await mongoose.startSession();
 
   try {
@@ -108,6 +108,17 @@ const deleteMembar = async (id: string) => {
     }
 
     const userId = deletedMembar.user;
+
+    // 🛡️ PROTECTION: Prevent self-deletion
+    if (requestingUserId && requestingUserId === userId.toString()) {
+      throw new AppError(httpStatus.FORBIDDEN, 'Cannot delete your own account. Please contact another administrator.');
+    }
+
+    // 🛡️ PROTECTION: Check if user is superAdmin before deletion (only one superAdmin allowed)
+    const userToDelete = await User.findById(userId);
+    if (userToDelete && userToDelete.role === 'superAdmin') {
+      throw new AppError(httpStatus.FORBIDDEN, 'Cannot delete superAdmin users. Only one superAdmin is allowed in the system.');
+    }
 
     const deletedUser = await User.findByIdAndDelete(
       userId);

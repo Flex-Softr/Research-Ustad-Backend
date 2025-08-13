@@ -90,7 +90,8 @@ const userToadmin = catchAsync(async (req, res) => {
 
 const deleteUser = catchAsync(async (req, res) => {
   const { id } = req.params;
-  const result = await UserServices.deleteUser(id);
+  const { id: requestingUserId } = req.user;
+  const result = await UserServices.deleteUser(id, requestingUserId);
   
   sendResponse(res, {
     statusCode: httpStatus.OK,
@@ -195,6 +196,33 @@ const deleteResearchMember = catchAsync(async (req, res) => {
   });
 });
 
+// ===== SUPERADMIN MANAGEMENT CONTROLLERS =====
+
+const replaceSuperAdmin = catchAsync(async (req, res) => {
+  const { newSuperAdminId } = req.body;
+  const { id: requestingUserId } = req.user;
+  
+  const result = await UserServices.replaceSuperAdmin(newSuperAdminId, requestingUserId);
+  
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'SuperAdmin successfully replaced',
+    data: result,
+  });
+});
+
+const getCurrentSuperAdmin = catchAsync(async (req, res) => {
+  const result = await UserServices.getCurrentSuperAdmin();
+  
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Current superAdmin retrieved successfully',
+    data: result,
+  });
+});
+
 export const UserControllers = {
   createResearchMembar,
   createResearchMembars,
@@ -213,4 +241,7 @@ export const UserControllers = {
   updateResearchMember,
   updateResearchMemberByEmail,
   deleteResearchMember,
+  // SuperAdmin management controllers
+  replaceSuperAdmin,
+  getCurrentSuperAdmin,
 };

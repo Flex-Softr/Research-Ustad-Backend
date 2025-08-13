@@ -15,16 +15,8 @@ const loginUser = async (payload: TLoginUser) => {
   if (!user) {
     throw new AppError(httpStatus.NOT_FOUND, 'This user is not found !');
   }
-  // checking if the user is already deleted
-
-  const isDeleted = user?.isDeleted;
-
-  if (isDeleted) {
-    throw new AppError(httpStatus.FORBIDDEN, 'This user is deleted !');
-  }
 
   // checking if the user is blocked
-
   const userStatus = user?.status;
 
   if (userStatus === 'blocked') {
@@ -32,12 +24,10 @@ const loginUser = async (payload: TLoginUser) => {
   }
 
   //checking if the password is correct
-
   if (!(await User.isPasswordMatched(payload?.password, user?.password)))
     throw new AppError(httpStatus.FORBIDDEN, 'Password do not matched');
 
   //create token and sent to the  client
-
   const jwtPayload = {
     id:user._id,
     email: user.email,
@@ -74,16 +64,8 @@ const changePassword = async (
   if (!user) {
     throw new AppError(httpStatus.NOT_FOUND, 'This user is not found !');
   }
-  // checking if the user is already deleted
-
-  const isDeleted = user?.isDeleted;
-
-  if (isDeleted) {
-    throw new AppError(httpStatus.FORBIDDEN, 'This user is deleted !');
-  }
 
   // checking if the user is blocked
-
   const userStatus = user?.status;
 
   if (userStatus === 'blocked') {
@@ -91,7 +73,6 @@ const changePassword = async (
   }
 
   //checking if the password is correct
-
   if (!(await User.isPasswordMatched(payload.oldPassword, user?.password)))
     throw new AppError(httpStatus.FORBIDDEN, 'Password do not matched');
 
@@ -127,12 +108,6 @@ const refreshToken = async (token: string) => {
 
   if (!user) {
     throw new AppError(httpStatus.NOT_FOUND, 'This user is not found !');
-  }
-  // checking if the user is already deleted
-  const isDeleted = user?.isDeleted;
-
-  if (isDeleted) {
-    throw new AppError(httpStatus.FORBIDDEN, 'This user is deleted !');
   }
 
   // checking if the user is blocked
@@ -173,12 +148,6 @@ const forgetPassword = async (email: string) => {
   if (!user) {
     throw new AppError(httpStatus.NOT_FOUND, 'This user is not found !');
   }
-  // checking if the user is already deleted
-  const isDeleted = user?.isDeleted;
-
-  if (isDeleted) {
-    throw new AppError(httpStatus.FORBIDDEN, 'This user is deleted !');
-  }
 
   // checking if the user is blocked
   const userStatus = user?.status;
@@ -214,12 +183,6 @@ const resetPassword = async (
 
   if (!user) {
     throw new AppError(httpStatus.NOT_FOUND, 'This user is not found !');
-  }
-  // checking if the user is already deleted
-  const isDeleted = user?.isDeleted;
-
-  if (isDeleted) {
-    throw new AppError(httpStatus.FORBIDDEN, 'This user is deleted !');
   }
 
   // checking if the user is blocked

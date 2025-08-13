@@ -18,6 +18,14 @@ const createResearchMembar = async (
   password: string,
   payload: Partial<TUser>,
 ) => {
+  // 🛡️ PROTECTION: Prevent creating multiple superAdmin users
+  if (payload.role === 'superAdmin') {
+    const existingSuperAdmin = await User.findOne({ role: 'superAdmin' });
+    if (existingSuperAdmin) {
+      throw new AppError(httpStatus.FORBIDDEN, 'Cannot create multiple superAdmin users. Only one superAdmin is allowed in the system.');
+    }
+  }
+
   const userData: Partial<TUser> = {};
   userData.password = password || (config.default_password as string);
   userData.designation = payload.designation;
@@ -89,6 +97,14 @@ const createResearchMembar = async (
 const createResearchMembars = async (
   payload: Partial<TUser> & { role?: string },
 ) => {
+  // 🛡️ PROTECTION: Prevent creating multiple superAdmin users
+  if (payload.role === 'superAdmin') {
+    const existingSuperAdmin = await User.findOne({ role: 'superAdmin' });
+    if (existingSuperAdmin) {
+      throw new AppError(httpStatus.FORBIDDEN, 'Cannot create multiple superAdmin users. Only one superAdmin is allowed in the system.');
+    }
+  }
+
   const userData: Partial<TUser> = {};
   userData.password = payload.password || (config.default_password as string);
   userData.designation = payload.designation;
@@ -115,9 +131,8 @@ const createResearchMembars = async (
     
     console.log(`🔍 Checking for existing user with email: ${payload.email}`);
     
-    // Check if user with this email already exists (including deleted ones)
-    // Use the native collection to bypass mongoose middleware
-    const existingUser = await User.collection.findOne({ email: payload.email });
+    // Check if user with this email already exists
+    const existingUser = await User.findOne({ email: payload.email });
     
     let newUser;
     
@@ -125,28 +140,12 @@ const createResearchMembars = async (
       console.log(`📋 Found existing user:`, {
         id: existingUser._id,
         email: existingUser.email,
-        isDeleted: existingUser.isDeleted,
         fullName: existingUser.fullName
       });
       
-      if (existingUser.isDeleted) {
-        // If user exists but is deleted, update the existing record
-        console.log(`✅ Updating deleted user with email: ${payload.email}`);
-        newUser = await User.findByIdAndUpdate(
-          existingUser._id,
-          {
-            ...userData,
-            isDeleted: false, // Reactivate the user
-            status: 'in-progress' // Reset status
-          },
-          { new: true, session }
-        );
-        console.log(`✅ User reactivated successfully:`, newUser?.email);
-      } else {
-        // If user exists and is not deleted, throw error
-        console.log(`❌ User already exists and is not deleted`);
-        throw new AppError(httpStatus.CONFLICT, 'User with this email already exists');
-      }
+      // If user exists, throw error
+      console.log(`❌ User already exists`);
+      throw new AppError(httpStatus.CONFLICT, 'User with this email already exists');
     } else {
       // Create new user if no existing user found
       console.log(`🆕 Creating new user with email: ${payload.email}`);
@@ -268,14 +267,12 @@ const getUserById = async (id: string) => {
  */
 const getUsers = async (options: {
   excludeSuperAdmin?: boolean;
-  excludeDeleted?: boolean;
   selectFields?: string;
   limit?: number;
   sort?: { [key: string]: 1 | -1 };
 } = {}) => {
   const {
     excludeSuperAdmin = false,
-    excludeDeleted = true,
     selectFields,
     limit,
     sort = { fullName: 1 }
@@ -286,10 +283,6 @@ const getUsers = async (options: {
   // Build query based on options
   if (excludeSuperAdmin) {
     query.role = { $ne: 'superAdmin' };
-  }
-  
-  if (excludeDeleted) {
-    query.isDeleted = false;
   }
 
   let userQuery = User.find(query);
@@ -367,7 +360,9 @@ const userToadmin = async (id:string) => {
   if (!user) {
     throw new Error("User not found");
   }
+  
   const newRole = user.role === "admin" ? "user" : "admin";
+  
   const result = await User.findByIdAndUpdate(
     id,
     { role: newRole },
@@ -376,31 +371,185 @@ const userToadmin = async (id:string) => {
   return result
 }
 
-const deleteUser = async (id: string) => {
-  const session = await mongoose.startSession();
+// ===== SUPERADMIN MANAGEMENT FUNCTIONS =====
 
+/**
+ * Replace the current superAdmin with a new one
+ * This is the ONLY way to change superAdmin in the system
+ */
+const replaceSuperAdmin = async (newSuperAdminId: string, requestingUserId?: string) => {
+  const session = await mongoose.startSession();
+  
   try {
     session.startTransaction();
-
-    const deletedUser = await User.findByIdAndUpdate(
-      id,
-      { isDeleted: true },
-      { new: true, session }
-    );
-
-    if (!deletedUser) {
-      throw new AppError(httpStatus.NOT_FOUND, 'User not found');
+    
+    // 🛡️ PROTECTION: Only current superAdmin can replace themselves
+    if (!requestingUserId) {
+      throw new AppError(httpStatus.FORBIDDEN, 'Authentication required to replace superAdmin.');
     }
-
+    
+    const requestingUser = await User.findById(requestingUserId);
+    if (!requestingUser || requestingUser.role !== 'superAdmin') {
+      throw new AppError(httpStatus.FORBIDDEN, 'Only the current superAdmin can replace themselves.');
+    }
+    
+    // Check if new superAdmin candidate exists
+    const newSuperAdminCandidate = await User.findById(newSuperAdminId);
+    if (!newSuperAdminCandidate) {
+      throw new AppError(httpStatus.NOT_FOUND, 'New superAdmin candidate not found.');
+    }
+    
+    // Check if new candidate is already superAdmin
+    if (newSuperAdminCandidate.role === 'superAdmin') {
+      throw new AppError(httpStatus.BAD_REQUEST, 'Selected user is already a superAdmin.');
+    }
+    
+    // Check if trying to replace with the same user
+    if (requestingUserId === newSuperAdminId) {
+      throw new AppError(httpStatus.BAD_REQUEST, 'Cannot replace superAdmin with the same user.');
+    }
+    
+    console.log(`🔄 Replacing superAdmin: ${requestingUser.email} -> ${newSuperAdminCandidate.email}`);
+    
+    // 1. Demote current superAdmin to admin
+    const demotedSuperAdmin = await User.findByIdAndUpdate(
+      requestingUserId,
+      { role: 'admin' },
+      { new: true, runValidators: true, session }
+    );
+    
+    // 2. Promote new candidate to superAdmin
+    const promotedSuperAdmin = await User.findByIdAndUpdate(
+      newSuperAdminId,
+      { role: 'superAdmin' },
+      { new: true, runValidators: true, session }
+    );
+    
     await session.commitTransaction();
-    return deletedUser;
+    
+    console.log(`✅ SuperAdmin successfully replaced: ${demotedSuperAdmin?.email} -> ${promotedSuperAdmin?.email}`);
+    
+    return {
+      message: 'SuperAdmin successfully replaced',
+      previousSuperAdmin: {
+        id: demotedSuperAdmin?._id,
+        email: demotedSuperAdmin?.email,
+        fullName: demotedSuperAdmin?.fullName,
+        newRole: 'admin'
+      },
+      newSuperAdmin: {
+        id: promotedSuperAdmin?._id,
+        email: promotedSuperAdmin?.email,
+        fullName: promotedSuperAdmin?.fullName,
+        newRole: 'superAdmin'
+      }
+    };
+    
   } catch (err: any) {
     await session.abortTransaction();
+    console.error('❌ Error during superAdmin replacement:', err);
     throw err;
   } finally {
     await session.endSession();
   }
 };
+
+/**
+ * Get current superAdmin information
+ */
+const getCurrentSuperAdmin = async () => {
+  const superAdmin = await User.findOne({ role: 'superAdmin' });
+  if (!superAdmin) {
+    throw new AppError(httpStatus.NOT_FOUND, 'No superAdmin found in the system.');
+  }
+  
+  return {
+    id: superAdmin._id,
+    email: superAdmin.email,
+    fullName: superAdmin.fullName,
+    role: superAdmin.role,
+    designation: superAdmin.designation
+  };
+};
+
+const deleteUser = async (id: string, requestingUserId?: string) => {
+  const session = await mongoose.startSession();
+
+  try {
+    session.startTransaction();
+
+    // First, check if user exists
+    const userToDelete = await User.findById(id);
+    if (!userToDelete) {
+      throw new AppError(httpStatus.NOT_FOUND, 'User not found');
+    }
+
+    // 🛡️ PROTECTION: Prevent self-deletion
+    if (requestingUserId && requestingUserId === id) {
+      throw new AppError(httpStatus.FORBIDDEN, 'Cannot delete your own account. Please contact another administrator.');
+    }
+
+    // 🛡️ PROTECTION: Prevent superAdmin deletion (only one superAdmin allowed)
+    if (userToDelete.role === 'superAdmin') {
+      throw new AppError(httpStatus.FORBIDDEN, 'Cannot delete superAdmin users. Only one superAdmin is allowed in the system.');
+    }
+
+    console.log(`🗑️ Hard deleting user: ${userToDelete.email} (ID: ${id})`);
+
+    // Delete all related data first
+    // 1. Delete user's research papers
+    const deletedPapers = await ResearchPaper.deleteMany(
+      { user: id },
+      { session }
+    );
+    console.log(`📄 Deleted ${deletedPapers.deletedCount} research papers`);
+
+    // 2. Delete user's blogs
+    const deletedBlogs = await Blog.deleteMany(
+      { author: id },
+      { session }
+    );
+    console.log(`📝 Deleted ${deletedBlogs.deletedCount} blogs`);
+
+    // 3. Remove user from author references in research papers
+    const updatedPapers = await ResearchPaper.updateMany(
+      { 'authorReferences.user': id },
+      { $pull: { authorReferences: { user: id } } },
+      { session }
+    );
+    console.log(`👥 Removed author references from ${updatedPapers.modifiedCount} papers`);
+
+    // 4. Finally, delete the user completely
+    const deletedUser = await User.findByIdAndDelete(id, { session });
+
+    if (!deletedUser) {
+      throw new AppError(httpStatus.NOT_FOUND, 'User not found');
+    }
+
+    console.log(`✅ User ${deletedUser.email} completely deleted from database`);
+
+    await session.commitTransaction();
+    return { 
+      message: 'User and all related data deleted successfully',
+      deletedUser: {
+        id: deletedUser._id,
+        email: deletedUser.email,
+        fullName: deletedUser.fullName
+      },
+      deletedPapers: deletedPapers.deletedCount,
+      deletedBlogs: deletedBlogs.deletedCount,
+      updatedPapers: updatedPapers.modifiedCount
+    };
+  } catch (err: any) {
+    await session.abortTransaction();
+    console.error('❌ Error during hard delete:', err);
+    throw err;
+  } finally {
+    await session.endSession();
+  }
+};
+
+
 
 const searchUsers = async (query: string) => {
   if (!query || query.trim().length < 2) {
@@ -411,7 +560,6 @@ const searchUsers = async (query: string) => {
   
   const users = await User.find({
     fullName: { $regex: searchRegex },
-    isDeleted: false,
   })
   .select('fullName email designation')
   .limit(10)
@@ -517,6 +665,10 @@ export const UserServices = {
   deleteUser,
   searchUsers,
   
+  // SuperAdmin management
+  replaceSuperAdmin,
+  getCurrentSuperAdmin,
+  
   // User updates
   updateResearchMember,
   updateResearchMemberByEmail,
@@ -528,7 +680,6 @@ export const UserServices = {
   Alluser: () => getUsers(),
   getAllResearchMembers: () => getUsers({ excludeSuperAdmin: true }),
   getAllUsers: () => getUsers({ 
-    excludeDeleted: true, 
     selectFields: 'fullName email designation',
     limit: 50 
   }),

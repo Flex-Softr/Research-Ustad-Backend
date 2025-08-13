@@ -152,6 +152,13 @@ const deleteUserValidationSchema = z.object({
   })
 });
 
+// SuperAdmin replacement validation schema
+const replaceSuperAdminValidationSchema = z.object({
+  body: z.object({
+    newSuperAdminId: z.string().min(1, { message: "New superAdmin ID is required." }),
+  })
+});
+
 export const UserValidation = {
   createUserValidationSchema,
   createResearchMemberValidationSchema,
@@ -160,4 +167,5 @@ export const UserValidation = {
   searchUserValidationSchema,
   updateUserRoleValidationSchema,
   deleteUserValidationSchema,
+  replaceSuperAdminValidationSchema,
 };

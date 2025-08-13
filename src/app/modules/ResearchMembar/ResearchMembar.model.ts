@@ -58,10 +58,7 @@ const ResearchMembarSchema = new Schema<IResearchMembar>(
       topic: { type: String, default: '' },
     }],
 
-    isDeleted: {
-      type: Boolean,
-      default: false,
-    },
+
   },
   {
     toJSON: {
@@ -71,20 +68,7 @@ const ResearchMembarSchema = new Schema<IResearchMembar>(
 );
 
 
-ResearchMembarSchema.pre('find', function (next) {
-  this.find({ isDeleted: { $ne: true } });
-  next();
-});
 
-ResearchMembarSchema.pre('findOne', function (next) {
-  this.find({ isDeleted: { $ne: true } });
-  next();
-});
-
-ResearchMembarSchema.pre('aggregate', function (next) {
-  this.pipeline().unshift({ $match: { isDeleted: { $ne: true } } });
-  next();
-});
 
 ResearchMembarSchema.statics.isUserExists = async function (email: string) {
   const existingUser = await ResearchMembar.findOne({ email});

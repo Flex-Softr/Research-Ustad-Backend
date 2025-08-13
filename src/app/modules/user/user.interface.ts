@@ -11,7 +11,7 @@ export interface TUser {
   designation: "Advisor" | "Lead" | "Mentor_Panel" | "Lead_Research_Associate" | "Research_Associate"|"superAdmin"; 
   status: 'in-progress' | 'blocked';
   role:"admin"|'user'|'superAdmin'
-  isDeleted: boolean;
+
   fullName: string;
   image: string;
   // Research member specific fields

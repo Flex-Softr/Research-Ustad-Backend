@@ -35,6 +35,6 @@ export interface IResearchMembar {
       role?: string;
       topic?: string;
     }>;
-    isDeleted:boolean;
+
   }
   

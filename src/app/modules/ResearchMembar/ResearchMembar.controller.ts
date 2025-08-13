@@ -64,7 +64,8 @@ const updateForuserAssociate = catchAsync(async (req, res) => {
 
 const deleteAssociate = catchAsync(async (req, res) => {
   const { id } = req.params;
-  const result = await ResearchServices.deleteMembar(id);
+  const { id: requestingUserId } = req.user;
+  const result = await ResearchServices.deleteMembar(id, requestingUserId);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,

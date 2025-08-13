@@ -32,6 +32,7 @@ router.get(
 
 router.get(
   '/personalPaper/:id',
+  auth(USER_ROLE.superAdmin, USER_ROLE.user, USER_ROLE.admin),
   ResearchPaperControllers.getpersonalPaperResearchUstadforid
 );
 

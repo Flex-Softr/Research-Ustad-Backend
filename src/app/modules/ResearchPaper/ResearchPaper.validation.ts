@@ -11,7 +11,13 @@ export const researchPaperSchema = z.object({
         journalRank: z.string().optional(),
         visitLink: z.string().url("Invalid URL format"),
         paperType: z.enum(["journal", "conference"]).optional(),
+        status: z.enum(["published", "ongoing"]).optional(),
         isApproved: z.boolean().optional(),
+        abstract: z.string().min(10, "Abstract must be at least 10 characters").optional(),
+        keywords: z.array(z.string().min(2, "Keyword must be at least 2 characters")).optional(),
+        citations: z.number().min(0, "Citations cannot be negative").optional(),
+        researchArea: z.string().min(2, "Research area must be at least 2 characters").optional(),
+        funding: z.string().min(2, "Funding information must be at least 2 characters").optional(),
     })
  
 });

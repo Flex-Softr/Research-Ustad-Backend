@@ -10,7 +10,13 @@ export interface IResearchPaper{
     journalRank?: string; 
     visitLink: string;
     paperType?: "journal" | "conference"; 
+    status: "published" | "ongoing";
     isApproved: boolean;
+    abstract?: string;
+    keywords?: string[];
+    citations?: number;
+    researchArea?: string;
+    funding?: string;
     createdAt?: Date;
     updatedAt?: Date;
     user: Types.ObjectId

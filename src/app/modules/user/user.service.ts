@@ -111,10 +111,51 @@ const createResearchMembars = async (
   const session = await mongoose.startSession();
 
   try {
-     session.startTransaction();
-    const newUser = await User.create([userData], { session });
+    session.startTransaction();
+    
+    console.log(`🔍 Checking for existing user with email: ${payload.email}`);
+    
+    // Check if user with this email already exists (including deleted ones)
+    // Use the native collection to bypass mongoose middleware
+    const existingUser = await User.collection.findOne({ email: payload.email });
+    
+    let newUser;
+    
+    if (existingUser) {
+      console.log(`📋 Found existing user:`, {
+        id: existingUser._id,
+        email: existingUser.email,
+        isDeleted: existingUser.isDeleted,
+        fullName: existingUser.fullName
+      });
+      
+      if (existingUser.isDeleted) {
+        // If user exists but is deleted, update the existing record
+        console.log(`✅ Updating deleted user with email: ${payload.email}`);
+        newUser = await User.findByIdAndUpdate(
+          existingUser._id,
+          {
+            ...userData,
+            isDeleted: false, // Reactivate the user
+            status: 'in-progress' // Reset status
+          },
+          { new: true, session }
+        );
+        console.log(`✅ User reactivated successfully:`, newUser?.email);
+      } else {
+        // If user exists and is not deleted, throw error
+        console.log(`❌ User already exists and is not deleted`);
+        throw new AppError(httpStatus.CONFLICT, 'User with this email already exists');
+      }
+    } else {
+      // Create new user if no existing user found
+      console.log(`🆕 Creating new user with email: ${payload.email}`);
+      const createdUsers = await User.create([userData], { session });
+      newUser = createdUsers[0];
+      console.log(`✅ New user created successfully:`, newUser?.email);
+    }
  
-    if (!newUser.length) {
+    if (!newUser) {
       throw new AppError(httpStatus.BAD_REQUEST, 'Failed to create user');
     }
     
@@ -127,9 +168,9 @@ const createResearchMembars = async (
     <p>Congratulations! Your account has been successfully created on <strong>ResearchUstad</strong>. You now have access to our platform and can start exploring.</p>
     <h3>Your Account Details:</h3>
     <ul>
-      <li><strong>Email:</strong>  ${newUser[0].email}</li>
+      <li><strong>Email:</strong>  ${newUser.email}</li>
       <li><strong>Password:</strong> ${plainPassword}</li>
-      <li><strong>designation:</strong> ${newUser[0].designation}</li>
+      <li><strong>designation:</strong> ${newUser.designation}</li>
     </ul>
     <p>For security reasons, we strongly recommend that you change your password immediately after logging in.</p>
 
@@ -141,9 +182,9 @@ const createResearchMembars = async (
     <p><strong>The ResearchUstad Team</strong></p>
     `;
 
-    await sendEmail(newUser[0].email, emailContent, subject);
+    await sendEmail(newUser.email, emailContent, subject);
     await session.commitTransaction();
-    return newUser;
+    return [newUser]; // Return as array for consistency with original function
   } catch (err: any) {
     await session.abortTransaction();
     throw err

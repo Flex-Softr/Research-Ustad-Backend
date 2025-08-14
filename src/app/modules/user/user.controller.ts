@@ -1,89 +1,96 @@
 import httpStatus from 'http-status';
 import catchAsync from '../../utils/catchAsync';
 import sendResponse from '../../utils/sendResponse';
-import { UserServices } from './user.service';
+import { UserService } from './user.service';
 
-const createResearchMembar = catchAsync(async (req, res) => {
+// ===== USER CREATION =====
+
+const createUser = catchAsync(async (req, res) => {
   const { password, ...userData } = req.body;
-  const result = await UserServices.createResearchMembar(
-    null, // No longer passing file since router handles it
-    password,
-    userData,
+  const result = await UserService.createUser(
+    { ...userData, password },
+    req.file || null, // Handle optional file upload
   );
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: 'ResearchMembar is created succesfully',
+    message: 'User created successfully',
     data: result,
   });
 });
 
-const createResearchMembars = catchAsync(async (req, res) => {
-  const result = await UserServices.createResearchMembars(req.body);
-
-  sendResponse(res, {
-    statusCode: httpStatus.OK,
-    success: true,
-    message: 'ResearchMembar is created succesfully',
-    data: result,
-  });
-});
+// ===== USER RETRIEVAL =====
 
 const getMe = catchAsync(async (req, res) => {
   const { email } = req.user;
-  const result = await UserServices.getMe(email);
+  const result = await UserService.getUserByEmail(email);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: 'User is retrieved succesfully',
+    message: 'User retrieved successfully',
     data: result,
   });
 });
 
-const Alluser = catchAsync(async (req, res) => {
-  const result = await UserServices.Alluser();
+const getAllUsers = catchAsync(async (req, res) => {
+  const { type, limit, fields } = req.query;
+  
+  let options = {};
+  if (type === 'research-members') {
+    options = { role: 'user' };
+  }
+  if (limit) {
+    options = { ...options, limit: parseInt(limit as string) };
+  }
+  if (fields) {
+    options = { ...options, selectFields: fields as string };
+  }
+
+  const result = await UserService.getUsers(options);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: 'All User is retrieved succesfully',
+    message: 'Users retrieved successfully',
     data: result,
   });
 });
 
-const AllInfo = catchAsync(async (req, res) => {
-  const result = await UserServices.AllInfo();
+const getPlatformStats = catchAsync(async (req, res) => {
+  const result = await UserService.getPlatformStats();
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: 'AllInfo is retrieved succesfully',
+    message: 'Platform statistics retrieved successfully',
     data: result,
   });
 });
 
-const AllInfoForPersonal = catchAsync(async (req, res) => {
+const getPersonalStats = catchAsync(async (req, res) => {
   const { id } = req.user;
-  const result = await UserServices.AllInfoForPersonal(id);
+  const result = await UserService.getUserStats(id);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: 'AllInfoForPersonal is retrieved succesfully',
+    message: 'Personal statistics retrieved successfully',
     data: result,
   });
 });
 
-const userToadmin = catchAsync(async (req, res) => {
+// ===== USER MANAGEMENT =====
+
+const toggleUserRole = catchAsync(async (req, res) => {
   const { id } = req.params;
-  const result = await UserServices.userToadmin(id);
+  const result = await UserService.toggleUserRole(id);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: 'userToadmin is  succesfully',
+    message: 'User role updated successfully',
     data: result,
   });
 });
@@ -91,8 +98,8 @@ const userToadmin = catchAsync(async (req, res) => {
 const deleteUser = catchAsync(async (req, res) => {
   const { id } = req.params;
   const { id: requestingUserId } = req.user;
-  const result = await UserServices.deleteUser(id, requestingUserId);
-  
+  const result = await UserService.deleteUser(id, requestingUserId);
+
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
@@ -103,7 +110,7 @@ const deleteUser = catchAsync(async (req, res) => {
 
 const searchUsers = catchAsync(async (req, res) => {
   const { query } = req.query;
-  const result = await UserServices.searchUsers(query as string);
+  const result = await UserService.searchUsers(query as string);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
@@ -113,97 +120,43 @@ const searchUsers = catchAsync(async (req, res) => {
   });
 });
 
-const getAllUsers = catchAsync(async (req, res) => {
-  const result = await UserServices.getAllUsers();
+// ===== USER UPDATES =====
 
-  sendResponse(res, {
-    statusCode: httpStatus.OK,
-    success: true,
-    message: 'All users retrieved successfully',
-    data: result,
-  });
-});
-
-// Research member specific controllers
-const getAllResearchMembers = catchAsync(async (req, res) => {
-  const result = await UserServices.getAllResearchMembers();
-
-  sendResponse(res, {
-    statusCode: httpStatus.OK,
-    success: true,
-    message: 'Research members are retrieved successfully',
-    data: result
-  });
-});
-
-const getSingleResearchMember = catchAsync(async (req, res) => {
+const updateUser = catchAsync(async (req, res) => {
   const { id } = req.params;
-  const result = await UserServices.getSingleResearchMember(id);
-  
+  const result = await UserService.updateUser(id, req.body);
+
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: 'Research member is retrieved successfully',
+    message: 'User updated successfully',
     data: result,
   });
 });
 
-const getSingleResearchMemberByEmail = catchAsync(async (req, res) => {
+const updateCurrentUser = catchAsync(async (req, res) => {
   const { email } = req.user;
-  const result = await UserServices.getSingleResearchMemberByEmail(email);
-  
-  sendResponse(res, {
-    statusCode: httpStatus.OK,
-    success: true,
-    message: 'Research member is retrieved successfully',
-    data: result,
-  });
-});
-
-const updateResearchMember = catchAsync(async (req, res) => {
-  const { id } = req.params;
-  const result = await UserServices.updateResearchMember(id, req.body);
+  const result = await UserService.updateUserByEmail(email, req.body);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: 'Research member is updated successfully',
+    message: 'User updated successfully',
     data: result,
   });
 });
 
-const updateResearchMemberByEmail = catchAsync(async (req, res) => {
-  const { email } = req.user;
-  const result = await UserServices.updateResearchMemberByEmail(email, req.body);
-
-  sendResponse(res, {
-    statusCode: httpStatus.OK,
-    success: true,
-    message: 'Research member is updated successfully',
-    data: result,
-  });
-});
-
-const deleteResearchMember = catchAsync(async (req, res) => {
-  const { id } = req.params;
-  const result = await UserServices.deleteResearchMember(id);
-  
-  sendResponse(res, {
-    statusCode: httpStatus.OK,
-    success: true,
-    message: 'Research member is deleted successfully',
-    data: result,
-  });
-});
-
-// ===== SUPERADMIN MANAGEMENT CONTROLLERS =====
+// ===== SUPERADMIN MANAGEMENT =====
 
 const replaceSuperAdmin = catchAsync(async (req, res) => {
   const { newSuperAdminId } = req.body;
   const { id: requestingUserId } = req.user;
-  
-  const result = await UserServices.replaceSuperAdmin(newSuperAdminId, requestingUserId);
-  
+
+  const result = await UserService.replaceSuperAdmin(
+    newSuperAdminId,
+    requestingUserId,
+  );
+
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
@@ -213,8 +166,8 @@ const replaceSuperAdmin = catchAsync(async (req, res) => {
 });
 
 const getCurrentSuperAdmin = catchAsync(async (req, res) => {
-  const result = await UserServices.getCurrentSuperAdmin();
-  
+  const result = await UserService.getCurrentSuperAdmin();
+
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
@@ -224,24 +177,23 @@ const getCurrentSuperAdmin = catchAsync(async (req, res) => {
 });
 
 export const UserControllers = {
-  createResearchMembar,
-  createResearchMembars,
+  // User creation
+  createUser,
+
+  // User retrieval
   getMe,
-  Alluser,
-  AllInfo,
-  AllInfoForPersonal,
-  userToadmin,
+  getAllUsers,
+  getPlatformStats,
+  getPersonalStats,
+
+  // User management
+  toggleUserRole,
   deleteUser,
   searchUsers,
-  getAllUsers,
-  // Research member specific controllers
-  getAllResearchMembers,
-  getSingleResearchMember,
-  getSingleResearchMemberByEmail,
-  updateResearchMember,
-  updateResearchMemberByEmail,
-  deleteResearchMember,
-  // SuperAdmin management controllers
+  updateUser,
+  updateCurrentUser,
+
+  // SuperAdmin management
   replaceSuperAdmin,
   getCurrentSuperAdmin,
 };

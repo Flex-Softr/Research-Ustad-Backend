@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-this-alias */
 import bcrypt from 'bcrypt';
-import mongoose, { Schema, model } from 'mongoose';
+import { Schema, model } from 'mongoose';
 import config from '../../config';
 import { UserStatus } from './user.constant';
 import { TUser, UserModel } from './user.interface';
@@ -54,7 +54,7 @@ const userSchema = new Schema<TUser, UserModel>(
       default: "user" 
   },
 
-    // Research member specific fields
+    // Research member specific fields (consolidated)
     contactNo: { type: String, default: '' },
     current: {
       institution: { type: String, default: '' },
@@ -66,7 +66,7 @@ const userSchema = new Schema<TUser, UserModel>(
       degree: { type: String, default: '' },
       field: { type: String, default: '' },
       institution: { type: String, default: '' },
-      status: { type: String, enum: ["Ongoing", "Completed"] },
+      status: { type: String, enum: ["Ongoing", "Completed", ""], default: "" },
       scholarship: { type: String, default: '' },
     },
     research: [{ type: String }],
@@ -83,6 +83,9 @@ const userSchema = new Schema<TUser, UserModel>(
       role: { type: String, default: '' },
       topic: { type: String, default: '' },
     }],
+    
+    // Publications array to track user's authored papers
+    publications: [{ type: Schema.Types.ObjectId, ref: 'ResearchPaper' }],
   },
   {
     timestamps: true,
@@ -103,32 +106,20 @@ userSchema.pre('save', async function (next) {
   next();
 });
 
-// set '' after saving password
 userSchema.post('save', function (doc, next) {
   doc.password = '';
   next();
 });
-
-
 
 userSchema.statics.isUserExistsByCustomId = async function (email: string) {
   return await User.findOne({ email }).select('+password');
 };
 
 userSchema.statics.isPasswordMatched = async function (
-  plainTextPassword,
-  hashedPassword,
+  plainTextPassword: string,
+  hashedPassword: string,
 ) {
   return await bcrypt.compare(plainTextPassword, hashedPassword);
 };
 
-userSchema.statics.isJWTIssuedBeforePasswordChanged = function (
-  passwordChangedTimestamp: Date,
-  jwtIssuedTimestamp: number,
-) {
-  const passwordChangedTime =
-    new Date(passwordChangedTimestamp).getTime() / 1000;
-  return passwordChangedTime > jwtIssuedTimestamp;
-};
-
-export const User = (mongoose.models.User as UserModel) || model<TUser, UserModel>('User', userSchema);
+export const User = model<TUser, UserModel>('User', userSchema);

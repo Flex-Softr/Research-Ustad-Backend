@@ -35,6 +35,17 @@ const postResearchUstad = catchAsync(async (req, res) => {
       data: result,
     });
   });
+
+  const getPublicSingleResearchUstad = catchAsync(async (req, res) => {
+    const { id } = req.params;
+    const result = await ResearchPaperService.getPublicSingleResearchUstad(id);
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: 'ResearchPaper retrieved successfully',
+      data: result,
+    });
+  });
   const getOngingResearchUstad = catchAsync(async (req, res) => {
     const result = await ResearchPaperService.getOngingResearchUstad();
     sendResponse(res, {
@@ -117,6 +128,7 @@ export const ResearchPaperControllers={
     postResearchUstad,
     updateResearchUstad,
     getPublicResearchUstad,
+    getPublicSingleResearchUstad,
     getAllResearchUstad,
     approveResearchUstad,
     rejectResearchUstad,

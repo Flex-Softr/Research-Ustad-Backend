@@ -8,110 +8,118 @@ import { UserControllers } from './user.controller';
 
 const router = express.Router();
 
-// Research member creation routes
+// ===== USER CREATION =====
+
+// Create user with optional file upload
 router.post(
-  '/create-ResearchMembar',
+  '/create',
   auth(USER_ROLE.superAdmin, USER_ROLE.admin),
   ...handleFileUpload('file'),
   validateRequest(UserValidation.createResearchMemberValidationSchema),
-  UserControllers.createResearchMembar,
+  UserControllers.createUser,
 );
 
+// Create user without file upload (JSON only)
 router.post(
-  '/create-ResearchMembars',
+  '/create-json',
   auth(USER_ROLE.superAdmin, USER_ROLE.admin),
   validateRequest(UserValidation.createResearchMemberJsonValidationSchema),
-  UserControllers.createResearchMembars,
+  UserControllers.createUser,
 );
 
-// User management routes
+// ===== USER RETRIEVAL =====
+
+// Get current user profile
 router.get(
   '/me',
   auth(USER_ROLE.superAdmin, USER_ROLE.admin, USER_ROLE.user),
   UserControllers.getMe,
 );
 
+// Get all users with optional filtering
 router.get(
   '/all',
   auth(USER_ROLE.superAdmin, USER_ROLE.admin),
-  UserControllers.Alluser,
+  UserControllers.getAllUsers,
 );
 
-router.get(
-  '/userinfo',
-  auth(USER_ROLE.superAdmin, USER_ROLE.admin),
-  UserControllers.AllInfo,
-);
-
-router.get(
-  '/personalinfo',
-  auth(USER_ROLE.superAdmin, USER_ROLE.admin, USER_ROLE.user),
-  UserControllers.AllInfoForPersonal,
-);
-
-router.put(
-  '/userToadmin/:id',
-  auth(USER_ROLE.superAdmin, USER_ROLE.admin),
-  UserControllers.userToadmin,
-);
-
-router.delete(
-  '/:id',
-  auth(USER_ROLE.superAdmin, USER_ROLE.admin),
-  UserControllers.deleteUser,
-);
-
-router.get(
-  '/search',
-  auth(USER_ROLE.superAdmin, USER_ROLE.admin, USER_ROLE.user),
-  UserControllers.searchUsers,
-);
-
+// Get all users (public - limited fields)
 router.get(
   '/all-users',
   auth(USER_ROLE.superAdmin, USER_ROLE.admin, USER_ROLE.user),
   UserControllers.getAllUsers,
 );
 
-// Research member specific routes (maintaining backward compatibility)
+// Get research members (public)
 router.get(
   '/research-members',
-  UserControllers.getAllResearchMembers,
+  UserControllers.getAllUsers,
 );
 
+// Get platform statistics (admin only)
 router.get(
-  '/research-members/:id',
-  UserControllers.getSingleResearchMember,
+  '/stats/platform',
+  auth(USER_ROLE.superAdmin, USER_ROLE.admin),
+  UserControllers.getPlatformStats,
 );
 
+// Get personal statistics
 router.get(
-  '/research-members/me',
+  '/stats/personal',
   auth(USER_ROLE.superAdmin, USER_ROLE.admin, USER_ROLE.user),
-  UserControllers.getSingleResearchMemberByEmail,
+  UserControllers.getPersonalStats,
 );
 
+// Search users
+router.get(
+  '/search',
+  auth(USER_ROLE.superAdmin, USER_ROLE.admin, USER_ROLE.user),
+  UserControllers.searchUsers,
+);
+
+// ===== RESEARCH MEMBER SPECIFIC =====
+
+// Update research member by ID (admin only)
 router.patch(
   '/research-members/:id',
   auth(USER_ROLE.superAdmin, USER_ROLE.admin),
   validateRequest(UserValidation.updateResearchMemberValidationSchema),
-  UserControllers.updateResearchMember,
+  UserControllers.updateUser,
 );
 
+// Update current user as research member (with file upload)
 router.put(
   '/research-members/me',
   auth(USER_ROLE.superAdmin, USER_ROLE.admin, USER_ROLE.user),
   ...handleFileUpload('file'),
   validateRequest(UserValidation.updateResearchMemberValidationSchema),
-  UserControllers.updateResearchMemberByEmail,
+  UserControllers.updateCurrentUser,
 );
 
+// ===== USER MANAGEMENT =====
+
+// Toggle user role (admin only)
+router.put(
+  '/toggle-role/:id',
+  auth(USER_ROLE.superAdmin, USER_ROLE.admin),
+  UserControllers.toggleUserRole,
+);
+
+// Delete user (admin only)
+router.delete(
+  '/:id',
+  auth(USER_ROLE.superAdmin, USER_ROLE.admin),
+  UserControllers.deleteUser,
+);
+
+// Delete research member (admin only)
 router.delete(
   '/research-members/:id',
   auth(USER_ROLE.superAdmin, USER_ROLE.admin),
-  UserControllers.deleteResearchMember,
+  UserControllers.deleteUser,
 );
 
-// ===== SUPERADMIN MANAGEMENT ROUTES =====
+// ===== SUPERADMIN MANAGEMENT =====
 
 // Get current superAdmin information
 router.get(
@@ -127,5 +135,25 @@ router.post(
   validateRequest(UserValidation.replaceSuperAdminValidationSchema),
   UserControllers.replaceSuperAdmin,
 );
+
+// ===== LEGACY ROUTES FOR BACKWARD COMPATIBILITY =====
+
+// Legacy route aliases to maintain existing frontend compatibility
+router.post(
+  '/create-ResearchMembar', 
+  auth(USER_ROLE.superAdmin, USER_ROLE.admin),
+  ...handleFileUpload('file'),
+  validateRequest(UserValidation.createResearchMemberValidationSchema),
+  UserControllers.createUser
+);
+router.post(
+  '/create-ResearchMembars', 
+  auth(USER_ROLE.superAdmin, USER_ROLE.admin),
+  validateRequest(UserValidation.createResearchMemberJsonValidationSchema),
+  UserControllers.createUser
+);
+router.get('/userinfo', UserControllers.getPlatformStats);
+router.get('/personalinfo', UserControllers.getPersonalStats);
+router.put('/userToadmin/:id', UserControllers.toggleUserRole);
 
 export const UserRoutes = router;

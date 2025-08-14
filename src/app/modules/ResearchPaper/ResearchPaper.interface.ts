@@ -1,9 +1,14 @@
 import { Types } from "mongoose";
 
+export interface IAuthor {
+  name: string;
+  email?: string;
+}
+
 export interface IResearchPaper{
     year: number;
     title: string;
-    authors: string[]; 
+    authors: IAuthor[]; 
     journal: string;
     volume?: string; 
     impactFactor?: number; 

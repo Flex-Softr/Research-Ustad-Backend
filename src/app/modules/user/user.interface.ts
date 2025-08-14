@@ -14,7 +14,8 @@ export interface TUser {
 
   fullName: string;
   image: string;
-  // Research member specific fields
+  
+  // Research member specific fields (consolidated from ResearchMembar)
   contactNo?: string;
   current?: {
     institution?: string;
@@ -26,37 +27,34 @@ export interface TUser {
     degree?: string;
     field?: string;
     institution?: string;
-    status?: "Ongoing" | "Completed";
+    status?: "Ongoing" | "Completed" | "";
     scholarship?: string;
   };
   research?: string[];
   shortBio?: string;
   socialLinks?: {
-    google_scholar?: string;
     researchgate?: string;
+    google_scholar?: string;
     linkedin?: string;
   };
   expertise?: string[];
   awards?: string[];
   conferences?: Array<{
-    name?: string;
-    role?: string;
-    topic?: string;
+    name: string;
+    role: string;
+    topic: string;
   }>;
+  
+  // Publications array to track user's authored papers
+  publications?: Types.ObjectId[];
 }
 
 export interface UserModel extends Model<TUser> {
-  //instance methods for checking if the user exist
   isUserExistsByCustomId(email: string): Promise<TUser>;
-  //instance methods for checking if passwords are matched
   isPasswordMatched(
     plainTextPassword: string,
     hashedPassword: string,
   ): Promise<boolean>;
-  isJWTIssuedBeforePasswordChanged(
-    passwordChangedTimestamp: Date,
-    jwtIssuedTimestamp: number,
-  ): boolean;
 }
 
 export type TUserRole = keyof typeof USER_ROLE;

@@ -1,10 +1,15 @@
 import { z } from "zod";
 
+const authorSchema = z.object({
+  name: z.string().min(2, "Author name must be at least 2 characters"),
+  email: z.string().email("Invalid email format").optional().or(z.literal(""))
+});
+
 export const researchPaperSchema = z.object({
     body:z.object({
         year: z.number().min(1900).max(new Date().getFullYear()), 
         title: z.string().min(5, "Title must be at least 5 characters"),
-        authors: z.array(z.string().min(2, "Author name must be at least 2 characters")),
+        authors: z.array(authorSchema).min(1, "At least one author is required"),
         journal: z.string().min(3, "Journal name must be at least 3 characters"),
         volume: z.string().optional(),
         impactFactor: z.number().min(0).max(50).optional(), 

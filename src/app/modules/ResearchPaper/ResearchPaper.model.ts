@@ -5,7 +5,10 @@ const ResearchPaperSchema = new Schema<IResearchPaper>(
   {
     year: { type: Number, required: true },
     title: { type: String, required: true },
-    authors: { type: [String], required: true },
+    authors: [{
+      name: { type: String, required: true },
+      email: { type: String, required: false }
+    }],
     journal: { type: String, required: true },
     volume: { type: String },
     impactFactor: { type: Number },

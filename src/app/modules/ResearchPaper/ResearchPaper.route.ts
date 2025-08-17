@@ -3,7 +3,7 @@ import auth from '../../middlewares/auth';
 import { USER_ROLE } from '../user/user.constant';
 import { ResearchPaperControllers } from './ResearchPaper.controller';
 import validateRequest from '../../middlewares/validateRequest';
-import { researchPaperSchema } from './ResearchPaper.validation';
+import { researchPaperSchema, researchPaperUpdateSchema } from './ResearchPaper.validation';
 const router = express.Router();
 router.post(
   '/add',
@@ -39,7 +39,7 @@ router.get(
 router.put(
   '/update/:id',
   auth(USER_ROLE.superAdmin, USER_ROLE.user, USER_ROLE.admin),
-  validateRequest(researchPaperSchema),
+  validateRequest(researchPaperUpdateSchema),
   ResearchPaperControllers.updateResearchUstad,
 );
 

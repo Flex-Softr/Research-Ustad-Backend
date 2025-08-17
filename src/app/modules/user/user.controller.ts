@@ -2,6 +2,7 @@ import httpStatus from 'http-status';
 import catchAsync from '../../utils/catchAsync';
 import sendResponse from '../../utils/sendResponse';
 import { UserService } from './user.service';
+import AppError from '../../errors/AppError';
 
 // ===== USER CREATION =====
 
@@ -25,6 +26,10 @@ const createUser = catchAsync(async (req, res) => {
 const getMe = catchAsync(async (req, res) => {
   const { email } = req.user;
   const result = await UserService.getUserByEmail(email);
+
+  if (!result) {
+    throw new AppError(httpStatus.NOT_FOUND, 'User not found');
+  }
 
   sendResponse(res, {
     statusCode: httpStatus.OK,

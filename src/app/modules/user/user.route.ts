@@ -50,7 +50,7 @@ router.get(
   UserControllers.getAllUsers,
 );
 
-// Get research members (public)
+// Get research members (public) - excludes admin and superAdmin
 router.get(
   '/research-members',
   UserControllers.getAllUsers,
@@ -78,6 +78,12 @@ router.get(
 );
 
 // ===== RESEARCH MEMBER SPECIFIC =====
+
+// Get single research member by ID (public)
+router.get(
+  '/research-members/:id',
+  UserControllers.getUserById,
+);
 
 // Update research member by ID (admin only)
 router.patch(

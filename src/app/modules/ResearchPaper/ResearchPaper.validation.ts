@@ -113,18 +113,18 @@ export const researchPaperSchema = z.object({
 
 // Update schema that allows partial updates
 export const researchPaperUpdateSchema = z.object({
-    body: z.object({
+  body: z.object({
         year: z.number().min(1900).max(new Date().getFullYear()).optional(), 
         title: z.string().min(5, "Title must be at least 5 characters").optional(),
         authors: z.preprocess(preprocessAuthors, z.array(authorUpdateSchema).min(1, "At least one author is required")).optional(),
         journal: z.string().min(3, "Journal name must be at least 3 characters").optional(),
-        volume: z.string().optional(),
-        impactFactor: z.number().min(0).max(50).optional(), 
-        journalRank: z.string().optional(),
+    volume: z.string().optional(),
+    impactFactor: z.number().min(0).max(50).optional(),
+    journalRank: z.string().optional(),
         visitLink: z.string().url("Invalid URL format").optional(),
         paperType: z.enum(["journal", "conference"]).optional(),
         status: z.enum(["published", "ongoing"]).optional(),
-        isApproved: z.boolean().optional(),
+    isApproved: z.boolean().optional(),
         abstract: z.string().min(10, "Abstract must be at least 10 characters").optional(),
         keywords: z.array(z.string().min(2, "Keyword must be at least 2 characters")).optional(),
         citations: z.number().min(0, "Citations cannot be negative").optional(),

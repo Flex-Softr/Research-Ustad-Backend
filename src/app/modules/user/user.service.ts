@@ -148,7 +148,7 @@ export class UserService {
   static async getUserByEmail(email: string): Promise<TUser | null> {
     const user = await User.findOne({ email }).populate({
       path: 'publications',
-      select: 'title citations journal abstract year visitLink authors',
+      select: 'title citations journal abstract year visitLink authors status isApproved',
       populate: {
         path: 'authors.user',
         select: 'fullName email designation image',
@@ -164,7 +164,7 @@ export class UserService {
   static async getUserById(id: string): Promise<TUser | null> {
     const user = await User.findById(id).populate({
       path: 'publications',
-      select: 'title citations journal abstract year visitLink authors',
+      select: 'title citations journal abstract year visitLink authors status isApproved',
       populate: {
         path: 'authors.user',
         select: 'fullName email designation image',
@@ -178,13 +178,23 @@ export class UserService {
    * Get all users with optional filtering and populated publications
    */
   static async getUsers(options: any = {}): Promise<TUser[]> {
-    const { type, limit, fields, selectFields } = options;
+    const { type, limit, fields, selectFields, excludeRoles, role } = options;
 
     const query: any = { isDeleted: { $ne: true } };
 
     // Apply type filter
     if (type === 'research-members') {
       query.role = 'user';
+    }
+
+    // Apply role filter
+    if (role) {
+      query.role = role;
+    }
+
+    // Apply exclude roles filter
+    if (excludeRoles && Array.isArray(excludeRoles)) {
+      query.role = { $nin: excludeRoles };
     }
 
     // Build the query
@@ -204,7 +214,7 @@ export class UserService {
     // Always populate publications with limited fields
     userQuery = userQuery.populate({
       path: 'publications',
-      select: 'title citations journal abstract year visitLink authors',
+      select: 'title citations journal abstract year visitLink authors status isApproved',
       populate: {
         path: 'authors.user',
         select: 'fullName email designation image',

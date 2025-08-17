@@ -42,10 +42,17 @@ const getMe = catchAsync(async (req, res) => {
 const getAllUsers = catchAsync(async (req, res) => {
   const { type, limit, fields } = req.query;
   
-  let options = {};
-  if (type === 'research-members') {
-    options = { role: 'user' };
+  let options: any = {};
+  
+  // Check if this is a research-members request (either by type param or route path)
+  const isResearchMembersRequest = type === 'research-members' || req.path.includes('research-members');
+  
+  if (isResearchMembersRequest) {
+    options = { 
+      role: 'user' // Only include regular users
+    };
   }
+  
   if (limit) {
     options = { ...options, limit: parseInt(limit as string) };
   }
@@ -59,6 +66,24 @@ const getAllUsers = catchAsync(async (req, res) => {
     statusCode: httpStatus.OK,
     success: true,
     message: 'Users retrieved successfully',
+    data: result,
+  });
+});
+
+
+
+const getUserById = catchAsync(async (req, res) => {
+  const { id } = req.params;
+  const result = await UserService.getUserById(id);
+
+  if (!result) {
+    throw new AppError(httpStatus.NOT_FOUND, 'User not found');
+  }
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'User retrieved successfully',
     data: result,
   });
 });
@@ -188,6 +213,7 @@ export const UserControllers = {
   // User retrieval
   getMe,
   getAllUsers,
+  getUserById,
   getPlatformStats,
   getPersonalStats,
 

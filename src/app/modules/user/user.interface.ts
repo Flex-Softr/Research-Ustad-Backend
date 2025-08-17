@@ -8,7 +8,7 @@ export interface TUser {
   password: string;
   needsPasswordChange: boolean;
   passwordChangedAt?: Date;
-  designation: "Advisor" | "Lead" | "Mentor_Panel" | "Lead_Research_Associate" | "Research_Associate"|"superAdmin"; 
+  designation: string; 
   status: 'in-progress' | 'blocked';
   role:"admin"|'user'|'superAdmin'
 

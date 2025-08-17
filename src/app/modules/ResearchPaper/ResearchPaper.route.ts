@@ -3,7 +3,7 @@ import auth from '../../middlewares/auth';
 import { USER_ROLE } from '../user/user.constant';
 import { ResearchPaperControllers } from './ResearchPaper.controller';
 import validateRequest from '../../middlewares/validateRequest';
-import { researchPaperSchema } from './ResearchPaper.validation';
+import { researchPaperSchema, researchPaperUpdateSchema } from './ResearchPaper.validation';
 const router = express.Router();
 router.post(
   '/add',
@@ -11,44 +11,51 @@ router.post(
   validateRequest(researchPaperSchema),
   ResearchPaperControllers.postResearchUstad,
 );
-router.get(
-  '/public',
-  ResearchPaperControllers.getPublicResearchUstad,
-);
+router.get('/public', ResearchPaperControllers.getPublicResearchUstad);
+router.get('/public/:id', ResearchPaperControllers.getPublicSingleResearchUstad);
 router.get(
   '/all',
-  auth(USER_ROLE.superAdmin,USER_ROLE.admin),
+  auth(USER_ROLE.superAdmin, USER_ROLE.admin),
   ResearchPaperControllers.getAllResearchUstad,
 );
-router.get(
-  '/onging',
-  ResearchPaperControllers.getOngingResearchUstad
-);
+router.get('/onging', ResearchPaperControllers.getOngingResearchUstad);
 router.get(
   '/personalPapers/:id',
-  ResearchPaperControllers.getpersonalPaperResearchUstad
+  ResearchPaperControllers.getpersonalPaperResearchUstad,
 );
-
 
 router.get(
   '/personalPaper/:id',
-  ResearchPaperControllers.getpersonalPaperResearchUstadforid
+  auth(USER_ROLE.superAdmin, USER_ROLE.user, USER_ROLE.admin),
+  ResearchPaperControllers.getpersonalPaperResearchUstadforid,
 );
 
 router.get(
   '/personalPaper',
   auth(USER_ROLE.superAdmin, USER_ROLE.user, USER_ROLE.admin),
-  ResearchPaperControllers.getpersonalPaperResearch
+  ResearchPaperControllers.getpersonalPaperResearch,
+);
+
+router.put(
+  '/update/:id',
+  auth(USER_ROLE.superAdmin, USER_ROLE.user, USER_ROLE.admin),
+  validateRequest(researchPaperUpdateSchema),
+  ResearchPaperControllers.updateResearchUstad,
 );
 
 router.put(
   '/approve/:id',
-  auth(USER_ROLE.superAdmin,USER_ROLE.admin),
+  auth(USER_ROLE.superAdmin, USER_ROLE.admin),
   ResearchPaperControllers.approveResearchUstad,
 );
+router.put(
+  '/reject/:id',
+  auth(USER_ROLE.superAdmin, USER_ROLE.admin),
+  ResearchPaperControllers.rejectResearchUstad,
+);
 router.delete(
-    '/delete/:id',
-    auth(USER_ROLE.superAdmin,USER_ROLE.admin,USER_ROLE.user),   
-     ResearchPaperControllers.deleteResearchUstad,
+  '/delete/:id',
+  auth(USER_ROLE.superAdmin, USER_ROLE.admin, USER_ROLE.user),
+  ResearchPaperControllers.deleteResearchUstad,
 );
 export const ResearchPaperRoutes = router;

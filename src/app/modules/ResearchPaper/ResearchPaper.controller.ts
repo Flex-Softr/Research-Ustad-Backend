@@ -13,12 +13,36 @@ const postResearchUstad = catchAsync(async (req, res) => {
       data: result,
     });
   });
+
+  const updateResearchUstad = catchAsync(async (req, res) => {
+    const { id } = req.params;
+    const { id: userId } = req.user;
+    const result = await ResearchPaperService.updateResearchUstad(id, req.body, userId);
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: 'ResearchPaper Updated successfully',
+      data: result,
+    });
+  });
+
   const getPublicResearchUstad = catchAsync(async (req, res) => {
     const result = await ResearchPaperService.getPublicResearchUstad();
     sendResponse(res, {
       statusCode: httpStatus.OK,
       success: true,
       message: 'ResearchPaper retrieved succesfully',
+      data: result,
+    });
+  });
+
+  const getPublicSingleResearchUstad = catchAsync(async (req, res) => {
+    const { id } = req.params;
+    const result = await ResearchPaperService.getPublicSingleResearchUstad(id);
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: 'ResearchPaper retrieved successfully',
       data: result,
     });
   });
@@ -77,7 +101,17 @@ const postResearchUstad = catchAsync(async (req, res) => {
     sendResponse(res, {
       statusCode: httpStatus.OK,
       success: true,
-      message: 'ResearchPaper Approve succesfully',
+      message: 'ResearchPaper Approved successfully',
+      data: result,
+    });
+  });
+
+  const rejectResearchUstad = catchAsync(async (req, res) => {
+    const result = await ResearchPaperService.rejectResearchUstad(req.params.id);
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: 'ResearchPaper Rejected successfully',
       data: result,
     });
   });
@@ -92,9 +126,12 @@ const postResearchUstad = catchAsync(async (req, res) => {
   })
 export const ResearchPaperControllers={
     postResearchUstad,
+    updateResearchUstad,
     getPublicResearchUstad,
+    getPublicSingleResearchUstad,
     getAllResearchUstad,
     approveResearchUstad,
+    rejectResearchUstad,
     deleteResearchUstad,
     getOngingResearchUstad,
     getpersonalPaperResearchUstad,

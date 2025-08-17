@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-this-alias */
 import bcrypt from 'bcrypt';
-import mongoose, { Schema, model } from 'mongoose';
+import { Schema, model } from 'mongoose';
 import config from '../../config';
 import { UserStatus } from './user.constant';
 import { TUser, UserModel } from './user.interface';
@@ -28,38 +28,71 @@ const userSchema = new Schema<TUser, UserModel>(
     image: {
       type: String,
       required: false,
-      default: "https://via.placeholder.com/300x300?text=User",
+      default:
+        'https://www.shutterstock.com/image-vector/default-avatar-profile-icon-social-600nw-1906669723.jpg',
     },
     passwordChangedAt: {
       type: Date,
     },
-    designation:  { 
-      type: String, 
-      enum: {
-          values: ["Advisor" , "Lead" , "Mentor_Panel" , "Lead_Research_Associate" , "Research_Associate","superAdmin"], 
-          message: "Status must be either Advisor | Lead | Mentor_Panel | Lead_Research_Associate | Research_Associate"
-      },
-  },
+    designation: {
+      type: String,
+      required: true,
+      maxlength: 50,
+    },
     status: {
       type: String,
       enum: UserStatus,
       default: 'in-progress',
     },
-    role: { 
-      type: String, 
+    role: {
+      type: String,
       enum: {
-          values: ["admin", "user", "superAdmin"], 
-          message: "Status must be either 'admin' or 'user'"
+        values: ['admin', 'user', 'superAdmin'],
+        message: "Status must be either 'admin' or 'user'",
       },
-      default: "user" 
-  },
-    isDeleted: {
-      type: Boolean,
-      default: false,
+      default: 'user',
     },
+
+    // Research member specific fields (consolidated)
+    contactNo: { type: String, default: '' },
+    current: {
+      institution: { type: String, default: '' },
+      department: { type: String, default: '' },
+      degree: { type: String, default: '' },
+      inst_designation: { type: String, default: '' },
+    },
+    education: {
+      degree: { type: String, default: '' },
+      field: { type: String, default: '' },
+      institution: { type: String, default: '' },
+      status: { type: String, enum: ['Ongoing', 'Completed', ''], default: '' },
+      scholarship: { type: String, default: '' },
+    },
+    research: [{ type: String }],
+    shortBio: { type: String, default: '' },
+    socialLinks: {
+      researchgate: { type: String, default: '' },
+      google_scholar: { type: String, default: '' },
+      linkedin: { type: String, default: '' },
+    },
+    expertise: [{ type: String, default: [] }],
+    awards: [{ type: String, default: [] }],
+    conferences: [
+      {
+        name: { type: String, default: '' },
+        role: { type: String, default: '' },
+        topic: { type: String, default: '' },
+      },
+    ],
+
+    // Publications array to track user's authored papers
+    publications: [{ type: Schema.Types.ObjectId, ref: 'ResearchPaper' }],
   },
   {
     timestamps: true,
+    toJSON: {
+      virtuals: true,
+    },
   },
 );
 
@@ -74,7 +107,6 @@ userSchema.pre('save', async function (next) {
   next();
 });
 
-// set '' after saving password
 userSchema.post('save', function (doc, next) {
   doc.password = '';
   next();
@@ -85,19 +117,10 @@ userSchema.statics.isUserExistsByCustomId = async function (email: string) {
 };
 
 userSchema.statics.isPasswordMatched = async function (
-  plainTextPassword,
-  hashedPassword,
+  plainTextPassword: string,
+  hashedPassword: string,
 ) {
   return await bcrypt.compare(plainTextPassword, hashedPassword);
 };
 
-userSchema.statics.isJWTIssuedBeforePasswordChanged = function (
-  passwordChangedTimestamp: Date,
-  jwtIssuedTimestamp: number,
-) {
-  const passwordChangedTime =
-    new Date(passwordChangedTimestamp).getTime() / 1000;
-  return passwordChangedTime > jwtIssuedTimestamp;
-};
-
-export const User = (mongoose.models.User as UserModel) || model<TUser, UserModel>('User', userSchema);
+export const User = model<TUser, UserModel>('User', userSchema);

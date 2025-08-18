@@ -340,9 +340,13 @@ export class UserService {
 
     const newRole = user.role === 'admin' ? 'user' : 'admin';
 
+    // Update the user's role and set passwordChangedAt to invalidate existing tokens
     const result = await User.findByIdAndUpdate(
       id,
-      { role: newRole },
+      { 
+        role: newRole,
+        passwordChangedAt: new Date(), // This will invalidate existing JWT tokens
+      },
       { new: true, runValidators: true },
     );
     return result!;

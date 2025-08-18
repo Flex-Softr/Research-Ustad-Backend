@@ -117,11 +117,19 @@ const toggleUserRole = catchAsync(async (req, res) => {
   const { id } = req.params;
   const result = await UserService.toggleUserRole(id);
 
+  const roleChangeMessage = result.role === 'admin' 
+    ? 'User promoted to admin successfully' 
+    : 'Admin demoted to user successfully';
+
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: 'User role updated successfully',
-    data: result,
+    message: roleChangeMessage,
+    data: {
+      ...result.toObject(),
+      tokenInvalidated: true, // Indicate that the user's token has been invalidated
+      requiresReauth: true, // Indicate that the user needs to re-authenticate
+    },
   });
 });
 

@@ -1,4 +1,3 @@
-
 import httpStatus from 'http-status';
 import mongoose, { Types } from 'mongoose';
 import config from '../../config';
@@ -11,10 +10,6 @@ import { TUser } from './user.interface';
 
 export class UserService {
   // ===== USER CREATION =====
-
-  /**
-   * Create a new user (supports both regular users and research members)
-   */
   static async createUser(
     payload: Partial<TUser> & { password?: string },
     file?: any,
@@ -148,7 +143,8 @@ export class UserService {
   static async getUserByEmail(email: string): Promise<TUser | null> {
     const user = await User.findOne({ email }).populate({
       path: 'publications',
-      select: 'title citations journal abstract year visitLink authors status isApproved',
+      select:
+        'title citations journal abstract year visitLink authors status isApproved',
       populate: {
         path: 'authors.user',
         select: 'fullName email designation image',
@@ -164,7 +160,8 @@ export class UserService {
   static async getUserById(id: string): Promise<TUser | null> {
     const user = await User.findById(id).populate({
       path: 'publications',
-      select: 'title citations journal abstract year visitLink authors status isApproved',
+      select:
+        'title citations journal abstract year visitLink authors status isApproved',
       populate: {
         path: 'authors.user',
         select: 'fullName email designation image',
@@ -214,7 +211,8 @@ export class UserService {
     // Always populate publications with limited fields
     userQuery = userQuery.populate({
       path: 'publications',
-      select: 'title citations journal abstract year visitLink authors status isApproved',
+      select:
+        'title citations journal abstract year visitLink authors status isApproved',
       populate: {
         path: 'authors.user',
         select: 'fullName email designation image',

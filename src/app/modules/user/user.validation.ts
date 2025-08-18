@@ -3,7 +3,7 @@ import { z } from "zod";
 // Basic user validation schema
 const createUserValidationSchema = z.object({
   body: z.object({
-    password: z.string().max(20),
+    password: z.string().min(5, { message: "Password must be at least 5 characters." }).max(20, { message: "Password cannot exceed 20 characters." }),
     email: z.string().email({ message: "Invalid email format." }),
     fullName: z.string().min(1, { message: "Full name is required." }),
     designation: z.string().min(1, { message: "Designation is required." }),
@@ -15,7 +15,7 @@ const createUserValidationSchema = z.object({
 // Research member creation with file upload
 const createResearchMemberValidationSchema = z.object({
   body: z.object({
-    password: z.string().max(20),
+    password: z.string().min(5, { message: "Password must be at least 5 characters." }).max(20, { message: "Password cannot exceed 20 characters." }),
     email: z.string().email({ message: "Invalid email format." }),
     fullName: z.string().min(1, { message: "Full name is required." }),
     designation: z.string().min(1, { message: "Designation is required." }),
@@ -55,7 +55,7 @@ const createResearchMemberValidationSchema = z.object({
 // Research member creation without file upload (JSON)
 const createResearchMemberJsonValidationSchema = z.object({
   body: z.object({
-    password: z.string().max(20),
+    password: z.string().min(5, { message: "Password must be at least 5 characters." }).max(20, { message: "Password cannot exceed 20 characters." }),
     email: z.string().email({ message: "Invalid email format." }),
     fullName: z.string().min(1, { message: "Full name is required." }),
     designation: z.string().min(1, { message: "Designation is required." }),

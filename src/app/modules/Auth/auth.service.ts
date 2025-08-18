@@ -29,7 +29,7 @@ const loginUser = async (payload: TLoginUser) => {
 
   //create token and sent to the  client
   const jwtPayload = {
-    id:user._id,
+    id: user._id,
     email: user.email,
     role: user.role,
   };
@@ -125,7 +125,7 @@ const refreshToken = async (token: string) => {
   }
 
   const jwtPayload = {
-    id:user._id,
+    id: user._id,
     email: user.email,
     role: user.role,
   };
@@ -157,7 +157,7 @@ const forgetPassword = async (email: string) => {
   }
 
   const jwtPayload = {
-    id:user._id,
+    id: user._id,
     email: user.email,
     role: user.role,
   };
@@ -169,7 +169,7 @@ const forgetPassword = async (email: string) => {
   );
 
   const resetUILink = `${config.reset_pass_ui_link}?email=${user.email}&token=${resetToken}`;
-  const subject = "Reset Your Password - Action Required";
+  const subject = 'Reset Your Password - Action Required';
 
   const htmlContent = `
     <!DOCTYPE html>

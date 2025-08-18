@@ -9,7 +9,7 @@ const Getblog = async () => {
   return result;
 };
 const Authorblog = async (id: string) => {
-  const result = await Blog.find({ author: id }).populate('author', 'fullName email image designation');
+  const result = await Blog.find({ author: new Types.ObjectId(id) }).populate('author', 'fullName email image designation');
   return result;
 };
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

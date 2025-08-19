@@ -52,6 +52,10 @@ const userSchema = new Schema<TUser, UserModel>(
       },
       default: 'user',
     },
+    isLoggedIn: {
+      type: Boolean,
+      default: false,
+    },
 
     // Research member specific fields (consolidated)
     contactNo: { type: String, default: '' },
@@ -87,6 +91,9 @@ const userSchema = new Schema<TUser, UserModel>(
 
     // Publications array to track user's authored papers
     publications: [{ type: Schema.Types.ObjectId, ref: 'ResearchPaper' }],
+    
+    // Blogs array to track user's authored blogs
+    blogs: [{ type: Schema.Types.ObjectId, ref: 'Blog' }],
   },
   {
     timestamps: true,

@@ -8,6 +8,7 @@ const blogValidationPost = z.object({
   publishedDate: z.string().refine((val) => !isNaN(Date.parse(val)), {
     message: "Invalid published date format",
   }).optional(),
+  status: z.enum(["pending", "approved", "rejected"]).optional(),
 }).superRefine((data, ctx) => {
   // Additional validation if needed
   if (data.title && data.title.trim().length === 0) {
@@ -35,6 +36,7 @@ const blogValidationUpdate = z.object({
   publishedDate: z.string().refine((val) => !isNaN(Date.parse(val)), {
     message: "Invalid published date format",
   }).optional(),
+  status: z.enum(["pending", "approved", "rejected"]).optional(),
 }).superRefine((data, ctx) => {
   // Additional validation if needed
   if (data.title !== undefined && data.title.trim().length === 0) {
@@ -54,7 +56,15 @@ const blogValidationUpdate = z.object({
   }
 });
 
+// Validation for status update
+const blogStatusValidation = z.object({
+  status: z.enum(["pending", "approved", "rejected"], {
+    message: "Status must be pending, approved, or rejected"
+  }),
+});
+
 export const Validationblog = {
   blogValidationPost,
   blogValidationUpdate,
+  blogStatusValidation,
 };

@@ -27,6 +27,9 @@ const loginUser = async (payload: TLoginUser) => {
   if (!(await User.isPasswordMatched(payload?.password, user?.password)))
     throw new AppError(httpStatus.FORBIDDEN, 'Password do not matched');
 
+  // Update user's login status
+  await User.findByIdAndUpdate(user._id, { isLoggedIn: true });
+
   //create token and sent to the  client
   const jwtPayload = {
     id: user._id,
@@ -482,10 +485,17 @@ const resetPassword = async (
   );
 };
 
+const logoutUser = async (userId: string) => {
+  // Update user's login status to false
+  await User.findByIdAndUpdate(userId, { isLoggedIn: false });
+  return { message: 'Logged out successfully' };
+};
+
 export const AuthServices = {
   loginUser,
   changePassword,
   refreshToken,
   forgetPassword,
   resetPassword,
+  logoutUser,
 };

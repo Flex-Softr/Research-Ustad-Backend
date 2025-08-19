@@ -7,6 +7,7 @@ export interface IBlog {
   imageUrl?: string;
   content: string;
   publishedDate: Date;
+  status: "pending" | "approved" | "rejected";
 }
 
 

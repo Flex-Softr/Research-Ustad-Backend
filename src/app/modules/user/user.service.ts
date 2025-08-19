@@ -155,18 +155,26 @@ export class UserService {
   }
 
   /**
-   * Get a single user by ID with populated publications
+   * Get a single user by ID with populated publications and blogs
    */
   static async getUserById(id: string): Promise<TUser | null> {
-    const user = await User.findById(id).populate({
-      path: 'publications',
-      select:
-        'title citations journal abstract year visitLink authors status isApproved',
-      populate: {
-        path: 'authors.user',
-        select: 'fullName email designation image',
+    const user = await User.findById(id).populate([
+      {
+        path: 'publications',
+        select:
+          'title citations journal abstract year visitLink authors status isApproved',
+        populate: {
+          path: 'authors.user',
+          select: 'fullName email designation image',
+        },
       },
-    });
+      {
+        path: 'blogs',
+        match: { status: 'approved' },
+        select: 'title category publishedDate imageUrl content status',
+        options: { sort: { publishedDate: -1 } },
+      },
+    ]);
 
     return user;
   }
@@ -209,16 +217,24 @@ export class UserService {
     }
 
     // Always populate publications with limited fields (only approved papers)
-    userQuery = userQuery.populate({
-      path: 'publications',
-      match: { isApproved: true },
-      select:
-        'title citations journal abstract year visitLink authors status isApproved',
-      populate: {
-        path: 'authors.user',
-        select: 'fullName email designation image',
+    userQuery = userQuery.populate([
+      {
+        path: 'publications',
+        match: { isApproved: true },
+        select:
+          'title citations journal abstract year visitLink authors status isApproved',
+        populate: {
+          path: 'authors.user',
+          select: 'fullName email designation image',
+        },
       },
-    });
+      {
+        path: 'blogs',
+        match: { status: 'approved' },
+        select: 'title category publishedDate imageUrl content status',
+        options: { sort: { publishedDate: -1 } },
+      },
+    ]);
 
     const users = await userQuery.exec();
     return users;
@@ -339,6 +355,14 @@ export class UserService {
       throw new AppError(httpStatus.NOT_FOUND, 'User not found');
     }
 
+    // Check if user is currently logged in
+    if (user.isLoggedIn) {
+      throw new AppError(
+        httpStatus.FORBIDDEN, 
+        'Cannot change role for a user who is currently logged in. Please ask them to log out first.'
+      );
+    }
+
     const newRole = user.role === 'admin' ? 'user' : 'admin';
 
     // Update the user's role and set passwordChangedAt to invalidate existing tokens
@@ -351,6 +375,17 @@ export class UserService {
       { new: true, runValidators: true },
     );
     return result!;
+  }
+
+  /**
+   * Check if user is currently logged in
+   */
+  static async isUserLoggedIn(id: string): Promise<boolean> {
+    const user = await User.findById(id);
+    if (!user) {
+      throw new AppError(httpStatus.NOT_FOUND, 'User not found');
+    }
+    return user.isLoggedIn || false;
   }
 
   /**

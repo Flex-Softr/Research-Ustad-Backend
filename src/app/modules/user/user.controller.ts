@@ -214,6 +214,23 @@ const getCurrentSuperAdmin = catchAsync(async (req, res) => {
   });
 });
 
+const checkUserLoginStatus = catchAsync(async (req, res) => {
+  const { id } = req.params;
+  
+  if (!req.user) {
+    throw new AppError(httpStatus.UNAUTHORIZED, 'User not authenticated');
+  }
+  
+  const isLoggedIn = await UserService.isUserLoggedIn(id);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'User login status retrieved successfully',
+    data: { isLoggedIn },
+  });
+});
+
 export const UserControllers = {
   // User creation
   createUser,
@@ -231,6 +248,7 @@ export const UserControllers = {
   searchUsers,
   updateUser,
   updateCurrentUser,
+  checkUserLoginStatus,
 
   // SuperAdmin management
   replaceSuperAdmin,

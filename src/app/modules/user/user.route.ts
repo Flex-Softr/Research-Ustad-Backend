@@ -134,6 +134,13 @@ router.get(
   UserControllers.getCurrentSuperAdmin,
 );
 
+// Check if a user is logged in
+router.get(
+  '/login-status/:id',
+  auth(USER_ROLE.superAdmin, USER_ROLE.admin),
+  UserControllers.checkUserLoginStatus,
+);
+
 // Replace current superAdmin with a new one
 router.post(
   '/superadmin/replace',

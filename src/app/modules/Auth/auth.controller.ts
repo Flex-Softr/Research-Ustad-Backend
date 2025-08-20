@@ -78,10 +78,29 @@ const resetPassword = catchAsync(async (req, res) => {
   });
 });
 
+const logoutUser = catchAsync(async (req, res) => {
+  if (!req.user) {
+    throw new AppError(httpStatus.UNAUTHORIZED, 'User not authenticated');
+  }
+
+  const result = await AuthServices.logoutUser(req.user.id);
+  
+  // Clear the refresh token cookie
+  res.clearCookie('refreshToken');
+  
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'User logged out successfully!',
+    data: result,
+  });
+});
+
 export const AuthControllers = {
   loginUser,
   changePassword,
   refreshToken,
   forgetPassword,
   resetPassword,
+  logoutUser,
 };

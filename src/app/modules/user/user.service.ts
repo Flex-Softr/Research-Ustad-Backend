@@ -1,4 +1,3 @@
-
 import httpStatus from 'http-status';
 import mongoose, { Types } from 'mongoose';
 import config from '../../config';
@@ -11,10 +10,6 @@ import { TUser } from './user.interface';
 
 export class UserService {
   // ===== USER CREATION =====
-
-  /**
-   * Create a new user (supports both regular users and research members)
-   */
   static async createUser(
     payload: Partial<TUser> & { password?: string },
     file?: any,
@@ -148,7 +143,8 @@ export class UserService {
   static async getUserByEmail(email: string): Promise<TUser | null> {
     const user = await User.findOne({ email }).populate({
       path: 'publications',
-      select: 'title citations journal abstract year visitLink authors status isApproved',
+      select:
+        'title citations journal abstract year visitLink authors status isApproved',
       populate: {
         path: 'authors.user',
         select: 'fullName email designation image',
@@ -159,17 +155,26 @@ export class UserService {
   }
 
   /**
-   * Get a single user by ID with populated publications
+   * Get a single user by ID with populated publications and blogs
    */
   static async getUserById(id: string): Promise<TUser | null> {
-    const user = await User.findById(id).populate({
-      path: 'publications',
-      select: 'title citations journal abstract year visitLink authors status isApproved',
-      populate: {
-        path: 'authors.user',
-        select: 'fullName email designation image',
+    const user = await User.findById(id).populate([
+      {
+        path: 'publications',
+        select:
+          'title citations journal abstract year visitLink authors status isApproved',
+        populate: {
+          path: 'authors.user',
+          select: 'fullName email designation image',
+        },
       },
-    });
+      {
+        path: 'blogs',
+        match: { status: 'approved' },
+        select: 'title category publishedDate imageUrl content status',
+        options: { sort: { publishedDate: -1 } },
+      },
+    ]);
 
     return user;
   }
@@ -211,15 +216,25 @@ export class UserService {
       userQuery = userQuery.select(fieldString);
     }
 
-    // Always populate publications with limited fields
-    userQuery = userQuery.populate({
-      path: 'publications',
-      select: 'title citations journal abstract year visitLink authors status isApproved',
-      populate: {
-        path: 'authors.user',
-        select: 'fullName email designation image',
+    // Always populate publications with limited fields (only approved papers)
+    userQuery = userQuery.populate([
+      {
+        path: 'publications',
+        match: { isApproved: true },
+        select:
+          'title citations journal abstract year visitLink authors status isApproved',
+        populate: {
+          path: 'authors.user',
+          select: 'fullName email designation image',
+        },
       },
-    });
+      {
+        path: 'blogs',
+        match: { status: 'approved' },
+        select: 'title category publishedDate imageUrl content status',
+        options: { sort: { publishedDate: -1 } },
+      },
+    ]);
 
     const users = await userQuery.exec();
     return users;
@@ -340,14 +355,37 @@ export class UserService {
       throw new AppError(httpStatus.NOT_FOUND, 'User not found');
     }
 
+    // Check if user is currently logged in
+    if (user.isLoggedIn) {
+      throw new AppError(
+        httpStatus.FORBIDDEN, 
+        'Cannot change role for a user who is currently logged in. Please ask them to log out first.'
+      );
+    }
+
     const newRole = user.role === 'admin' ? 'user' : 'admin';
 
+    // Update the user's role and set passwordChangedAt to invalidate existing tokens
     const result = await User.findByIdAndUpdate(
       id,
-      { role: newRole },
+      { 
+        role: newRole,
+        passwordChangedAt: new Date(), // This will invalidate existing JWT tokens
+      },
       { new: true, runValidators: true },
     );
     return result!;
+  }
+
+  /**
+   * Check if user is currently logged in
+   */
+  static async isUserLoggedIn(id: string): Promise<boolean> {
+    const user = await User.findById(id);
+    if (!user) {
+      throw new AppError(httpStatus.NOT_FOUND, 'User not found');
+    }
+    return user.isLoggedIn || false;
   }
 
   /**
@@ -641,6 +679,7 @@ export class UserService {
 
   /**
    * Add a research paper to users' publications based on author emails
+   * Only adds approved papers to user publications
    */
   static async addPaperToAuthors(
     paperId: Types.ObjectId,
@@ -654,6 +693,12 @@ export class UserService {
       | string
     >,
   ): Promise<void> {
+    // First check if the paper is approved
+    const paper = await mongoose.model('ResearchPaper').findById(paperId);
+    if (!paper || !paper.isApproved) {
+      console.log(`📝 Paper ${paperId} is not approved, skipping publication linking`);
+      return;
+    }
     const session = await mongoose.startSession();
 
     try {
@@ -840,11 +885,12 @@ export class UserService {
   }
 
   /**
-   * Get user's publications with full research paper data
+   * Get user's publications with full research paper data (only approved papers)
    */
   static async getUserPublications(userId: string): Promise<any[]> {
     const user = await User.findById(userId).populate({
       path: 'publications',
+      match: { isApproved: true },
       select:
         'title authors journal year status isApproved visitLink abstract keywords citations researchArea funding createdAt',
     });
@@ -857,7 +903,7 @@ export class UserService {
   }
 
   /**
-   * Get all team members with their publications
+   * Get all team members with their publications (only approved papers)
    */
   static async getTeamMembersWithPublications(): Promise<any[]> {
     const users = await User.find({
@@ -865,6 +911,7 @@ export class UserService {
       isDeleted: { $ne: true },
     }).populate({
       path: 'publications',
+      match: { isApproved: true },
       select:
         'title authors journal year status isApproved visitLink abstract keywords citations researchArea funding createdAt',
     });
@@ -887,6 +934,44 @@ export class UserService {
       conferences: user.conferences,
       publications: user.publications || [],
     }));
+  }
+
+  /**
+   * Remove unapproved papers from all users' publications
+   * This should be called when a paper is rejected or when checking for unapproved papers
+   */
+  static async removeUnapprovedPapersFromUsers(): Promise<void> {
+    const session = await mongoose.startSession();
+
+    try {
+      await session.startTransaction();
+
+      // Find all papers that are not approved
+      const unapprovedPapers = await mongoose.model('ResearchPaper').find({
+        isApproved: false,
+      }).session(session);
+
+      console.log(`🔍 Found ${unapprovedPapers.length} unapproved papers`);
+
+      // Remove each unapproved paper from all users' publications
+      for (const paper of unapprovedPapers) {
+        await User.updateMany(
+          { publications: paper._id },
+          { $pull: { publications: paper._id } },
+          { session }
+        );
+        console.log(`🗑️ Removed unapproved paper ${paper._id} from all users`);
+      }
+
+      await session.commitTransaction();
+      console.log(`✅ Successfully removed all unapproved papers from user publications`);
+    } catch (error) {
+      await session.abortTransaction();
+      console.error('❌ Error removing unapproved papers from users:', error);
+      throw error;
+    } finally {
+      await session.endSession();
+    }
   }
 }
 

@@ -24,7 +24,7 @@ export interface IResearchPaper{
     journalRank?: string; 
     visitLink: string;
     paperType?: "journal" | "conference"; 
-    status: "published" | "ongoing";
+    status: "published" | "ongoing" | "under_review" | "in_preparation" | "revision";
     isApproved: boolean;
     abstract?: string;
     keywords?: string[];

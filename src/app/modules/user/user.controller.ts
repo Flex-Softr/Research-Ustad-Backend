@@ -117,11 +117,19 @@ const toggleUserRole = catchAsync(async (req, res) => {
   const { id } = req.params;
   const result = await UserService.toggleUserRole(id);
 
+  const roleChangeMessage = result.role === 'admin' 
+    ? 'User promoted to admin successfully' 
+    : 'Admin demoted to user successfully';
+
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: 'User role updated successfully',
-    data: result,
+    message: roleChangeMessage,
+    data: {
+      ...(result as any).toObject(),
+      tokenInvalidated: true, // Indicate that the user's token has been invalidated
+      requiresReauth: true, // Indicate that the user needs to re-authenticate
+    },
   });
 });
 
@@ -206,6 +214,23 @@ const getCurrentSuperAdmin = catchAsync(async (req, res) => {
   });
 });
 
+const checkUserLoginStatus = catchAsync(async (req, res) => {
+  const { id } = req.params;
+  
+  if (!req.user) {
+    throw new AppError(httpStatus.UNAUTHORIZED, 'User not authenticated');
+  }
+  
+  const isLoggedIn = await UserService.isUserLoggedIn(id);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'User login status retrieved successfully',
+    data: { isLoggedIn },
+  });
+});
+
 export const UserControllers = {
   // User creation
   createUser,
@@ -223,6 +248,7 @@ export const UserControllers = {
   searchUsers,
   updateUser,
   updateCurrentUser,
+  checkUserLoginStatus,
 
   // SuperAdmin management
   replaceSuperAdmin,

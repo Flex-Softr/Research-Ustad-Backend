@@ -10,7 +10,8 @@ export interface TUser {
   passwordChangedAt?: Date;
   designation: string; 
   status: 'in-progress' | 'blocked';
-  role:"admin"|'user'|'superAdmin'
+  role:"admin"|'user'|'superAdmin';
+  isLoggedIn?: boolean;
 
   fullName: string;
   image: string;
@@ -47,6 +48,9 @@ export interface TUser {
   
   // Publications array to track user's authored papers
   publications?: Types.ObjectId[];
+  
+  // Blogs array to track user's authored blogs
+  blogs?: Types.ObjectId[];
 }
 
 export interface UserModel extends Model<TUser> {
@@ -55,6 +59,10 @@ export interface UserModel extends Model<TUser> {
     plainTextPassword: string,
     hashedPassword: string,
   ): Promise<boolean>;
+  isJWTIssuedBeforePasswordChanged(
+    passwordChangedTimestamp: Date,
+    jwtIssuedTimestamp: number,
+  ): boolean;
 }
 
 export type TUserRole = keyof typeof USER_ROLE;

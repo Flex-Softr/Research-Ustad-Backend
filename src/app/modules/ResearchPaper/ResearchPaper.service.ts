@@ -146,6 +146,17 @@ const approveResearchUstad= async(id:string)=>{
 
     paper.isApproved = true;
     const result =  await paper.save();
+    
+    // Add the approved paper to authors' publications
+    if (result && result.authors) {
+      try {
+        await UserService.addPaperToAuthors(result._id, result.authors);
+      } catch (error) {
+        console.error('⚠️ Warning: Failed to add approved paper to authors:', error);
+        // Don't throw error here to avoid breaking paper approval
+      }
+    }
+    
   return result
 
 }
@@ -176,6 +187,15 @@ const rejectResearchUstad= async(id:string)=>{
 
     paper.isApproved = false;
     const result =  await paper.save();
+    
+    // Remove the rejected paper from all users' publications
+    try {
+      await UserService.removePaperFromAuthors(paper._id);
+    } catch (error) {
+      console.error('⚠️ Warning: Failed to remove rejected paper from authors:', error);
+      // Don't throw error here to avoid breaking paper rejection
+    }
+    
   return result
 }
 

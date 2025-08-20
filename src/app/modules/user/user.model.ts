@@ -52,6 +52,10 @@ const userSchema = new Schema<TUser, UserModel>(
       },
       default: 'user',
     },
+    isLoggedIn: {
+      type: Boolean,
+      default: false,
+    },
 
     // Research member specific fields (consolidated)
     contactNo: { type: String, default: '' },
@@ -87,6 +91,9 @@ const userSchema = new Schema<TUser, UserModel>(
 
     // Publications array to track user's authored papers
     publications: [{ type: Schema.Types.ObjectId, ref: 'ResearchPaper' }],
+    
+    // Blogs array to track user's authored blogs
+    blogs: [{ type: Schema.Types.ObjectId, ref: 'Blog' }],
   },
   {
     timestamps: true,
@@ -121,6 +128,14 @@ userSchema.statics.isPasswordMatched = async function (
   hashedPassword: string,
 ) {
   return await bcrypt.compare(plainTextPassword, hashedPassword);
+};
+
+userSchema.statics.isJWTIssuedBeforePasswordChanged = function (
+  passwordChangedTimestamp: Date,
+  jwtIssuedTimestamp: number,
+) {
+  const passwordChangedTime = new Date(passwordChangedTimestamp).getTime() / 1000;
+  return passwordChangedTime > jwtIssuedTimestamp;
 };
 
 export const User = model<TUser, UserModel>('User', userSchema);

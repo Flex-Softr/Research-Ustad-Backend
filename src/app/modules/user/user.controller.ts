@@ -126,7 +126,7 @@ const toggleUserRole = catchAsync(async (req, res) => {
     success: true,
     message: roleChangeMessage,
     data: {
-      ...result.toObject(),
+      ...(result as any).toObject(),
       tokenInvalidated: true, // Indicate that the user's token has been invalidated
       requiresReauth: true, // Indicate that the user needs to re-authenticate
     },

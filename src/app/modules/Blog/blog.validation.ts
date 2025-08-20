@@ -59,7 +59,9 @@ const blogValidationUpdate = z.object({
 // Validation for status update
 const blogStatusValidation = z.object({
   status: z.enum(["pending", "approved", "rejected"], {
-    message: "Status must be pending, approved, or rejected"
+    // message: "Status must be pending, approved, or rejected"
+    required_error: "Status is required",
+    invalid_type_error: "Status must be pending, approved, or rejected",
   }),
 });
 

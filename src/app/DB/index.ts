@@ -7,10 +7,11 @@ const superUser = {
   password: config.super_admin_password,
   needsPasswordChange: false,
   role: 'superAdmin',
-  image:"https://i.ibb.co.com/9HK7CcHy/Whats-App-Image-2025-03-12-at-11-29-38-8d375b0e.jpg",
-  fullName:"Anis Islam",
+  image:
+    'https://i.ibb.co.com/9HK7CcHy/Whats-App-Image-2025-03-12-at-11-29-38-8d375b0e.jpg',
+  fullName: 'Anis Islam',
+  designation: 'Super Administrator',
   status: 'in-progress',
-
 };
 
 const seedSuperAdmin = async () => {

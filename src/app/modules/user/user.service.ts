@@ -116,7 +116,7 @@ export class UserService {
     </ul>
     <p>For security reasons, we strongly recommend that you change your password immediately after logging in.</p>
 
-      <p><a href="${config.frontend_url}" style="background-color: #4CAF50; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block;">Log In</a></p>
+      <p><a href="${config.frontend_urls}" style="background-color: #4CAF50; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block;">Log In</a></p>
 
     <p>If you have any questions, feel free to reach out to our support team.</p>
 
@@ -358,8 +358,8 @@ export class UserService {
     // Check if user is currently logged in
     if (user.isLoggedIn) {
       throw new AppError(
-        httpStatus.FORBIDDEN, 
-        'Cannot change role for a user who is currently logged in. Please ask them to log out first.'
+        httpStatus.FORBIDDEN,
+        'Cannot change role for a user who is currently logged in. Please ask them to log out first.',
       );
     }
 
@@ -368,7 +368,7 @@ export class UserService {
     // Update the user's role and set passwordChangedAt to invalidate existing tokens
     const result = await User.findByIdAndUpdate(
       id,
-      { 
+      {
         role: newRole,
         passwordChangedAt: new Date(), // This will invalidate existing JWT tokens
       },
@@ -696,7 +696,9 @@ export class UserService {
     // First check if the paper is approved
     const paper = await mongoose.model('ResearchPaper').findById(paperId);
     if (!paper || !paper.isApproved) {
-      console.log(`📝 Paper ${paperId} is not approved, skipping publication linking`);
+      console.log(
+        `📝 Paper ${paperId} is not approved, skipping publication linking`,
+      );
       return;
     }
     const session = await mongoose.startSession();
@@ -947,9 +949,12 @@ export class UserService {
       await session.startTransaction();
 
       // Find all papers that are not approved
-      const unapprovedPapers = await mongoose.model('ResearchPaper').find({
-        isApproved: false,
-      }).session(session);
+      const unapprovedPapers = await mongoose
+        .model('ResearchPaper')
+        .find({
+          isApproved: false,
+        })
+        .session(session);
 
       console.log(`🔍 Found ${unapprovedPapers.length} unapproved papers`);
 
@@ -958,13 +963,15 @@ export class UserService {
         await User.updateMany(
           { publications: paper._id },
           { $pull: { publications: paper._id } },
-          { session }
+          { session },
         );
         console.log(`🗑️ Removed unapproved paper ${paper._id} from all users`);
       }
 
       await session.commitTransaction();
-      console.log(`✅ Successfully removed all unapproved papers from user publications`);
+      console.log(
+        `✅ Successfully removed all unapproved papers from user publications`,
+      );
     } catch (error) {
       await session.abortTransaction();
       console.error('❌ Error removing unapproved papers from users:', error);

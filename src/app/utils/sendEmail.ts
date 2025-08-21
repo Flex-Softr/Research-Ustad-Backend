@@ -1,5 +1,5 @@
 import nodemailer from 'nodemailer';
-
+import config from '../config';
 
 export const sendEmail = async (to: string, html: string, subject: string) => {
   const transporter = nodemailer.createTransport({
@@ -7,8 +7,8 @@ export const sendEmail = async (to: string, html: string, subject: string) => {
     port: 587, 
     secure: false, 
     auth: {
-      user: 'junayetshiblu0@gmail.com',
-      pass: 'noyj xebx ehmu daqz',
+      user: config.email_user,
+      pass: config.email_pass,
     },
     tls: {
       rejectUnauthorized: false, 
@@ -16,7 +16,7 @@ export const sendEmail = async (to: string, html: string, subject: string) => {
   });
 
   const mailOptions = {
-    from: '"ResearchUstad" <junayetshiblu0@gmail.com>', // ✅ Sender email ঠিক করো
+    from: `"ResearchUstad" <${config.email_user}>`,
     to,
     subject,
     html,

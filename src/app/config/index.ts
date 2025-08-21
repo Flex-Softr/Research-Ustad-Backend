@@ -3,8 +3,6 @@ import path from 'path';
 
 dotenv.config({ path: path.join((process.cwd(), '.env')) });
 
-console.log('LOADED BACKEND_URL:', process.env.BACKEND_URL);
-
 export default {
   NODE_ENV: process.env.NODE_ENV,
   port: process.env.PORT,
@@ -20,4 +18,7 @@ export default {
   super_admin_password: process.env.SUPER_ADMIN_PASSWORD,
   frontend_url: process.env.FRONTEND_URL,
   backend_url: process.env.BACKEND_URL,
+  // Email configuration
+  email_user: process.env.EMAIL_USER,
+  email_pass: process.env.EMAIL_PASS,
 };

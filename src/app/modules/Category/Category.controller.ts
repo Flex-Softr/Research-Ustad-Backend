@@ -63,10 +63,22 @@ const DeleteCategory = catchAsync(async (req, res) => {
   });
 });
 
+// Get category statistics
+const GetCategoryStats = catchAsync(async (req, res) => {
+  const result = await categoryService.GetCategoryStats();
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Category statistics retrieved successfully',
+    data: result,
+  });
+});
+
 export const categoryController = {
   GetCategories,
   GetSingleCategory,
   PostCategory,
   UpdateCategory,
   DeleteCategory,
+  GetCategoryStats,
 }; 

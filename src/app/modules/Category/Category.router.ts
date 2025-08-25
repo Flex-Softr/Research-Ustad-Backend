@@ -10,6 +10,9 @@ const router = Router();
 // Get all categories
 router.get('/', categoryController.GetCategories);
 
+// Get category statistics
+router.get('/stats', categoryController.GetCategoryStats);
+
 // Get single category
 router.get('/:id', categoryController.GetSingleCategory);
 

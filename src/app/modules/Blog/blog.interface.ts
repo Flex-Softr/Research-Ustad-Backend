@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 export interface IBlog {
   title: string;
   author: mongoose.Types.ObjectId;
-  category: string;
+  category: mongoose.Types.ObjectId;
   imageUrl?: string;
   content: string;
   publishedDate: Date;

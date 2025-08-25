@@ -34,11 +34,11 @@ const courseSchema = new Schema<Icourse>({
   },
   offlineLocation: { 
     type: String,
-    required: function(this: any) {
+    required: function() {
       return this.location === "Offline";
     },
     validate: {
-      validator: function(this: any, value: string) {
+      validator: function(this: Icourse, value: string) {
         if (this.location === "Offline") {
           return value && value.trim().length > 0;
         }
@@ -60,17 +60,18 @@ const courseSchema = new Schema<Icourse>({
     }
   },
   category: { 
-    type: String, 
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'category',
     required: [true, "Category is required"] 
   },
   fee: { 
     type: Number, 
-    required: function(this: any) {
+    required: function() {
       return !this.isFree;
     },
     min: [0, "Fee cannot be negative"],
     validate: {
-      validator: function(this: any, value: number) {
+      validator: function(this: Icourse, value: number) {
         if (!this.isFree && (value === undefined || value === null)) {
           return false;
         }
@@ -93,7 +94,7 @@ const courseSchema = new Schema<Icourse>({
     required: [true, "Capacity is required"], 
     min: [1, "Capacity must be at least 1"],
     validate: {
-      validator: function(this: any, value: number): boolean {
+      validator: function(this: Icourse, value: number): boolean {
         return value >= this.enrolled;
       },
       message: "Capacity cannot be less than enrolled students"
@@ -145,7 +146,14 @@ const courseSchema = new Schema<Icourse>({
     type: [instructorSchema], 
     required: [true, "At least one instructor is required"],
     validate: {
-      validator: function(instructors: any[]) {
+      validator: function(instructors: Array<{
+        name: string;
+        imageUrl: string;
+        specialization: string;
+        experience: string;
+        rating: number;
+        students: number;
+      }>) {
         return instructors && instructors.length > 0;
       },
       message: "At least one instructor is required"
@@ -179,6 +187,10 @@ const courseSchema = new Schema<Icourse>({
     default: "upcoming" 
   }
 }, { timestamps: true });
+
+// Add indexes for better performance
+courseSchema.index({ category: 1 });
+courseSchema.index({ status: 1 });
 
 // Pre-save middleware to set status based on dates
 courseSchema.pre("save", function(next) {
@@ -220,20 +232,10 @@ courseSchema.pre("save", function(next) {
     }
     
     // Calculate status based on dates - only upcoming and ongoing
-    if (this.endDate) {
-      const endDate = new Date(this.endDate);
-      if (now < startDate) {
-        this.status = "upcoming";
-      } else {
-        this.status = "ongoing";
-      }
+    if (now < startDate) {
+      this.status = "upcoming";
     } else {
-      // If no endDate, just compare with startDate
-      if (now < startDate) {
-        this.status = "upcoming";
-      } else {
-        this.status = "ongoing";
-      }
+      this.status = "ongoing";
     }
   }
   
@@ -283,20 +285,10 @@ courseSchema.pre("findOneAndUpdate", function(next) {
     }
     
     // Calculate status based on dates - only upcoming and ongoing
-    if (update.endDate) {
-      const endDate = new Date(update.endDate);
-      if (now < startDate) {
-        update.status = "upcoming";
-      } else {
-        update.status = "ongoing";
-      }
+    if (now < startDate) {
+      update.status = "upcoming";
     } else {
-      // If no endDate, just compare with startDate
-      if (now < startDate) {
-        update.status = "upcoming";
-      } else {
-        update.status = "ongoing";
-      }
+      update.status = "ongoing";
     }
   }
 

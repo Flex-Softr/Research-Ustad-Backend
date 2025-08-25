@@ -10,7 +10,11 @@ const SchemaBlog = new Schema<IBlog>(
       required: true,
     },
     imageUrl: { type: String, required: false },
-    category: { type: String, required: true },
+    category: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'blogCategory',
+      required: true,
+    },
     content: { type: String, required: true },
     publishedDate: { type: Date, default: () => new Date() },
     status: {
@@ -21,5 +25,9 @@ const SchemaBlog = new Schema<IBlog>(
   },
   { timestamps: true },
 );
+
+// ✅ Add indexes here
+SchemaBlog.index({ category: 1 });
+SchemaBlog.index({ status: 1 });
 
 export const Blog = model<IBlog>('Blog', SchemaBlog);

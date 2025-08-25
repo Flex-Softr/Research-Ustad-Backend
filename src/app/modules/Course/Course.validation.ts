@@ -5,9 +5,9 @@ const instructorValidation = z.object({
   name: z.string().min(1, 'Instructor name is required'),
   imageUrl: z.string().min(1, 'Instructor image URL is required'),
   specialization: z.string().min(1, 'Specialization is required'),
-  experience: z.string().min(1, 'Experience is required'),
-  rating: z.number().min(0).max(5, 'Rating must be between 0 and 5'),
-  students: z.number().min(0, 'Students count cannot be negative'),
+  experience: z.string().min(1, 'Instructor experience is required'),
+  rating: z.number().min(0).max(5, 'Rating must be between 0 and 5').optional(),
+  students: z.number().min(0, 'Students count cannot be negative').optional(),
 });
 
 const courseValidationPost = z.object({
@@ -25,7 +25,9 @@ const courseValidationPost = z.object({
           message: 'Level must be Beginner, Intermediate, or Advanced',
         }),
       }),
-      category: z.string().min(1, 'Category is required'),
+      category: z.string().min(1, 'Category is required').refine((val) => {
+        return /^[0-9a-fA-F]{24}$/.test(val);
+      }, 'Category must be a valid ObjectId'),
       fee: z.number().min(0, 'Fee cannot be negative').optional(),
       isFree: z.boolean().default(false),
       enrolled: z.number().min(0).optional().default(0),
@@ -85,7 +87,10 @@ const courseValidationUpdate = z.object({
       offlineLocation: z.string().optional(),
       duration: z.string().optional(),
       level: z.enum(['Beginner', 'Intermediate', 'Advanced']).optional(),
-      category: z.string().optional(),
+      category: z.string().optional().refine((val) => {
+        if (!val) return true; // Optional field
+        return /^[0-9a-fA-F]{24}$/.test(val);
+      }, 'Category must be a valid ObjectId'),
       fee: z.number().min(0).optional(),
       isFree: z.boolean().optional(),
       enrolled: z.number().min(0).optional(),

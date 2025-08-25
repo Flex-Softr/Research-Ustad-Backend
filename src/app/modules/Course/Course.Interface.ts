@@ -1,3 +1,5 @@
+import mongoose from "mongoose";
+
 export interface Icourse {
   title: string;
   description: string;
@@ -6,7 +8,7 @@ export interface Icourse {
   offlineLocation?: string; // New field for exact offline location
   duration: string;
   level: string;
-  category: string;
+  category: mongoose.Types.ObjectId;
   fee?: number; // Made optional for free courses
   isFree: boolean; // New field to indicate if course is free
   enrolled: number;
@@ -26,7 +28,7 @@ export interface Icourse {
     rating: number;
     students: number;
   }>;
-  tags: string[];
+  tags?: string[];
   whatYouWillLearn: string[];
   requirements: string[];
   startDate?: Date;

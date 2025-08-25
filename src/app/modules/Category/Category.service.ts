@@ -4,7 +4,31 @@ import { io } from '../../utils/socket';
 import AppError from '../../errors/AppError';
 
 const GetCategories = async () => {
-  const result = await categoryModel.find().sort({ createdAt: -1 });
+  // Use aggregation to get categories with course counts
+  const result = await categoryModel.aggregate([
+    {
+      $lookup: {
+        from: 'courses', // Collection name for courses
+        localField: '_id',
+        foreignField: 'category',
+        as: 'courses'
+      }
+    },
+    {
+      $addFields: {
+        courseCount: { $size: '$courses' }
+      }
+    },
+    {
+      $project: {
+        courses: 0 // Remove the courses array from the result
+      }
+    },
+    {
+      $sort: { createdAt: -1 }
+    }
+  ]);
+  
   return result;
 };
 
@@ -24,8 +48,11 @@ const PostCategory = async (body: ICategory) => {
   }
 
   const result = await categoryModel.create(body);
-  const categories = await categoryModel.find().sort({ createdAt: -1 });
+  
+  // Emit updated categories list
+  const categories = await GetCategories();
   io.emit('categoryUpdate', categories);
+  
   return result;
 };
 
@@ -46,8 +73,10 @@ const UpdateCategory = async (id: string, body: Partial<ICategory>) => {
     throw new AppError(404, 'Category not found');
   }
   
-  const categories = await categoryModel.find().sort({ createdAt: -1 });
+  // Emit updated categories list
+  const categories = await GetCategories();
   io.emit('categoryUpdate', categories);
+  
   return result;
 };
 
@@ -56,20 +85,100 @@ const DeleteCategory = async (id: string) => {
   if (!result) {
     throw new AppError(404, 'This category is not found');
   }
-  const categories = await categoryModel.find().sort({ createdAt: -1 });
+  
+  // Emit updated categories list
+  const categories = await GetCategories();
   io.emit('categoryUpdate', categories);
+  
   return result;
 };
 
 // Update category stats when courses are added/removed
 const UpdateCategoryStats = async () => {
-  const categories = await categoryModel.find();
-  
-  for (const category of categories) {
-    // This would be called when courses are added/removed
-    // For now, we'll just return the categories as is
-    // In a real implementation, you'd aggregate course data here
+  // Use aggregation to update course counts for all categories
+  const categoriesWithCounts = await categoryModel.aggregate([
+    {
+      $lookup: {
+        from: 'courses',
+        localField: '_id',
+        foreignField: 'category',
+        as: 'courses'
+      }
+    },
+    {
+      $addFields: {
+        courseCount: { $size: '$courses' }
+      }
+    },
+    {
+      $project: {
+        _id: 1,
+        courseCount: 1
+      }
+    }
+  ]);
+
+  // Update each category with its course count
+  for (const category of categoriesWithCounts) {
+    await categoryModel.findByIdAndUpdate(
+      category._id, 
+      { courseCount: category.courseCount }
+    );
   }
+};
+
+// Get categories with course statistics
+const GetCategoryStats = async () => {
+  const stats = await categoryModel.aggregate([
+    {
+      $lookup: {
+        from: 'courses',
+        localField: '_id',
+        foreignField: 'category',
+        as: 'courses'
+      }
+    },
+    {
+      $addFields: {
+        courseCount: { $size: '$courses' },
+        totalEnrollments: {
+          $sum: '$courses.enrolled'
+        },
+        averageRating: {
+          $cond: {
+            if: { $gt: [{ $size: '$courses' }, 0] },
+            then: { $avg: '$courses.rating' },
+            else: 0
+          }
+        },
+        totalRevenue: {
+          $sum: {
+            $map: {
+              input: '$courses',
+              as: 'course',
+              in: {
+                $cond: {
+                  if: { $eq: ['$$course.isFree', false] },
+                  then: { $multiply: ['$$course.fee', '$$course.enrolled'] },
+                  else: 0
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      $project: {
+        courses: 0
+      }
+    },
+    {
+      $sort: { courseCount: -1 }
+    }
+  ]);
+
+  return stats;
 };
 
 export const categoryService = {
@@ -79,4 +188,5 @@ export const categoryService = {
   UpdateCategory,
   DeleteCategory,
   UpdateCategoryStats,
+  GetCategoryStats,
 }; 

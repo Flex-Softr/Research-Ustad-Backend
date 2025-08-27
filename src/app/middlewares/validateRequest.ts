@@ -26,12 +26,30 @@ import catchAsync from '../utils/catchAsync';
 const validateRequest = (schema: ZodTypeAny) => {
   return catchAsync(async (req: Request, res: Response, next: NextFunction) => {
     try {
-      // If schema is an object schema with a 'body' property
-      if ('shape' in schema && (schema as any).shape?.body) {
-        await schema.parseAsync({
-          body: req.body,
-          cookies: req.cookies,
-        });
+      // If schema is an object schema with specific properties
+      if ('shape' in schema) {
+        const schemaShape = (schema as any).shape;
+        
+        // Prepare validation data based on what the schema expects
+        const validationData: any = {};
+        
+        if (schemaShape.body) {
+          validationData.body = req.body;
+        }
+        
+        if (schemaShape.params) {
+          validationData.params = req.params;
+        }
+        
+        if (schemaShape.query) {
+          validationData.query = req.query;
+        }
+        
+        if (schemaShape.cookies) {
+          validationData.cookies = req.cookies;
+        }
+        
+        await schema.parseAsync(validationData);
       } else {
         // For schemas that validate req.body directly
         await schema.parseAsync(req.body);

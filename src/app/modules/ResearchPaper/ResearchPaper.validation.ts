@@ -123,14 +123,11 @@ export const researchPaperSchema = z.object({
     impactFactor: z.number().min(0).max(50).optional(),
     journalRank: z.string().optional(),
     visitLink: z.string().url('Invalid URL format'),
-    paperType: z.enum(['journal', 'conference']),
+    paperType: z.enum(['journal', 'conference', 'book']),
     status: z
       .enum([
         'published',
         'ongoing',
-        'under_review',
-        'in_preparation',
-        'revision',
       ])
       .optional(),
     isApproved: z.boolean().optional(),
@@ -167,14 +164,11 @@ export const researchPaperUpdateSchema = z.object({
       impactFactor: z.number().min(0).max(50).optional(),
       journalRank: z.string().optional(),
       visitLink: z.string().url('Invalid URL format').optional(),
-      paperType: z.enum(['journal', 'conference']).optional(),
+      paperType: z.enum(['journal', 'conference', 'book']).optional(),
       status: z
         .enum([
           'published',
           'ongoing',
-          'under_review',
-          'in_preparation',
-          'revision',
         ])
         .optional(),
       isApproved: z.boolean().optional(),

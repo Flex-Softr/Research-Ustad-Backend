@@ -12,6 +12,7 @@ router.post(
   ResearchPaperControllers.postResearchUstad,
 );
 router.get('/public', ResearchPaperControllers.getPublicResearchUstad);
+router.get('/public/query', ResearchPaperControllers.getPublicResearchUstadByStatus);
 router.get('/public/:id', ResearchPaperControllers.getPublicSingleResearchUstad);
 router.get(
   '/all',

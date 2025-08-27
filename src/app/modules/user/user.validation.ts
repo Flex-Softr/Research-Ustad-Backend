@@ -210,10 +210,11 @@ const updateUserRoleValidationSchema = z.object({
   }),
 });
 
-// User deletion validation schema
-const deleteUserValidationSchema = z.object({
+
+// Research member deletion validation schema
+const deleteResearchMemberValidationSchema = z.object({
   params: z.object({
-    id: z.string().min(1, { message: 'User ID is required.' }),
+    id: z.string().min(1, { message: 'Research member ID is required.' }),
   }),
 });
 
@@ -233,6 +234,6 @@ export const UserValidation = {
   updateResearchMemberValidationSchema,
   searchUserValidationSchema,
   updateUserRoleValidationSchema,
-  deleteUserValidationSchema,
+  deleteResearchMemberValidationSchema,
   replaceSuperAdminValidationSchema,
 };

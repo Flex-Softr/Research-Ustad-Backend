@@ -111,17 +111,11 @@ router.put(
   UserControllers.toggleUserRole,
 );
 
-// Delete user (admin only)
-router.delete(
-  '/:id',
-  auth(USER_ROLE.superAdmin, USER_ROLE.admin),
-  UserControllers.deleteUser,
-);
-
 // Delete research member (admin only)
 router.delete(
   '/research-members/:id',
   auth(USER_ROLE.superAdmin, USER_ROLE.admin),
+  validateRequest(UserValidation.deleteResearchMemberValidationSchema),
   UserControllers.deleteUser,
 );
 

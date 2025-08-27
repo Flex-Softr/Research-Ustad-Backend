@@ -92,7 +92,8 @@ const updateResearchUstad = async (id: string, body: Partial<IResearchPaper>, us
 const getPublicResearchUstad= async()=>{
     const result = await ResearchPaper.find({ isApproved: true })
       .populate('authors.user', 'fullName email designation image')
-      .populate('user', 'fullName email');
+      .populate('user', 'fullName email')
+      .sort({ year: -1 }); // Sort by year in descending order (latest to oldest)
     return result
 }
 
@@ -109,19 +110,22 @@ const getPublicSingleResearchUstad= async(id: string)=>{
 const getOngingResearchUstad= async()=>{
     const result = await ResearchPaper.find({ isApproved: false })
       .populate('user', 'fullName email')
-      .populate('authors.user', 'fullName email designation image');
+      .populate('authors.user', 'fullName email designation image')
+      .sort({ year: -1 }); // Sort by year in descending order (latest to oldest)
     return result
 }
 
 const getpersonalPaperResearchUstad= async(id:string)=>{
     const result = await ResearchPaper.find({ user:id })
-      .populate('authors.user', 'fullName email designation image');
+      .populate('authors.user', 'fullName email designation image')
+      .sort({ year: -1 }); // Sort by year in descending order (latest to oldest)
     return result
 }
 
 const getpersonalPaperResearch= async(id:Types.ObjectId)=>{
     const result = await ResearchPaper.find({ user:id })
-      .populate('authors.user', 'fullName email designation image');
+      .populate('authors.user', 'fullName email designation image')
+      .sort({ year: -1 }); // Sort by year in descending order (latest to oldest)
     return result
 }
 
@@ -134,7 +138,8 @@ const getpersonalPaperResearchUstadforid= async(id:string)=>{
 const getAllResearchUstad= async()=>{
     const result = await ResearchPaper.find()
       .populate('user', 'fullName email')
-      .populate('authors.user', 'fullName email designation image');
+      .populate('authors.user', 'fullName email designation image')
+      .sort({ year: -1 }); // Sort by year in descending order (latest to oldest)
     return result
 }
 
@@ -199,6 +204,27 @@ const rejectResearchUstad= async(id:string)=>{
   return result
 }
 
+const getPublicResearchUstadByStatus = async (status?: string) => {
+  const query: any = { isApproved: true };
+  
+  // If status is provided, filter by status
+  if (status) {
+    if (status === 'published') {
+      query.status = 'published';
+    } else if (status === 'ongoing') {
+      query.status = 'ongoing';
+    }
+    // If status is 'all' or any other value, show all approved papers
+  }
+  
+  const result = await ResearchPaper.find(query)
+    .populate('authors.user', 'fullName email designation image')
+    .populate('user', 'fullName email')
+    .sort({ year: -1 }); // Sort by year in descending order (latest to oldest)
+  
+  return result;
+};
+
 export const ResearchPaperService ={
     postResearchUstad,
     updateResearchUstad,
@@ -211,5 +237,6 @@ export const ResearchPaperService ={
     getOngingResearchUstad,
     getpersonalPaperResearchUstad,
     getpersonalPaperResearchUstadforid,
-    getpersonalPaperResearch
+    getpersonalPaperResearch,
+    getPublicResearchUstadByStatus
 }

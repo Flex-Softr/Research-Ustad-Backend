@@ -56,7 +56,9 @@ export class UserService {
         researchgate: '',
         google_scholar: '',
         linkedin: '',
+        orcid: '',
       },
+      citations: payload.citations || 0,
       expertise: payload.expertise || [],
       awards: payload.awards || [],
       conferences: payload.conferences || [],
@@ -144,7 +146,8 @@ export class UserService {
     const user = await User.findOne({ email }).populate({
       path: 'publications',
       select:
-        'title citations journal abstract year visitLink authors status isApproved',
+        'title citations journal abstract year visitLink authors status isApproved paperType',
+      options: { sort: { year: -1 } },
       populate: {
         path: 'authors.user',
         select: 'fullName email designation image',
@@ -162,7 +165,8 @@ export class UserService {
       {
         path: 'publications',
         select:
-          'title citations journal abstract year visitLink authors status isApproved',
+          'title citations journal abstract year visitLink authors status isApproved paperType',
+        options: { sort: { year: -1 } },
         populate: {
           path: 'authors.user',
           select: 'fullName email designation image',
@@ -222,7 +226,8 @@ export class UserService {
         path: 'publications',
         match: { isApproved: true },
         select:
-          'title citations journal abstract year visitLink authors status isApproved',
+          'title citations journal abstract year visitLink authors status isApproved paperType',
+        options: { sort: { year: -1 } },
         populate: {
           path: 'authors.user',
           select: 'fullName email designation image',
@@ -237,26 +242,59 @@ export class UserService {
     ]);
 
     const users = await userQuery.exec();
-    return users;
+    
+    // Sort users by role priority: superAdmin first, then admin, then user
+    const sortedUsers = users.sort((a, b) => {
+      const rolePriority = {
+        superAdmin: 3,
+        admin: 2,
+        user: 1
+      };
+      
+      const priorityA = rolePriority[a.role as keyof typeof rolePriority] || 0;
+      const priorityB = rolePriority[b.role as keyof typeof rolePriority] || 0;
+      
+      // If roles are the same, sort by fullName alphabetically
+      if (priorityA === priorityB) {
+        return a.fullName.localeCompare(b.fullName);
+      }
+      
+      // Sort by role priority (descending)
+      return priorityB - priorityA;
+    });
+    
+    return sortedUsers;
   }
 
   /**
    * Get all research members (users with designations)
    */
   static async getResearchMembers(): Promise<TUser[]> {
-    return await User.find({
+    const users = await User.find({
       designation: { $exists: true, $ne: null },
       role: { $ne: 'superAdmin' },
-    }).sort({ fullName: 1 });
-  }
-
-  /**
-   * Get research members by designation
-   */
-  static async getResearchMembersByDesignation(
-    designation: string,
-  ): Promise<TUser[]> {
-    return await User.find({ designation }).sort({ fullName: 1 });
+    });
+    
+    // Sort by role priority: admin first, then user, then by fullName
+    const sortedUsers = users.sort((a, b) => {
+      const rolePriority = {
+        admin: 2,
+        user: 1
+      };
+      
+      const priorityA = rolePriority[a.role as keyof typeof rolePriority] || 0;
+      const priorityB = rolePriority[b.role as keyof typeof rolePriority] || 0;
+      
+      // If roles are the same, sort by fullName alphabetically
+      if (priorityA === priorityB) {
+        return a.fullName.localeCompare(b.fullName);
+      }
+      
+      // Sort by role priority (descending)
+      return priorityB - priorityA;
+    });
+    
+    return sortedUsers;
   }
 
   // ===== USER UPDATES =====
@@ -265,11 +303,16 @@ export class UserService {
    * Update user by ID
    */
   static async updateUser(id: string, payload: Partial<TUser>): Promise<TUser> {
-    const { current, education, socialLinks, ...remainingData } = payload;
+    const { current, education, socialLinks, citations, ...remainingData } = payload;
 
     const modifiedUpdatedData: Record<string, unknown> = {
       ...remainingData,
     };
+
+    // Handle citations field
+    if (citations !== undefined) {
+      modifiedUpdatedData.citations = citations;
+    }
 
     if (current && Object.keys(current).length) {
       for (const [key, value] of Object.entries(current)) {
@@ -308,11 +351,16 @@ export class UserService {
     email: string,
     payload: Partial<TUser>,
   ): Promise<TUser> {
-    const { current, education, socialLinks, ...remainingData } = payload;
+    const { current, education, socialLinks, citations, ...remainingData } = payload;
 
     const modifiedUpdatedData: Record<string, unknown> = {
       ...remainingData,
     };
+
+    // Handle citations field
+    if (citations !== undefined) {
+      modifiedUpdatedData.citations = citations;
+    }
 
     if (current && Object.keys(current).length) {
       for (const [key, value] of Object.entries(current)) {
@@ -885,162 +933,4 @@ export class UserService {
       await session.endSession();
     }
   }
-
-  /**
-   * Get user's publications with full research paper data (only approved papers)
-   */
-  static async getUserPublications(userId: string): Promise<any[]> {
-    const user = await User.findById(userId).populate({
-      path: 'publications',
-      match: { isApproved: true },
-      select:
-        'title authors journal year status isApproved visitLink abstract keywords citations researchArea funding createdAt',
-    });
-
-    if (!user) {
-      throw new AppError(httpStatus.NOT_FOUND, 'User not found');
-    }
-
-    return user.publications || [];
-  }
-
-  /**
-   * Get all team members with their publications (only approved papers)
-   */
-  static async getTeamMembersWithPublications(): Promise<any[]> {
-    const users = await User.find({
-      role: { $in: ['user', 'admin', 'superAdmin'] },
-      isDeleted: { $ne: true },
-    }).populate({
-      path: 'publications',
-      match: { isApproved: true },
-      select:
-        'title authors journal year status isApproved visitLink abstract keywords citations researchArea funding createdAt',
-    });
-
-    return users.map((user) => ({
-      _id: user._id,
-      fullName: user.fullName,
-      email: user.email,
-      designation: user.designation,
-      role: user.role,
-      image: user.image,
-      shortBio: user.shortBio,
-      contactNo: user.contactNo,
-      current: user.current,
-      education: user.education,
-      research: user.research,
-      socialLinks: user.socialLinks,
-      expertise: user.expertise,
-      awards: user.awards,
-      conferences: user.conferences,
-      publications: user.publications || [],
-    }));
-  }
-
-  /**
-   * Remove unapproved papers from all users' publications
-   * This should be called when a paper is rejected or when checking for unapproved papers
-   */
-  static async removeUnapprovedPapersFromUsers(): Promise<void> {
-    const session = await mongoose.startSession();
-
-    try {
-      await session.startTransaction();
-
-      // Find all papers that are not approved
-      const unapprovedPapers = await mongoose
-        .model('ResearchPaper')
-        .find({
-          isApproved: false,
-        })
-        .session(session);
-
-      console.log(`🔍 Found ${unapprovedPapers.length} unapproved papers`);
-
-      // Remove each unapproved paper from all users' publications
-      for (const paper of unapprovedPapers) {
-        await User.updateMany(
-          { publications: paper._id },
-          { $pull: { publications: paper._id } },
-          { session },
-        );
-        console.log(`🗑️ Removed unapproved paper ${paper._id} from all users`);
-      }
-
-      await session.commitTransaction();
-      console.log(
-        `✅ Successfully removed all unapproved papers from user publications`,
-      );
-    } catch (error) {
-      await session.abortTransaction();
-      console.error('❌ Error removing unapproved papers from users:', error);
-      throw error;
-    } finally {
-      await session.endSession();
-    }
-  }
 }
-
-// ===== LEGACY EXPORTS FOR BACKWARD COMPATIBILITY =====
-
-// Export individual functions for backward compatibility
-export const UserServices = {
-  // User creation
-  createResearchMembar: (
-    file: any,
-    password: string,
-    payload: Partial<TUser>,
-  ) => UserService.createUser({ ...payload, password }, file),
-  createResearchMembars: (payload: Partial<TUser> & { password?: string }) =>
-    UserService.createUser(payload),
-
-  // User retrieval
-  getMe: (email: string) => UserService.getUserByEmail(email),
-  getUserByEmail: (email: string) => UserService.getUserByEmail(email),
-  getUserById: (id: string) => UserService.getUserById(id),
-  getUsers: (options?: any) => UserService.getUsers(options),
-
-  // Research member specific
-  getAllResearchMembers: () => UserService.getResearchMembers(),
-  getResearchMembersByDesignation: (designation: string) =>
-    UserService.getResearchMembersByDesignation(designation),
-  getSingleResearchMember: (id: string) => UserService.getUserById(id),
-  getSingleResearchMemberByEmail: (email: string) =>
-    UserService.getUserByEmail(email),
-
-  // User management
-  userToadmin: (id: string) => UserService.toggleUserRole(id),
-  deleteUser: (id: string, requestingUserId?: string) =>
-    UserService.deleteUser(id, requestingUserId),
-  searchUsers: (query: string) => UserService.searchUsers(query),
-
-  // User updates
-  updateUser: (id: string, payload: Partial<TUser>) =>
-    UserService.updateUser(id, payload),
-  updateUserByEmail: (email: string, payload: Partial<TUser>) =>
-    UserService.updateUserByEmail(email, payload),
-  updateResearchMember: (id: string, payload: Partial<TUser>) =>
-    UserService.updateUser(id, payload),
-  updateResearchMemberByEmail: (email: string, payload: Partial<TUser>) =>
-    UserService.updateUserByEmail(email, payload),
-
-  // SuperAdmin management
-  replaceSuperAdmin: (newSuperAdminId: string, requestingUserId?: string) =>
-    UserService.replaceSuperAdmin(newSuperAdminId, requestingUserId),
-  getCurrentSuperAdmin: () => UserService.getCurrentSuperAdmin(),
-
-  // Statistics
-  AllInfo: () => UserService.getPlatformStats(),
-  AllInfoForPersonal: (id: string) => UserService.getUserStats(id),
-
-  // Legacy aliases
-  Alluser: () => UserService.getUsers(),
-  getAllUsers: () =>
-    UserService.getUsers({
-      selectFields: 'fullName email designation',
-      limit: 50,
-    }),
-  deleteResearchMember: (id: string, requestingUserId?: string) =>
-    UserService.deleteUser(id, requestingUserId),
-};

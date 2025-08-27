@@ -33,10 +33,12 @@ export interface TUser {
   };
   research?: string[];
   shortBio?: string;
+  citations?: number;
   socialLinks?: {
     researchgate?: string;
     google_scholar?: string;
     linkedin?: string;
+    orcid?: string;
   };
   expertise?: string[];
   awards?: string[];

@@ -74,10 +74,12 @@ const userSchema = new Schema<TUser, UserModel>(
     },
     research: [{ type: String }],
     shortBio: { type: String, default: '' },
+    citations: { type: Number, default: 0 },
     socialLinks: {
       researchgate: { type: String, default: '' },
       google_scholar: { type: String, default: '' },
       linkedin: { type: String, default: '' },
+      orcid: { type: String, default: '' },
     },
     expertise: [{ type: String, default: [] }],
     awards: [{ type: String, default: [] }],

@@ -7,6 +7,8 @@ import { blogRouter } from '../modules/Blog/blog.router';
 import { UserRoutes } from '../modules/user/user.route';
 import { CategoryRouter } from '../modules/Category/Category.router';
 import { BlogCategoryRouter } from '../modules/BlogCategory/BlogCategory.router';
+import { AchievementRoutes } from '../modules/Achievement/achievement.router';
+import { InternationalConferenceRoutes } from '../modules/InternationalConference/internationalConference.router';
 
 const router = Router();
 const moduleRoutes = [
@@ -22,7 +24,6 @@ const moduleRoutes = [
     path: '/paper',
     route: ResearchPaperRoutes,
   },
-
   {
     path: '/course',
     route: CourseRouter,
@@ -42,6 +43,14 @@ const moduleRoutes = [
   {
     path: '/blog-category',
     route: BlogCategoryRouter,
+  },
+  {
+    path: '/achievement',
+    route: AchievementRoutes,
+  },
+  {
+    path: '/international-conference',
+    route: InternationalConferenceRoutes,
   },
 ];
 

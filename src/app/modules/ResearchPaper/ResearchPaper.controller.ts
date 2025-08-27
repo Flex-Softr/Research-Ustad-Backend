@@ -124,10 +124,23 @@ const postResearchUstad = catchAsync(async (req, res) => {
       data: result,
     });
   })
+
+const getPublicResearchUstadByStatus = catchAsync(async (req, res) => {
+  const { status } = req.query;
+  const result = await ResearchPaperService.getPublicResearchUstadByStatus(status as string);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Research papers retrieved successfully',
+    data: result,
+  });
+});
+
 export const ResearchPaperControllers={
     postResearchUstad,
     updateResearchUstad,
     getPublicResearchUstad,
+    getPublicResearchUstadByStatus,
     getPublicSingleResearchUstad,
     getAllResearchUstad,
     approveResearchUstad,

@@ -6,10 +6,11 @@ import { User } from '../user/user.model';
 import { blogCategoryModel } from '../BlogCategory/BlogCategory.model';
 
 const Getblog = async () => {
-  // Only return approved blogs for public view
+  // Only return approved blogs for public view, sorted by latest first
   const result = await Blog.find({ status: 'approved' })
     .populate('author', 'fullName email image designation')
-    .populate('category', 'name description');
+    .populate('category', 'name description')
+    .sort({ createdAt: -1 }); // Sort by creation time, latest first
 
   return result;
 };
@@ -23,7 +24,8 @@ const Authorblog = async (id: string) => {
   try {
     const result = await Blog.find({ author: new Types.ObjectId(id) })
       .populate('author', 'fullName email image designation')
-      .populate('category', 'name description');
+      .populate('category', 'name description')
+      .sort({ createdAt: -1 }); // Sort by creation time, latest first
     return result;
   } catch (error) {
     throw new AppError(500, 'Failed to fetch user blogs');
@@ -34,7 +36,8 @@ const Authorblog = async (id: string) => {
 const GetAllBlogsForAdmin = async () => {
   const result = await Blog.find()
     .populate('author', 'fullName email image designation')
-    .populate('category', 'name description');
+    .populate('category', 'name description')
+    .sort({ createdAt: -1 }); // Sort by creation time, latest first
   return result;
 };
 

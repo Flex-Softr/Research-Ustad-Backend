@@ -30,26 +30,32 @@ const validateRequest = (schema: ZodTypeAny) => {
       if ('shape' in schema) {
         const schemaShape = (schema as any).shape;
         
-        // Prepare validation data based on what the schema expects
-        const validationData: any = {};
-        
-        if (schemaShape.body) {
-          validationData.body = req.body;
+        // Check if the schema expects body, params, query, or cookies
+        if (schemaShape.body || schemaShape.params || schemaShape.query || schemaShape.cookies) {
+          // Prepare validation data based on what the schema expects
+          const validationData: any = {};
+          
+          if (schemaShape.body) {
+            validationData.body = req.body;
+          }
+          
+          if (schemaShape.params) {
+            validationData.params = req.params;
+          }
+          
+          if (schemaShape.query) {
+            validationData.query = req.query;
+          }
+          
+          if (schemaShape.cookies) {
+            validationData.cookies = req.cookies;
+          }
+          
+          await schema.parseAsync(validationData);
+        } else {
+          // For simple object schemas that validate req.body directly
+          await schema.parseAsync(req.body);
         }
-        
-        if (schemaShape.params) {
-          validationData.params = req.params;
-        }
-        
-        if (schemaShape.query) {
-          validationData.query = req.query;
-        }
-        
-        if (schemaShape.cookies) {
-          validationData.cookies = req.cookies;
-        }
-        
-        await schema.parseAsync(validationData);
       } else {
         // For schemas that validate req.body directly
         await schema.parseAsync(req.body);

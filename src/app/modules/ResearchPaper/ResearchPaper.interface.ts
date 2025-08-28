@@ -23,7 +23,7 @@ export interface IResearchPaper{
     impactFactor?: number; 
     journalRank?: string; 
     visitLink: string;
-    paperType?: "journal" | "conference" | "book"; 
+    paperType?: "journal" | "conference" | "book chapter"; 
     status: "published" | "ongoing" | "under_review" | "in_preparation" | "revision";
     isApproved: boolean;
     abstract?: string;

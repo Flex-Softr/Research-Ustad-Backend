@@ -92,7 +92,7 @@ const postResearchUstad = catchAsync(async (req, res) => {
     sendResponse(res, {
       statusCode: httpStatus.OK,
       success: true,
-      message: 'ResearchPaper getAll retrieved succesfully',
+      message: 'Approved research papers retrieved successfully',
       data: result,
     });
   });

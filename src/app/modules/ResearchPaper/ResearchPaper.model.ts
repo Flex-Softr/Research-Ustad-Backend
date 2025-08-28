@@ -27,7 +27,7 @@ const ResearchPaperSchema = new Schema<IResearchPaper>(
     impactFactor: { type: Number },
     journalRank: { type: String },
     visitLink: { type: String, required: true },
-    paperType: { type: String, enum: ["journal", "conference", "book"] },
+    paperType: { type: String, enum: ["journal", "conference", "book chapter"] },
     status: { type: String, enum: ["published", "ongoing"], default: "ongoing" },
     isApproved: { type: Boolean, default: false },
     abstract: { type: String },

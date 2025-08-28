@@ -135,8 +135,9 @@ const getpersonalPaperResearchUstadforid= async(id:string)=>{
     return result
 }
 
+// Get all approved research papers for admin management
 const getAllResearchUstad= async()=>{
-    const result = await ResearchPaper.find()
+    const result = await ResearchPaper.find({ isApproved: true })
       .populate('user', 'fullName email')
       .populate('authors.user', 'fullName email designation image')
       .sort({ year: -1 }); // Sort by year in descending order (latest to oldest)

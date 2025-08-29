@@ -398,7 +398,7 @@ const forgetPassword = async (email: string) => {
                 </div>
                 
                 <div class="button-container">
-                    <a href="${resetUILink}" class="reset-button">
+                    <a href="${resetUILink}" class="reset-button" target="_blank">
                         🔑 Reset My Password
                     </a>
                 </div>

@@ -9,6 +9,7 @@ import { CategoryRouter } from '../modules/Category/Category.router';
 import { BlogCategoryRouter } from '../modules/BlogCategory/BlogCategory.router';
 import { AchievementRoutes } from '../modules/Achievement/achievement.router';
 import { InternationalConferenceRoutes } from '../modules/InternationalConference/internationalConference.router';
+import { ContactRoutes } from '../modules/Contact/contact.router';
 
 const router = Router();
 const moduleRoutes = [
@@ -51,6 +52,10 @@ const moduleRoutes = [
   {
     path: '/international-conference',
     route: InternationalConferenceRoutes,
+  },
+  {
+    path: '/contact',
+    route: ContactRoutes,
   },
 ];
 

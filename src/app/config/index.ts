@@ -23,4 +23,6 @@ export default {
   // Email configuration
   email_user: process.env.EMAIL_USER,
   email_pass: process.env.EMAIL_PASS,
+  email_host: process.env.EMAIL_HOST,
+  email_port: process.env.EMAIL_PORT,
 };

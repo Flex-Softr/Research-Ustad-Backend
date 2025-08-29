@@ -5,7 +5,7 @@ import { eventModel } from './event.model';
 
 // get all event
 const Getevent = async () => {
-  const result = await eventModel.find();
+  const result = await eventModel.find().sort({ createdAt: -1 });
   return result;
 };
 

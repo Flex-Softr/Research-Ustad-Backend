@@ -72,69 +72,64 @@ export class UserService {
       userData.image = file;
     }
 
-    const session = await mongoose.startSession();
+    console.log(`🔍 Checking for existing user with email: ${payload.email}`);
 
-    try {
-      await session.startTransaction();
+    // Check if user with this email already exists
+    const existingUser = await User.findOne({ email: payload.email });
 
-      console.log(`🔍 Checking for existing user with email: ${payload.email}`);
+    let newUser;
 
-      // Check if user with this email already exists
-      const existingUser = await User.findOne({ email: payload.email });
-
-      let newUser;
-
-      if (existingUser) {
-        console.log(`❌ User already exists`);
-        throw new AppError(
-          httpStatus.CONFLICT,
-          'User with this email already exists',
-        );
-      } else {
-        // Create new user
-        console.log(`🆕 Creating new user with email: ${payload.email}`);
-        const createdUsers = await User.create([userData], { session });
-        newUser = createdUsers[0];
-        console.log(`✅ New user created successfully:`, newUser?.email);
-      }
-
-      if (!newUser) {
-        throw new AppError(httpStatus.BAD_REQUEST, 'Failed to create user');
-      }
-
-      const plainPassword =
-        payload.password || (config.default_password as string);
-
-      const subject = 'Welcome to ResearchUstad';
-      const emailContent = `
-       <h2 style="color: #4CAF50; text-align: center;">Welcome to ResearchUstad!</h2>
-    <p>Dear ${payload.fullName},</p>
-    <p>Congratulations! Your account has been successfully created on <strong>ResearchUstad</strong>. You now have access to our platform and can start exploring.</p>
-    <h3>Your Account Details:</h3>
-    <ul>
-      <li><strong>Email:</strong>  ${newUser.email}</li>
-      <li><strong>Password:</strong> ${plainPassword}</li>
-        <li><strong>Designation:</strong> ${newUser.designation}</li>
-    </ul>
-    <p>For security reasons, we strongly recommend that you change your password immediately after logging in.</p>
-
-      <p><a href="${config.frontend_urls}" style="background-color: #4CAF50; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block;">Log In</a></p>
-
-    <p>If you have any questions, feel free to reach out to our support team.</p>
-
-    <p>Best regards,</p>
-    <p><strong>The ResearchUstad Team</strong></p>
-    `;
-
-      await sendEmail(newUser.email, emailContent, subject);
-      await session.commitTransaction();
-      return [newUser];
-    } catch (err: any) {
-      await session.abortTransaction();
-      throw err;
-    } finally {
-      await session.endSession();
+    if (existingUser) {
+      console.log(`❌ User already exists`);
+      throw new AppError(
+        httpStatus.CONFLICT,
+        'User with this email already exists',
+      );
+    } else {
+      // Create new user
+      console.log(`🆕 Creating new user with email: ${payload.email}`);
+      const createdUsers = await User.create([userData]);
+      newUser = createdUsers[0];
+      console.log(`✅ New user created successfully:`, newUser?.email);
     }
+
+    if (!newUser) {
+      throw new AppError(httpStatus.BAD_REQUEST, 'Failed to create user');
+    }
+
+    const plainPassword =
+      payload.password || (config.default_password as string);
+
+    const subject = 'Welcome to ResearchUstad';
+    const emailContent = `
+     <h2 style="color: #4CAF50; text-align: center;">Welcome to ResearchUstad!</h2>
+  <p>Dear ${payload.fullName},</p>
+  <p>Congratulations! Your account has been successfully created on <strong>ResearchUstad</strong>. You now have access to our platform and can start exploring.</p>
+  <h3>Your Account Details:</h3>
+  <ul>
+    <li><strong>Email:</strong>  ${newUser.email}</li>
+    <li><strong>Password:</strong> ${plainPassword}</li>
+      <li><strong>Designation:</strong> ${newUser.designation}</li>
+  </ul>
+  <p>For security reasons, we strongly recommend that you change your password immediately after logging in.</p>
+
+    <p><a href="${config.frontend_urls}" style="background-color: #4CAF50; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block;">Log In</a></p>
+
+  <p>If you have any questions, feel free to reach out to our support team.</p>
+
+  <p>Best regards,</p>
+  <p><strong>The ResearchUstad Team</strong></p>
+  `;
+
+    // Send email (don't block user creation if email fails)
+    try {
+      await sendEmail(newUser.email, emailContent, subject);
+    } catch (emailError) {
+      console.error('Failed to send welcome email:', emailError);
+      // Don't throw error - user creation should still succeed
+    }
+
+    return [newUser];
   }
 
   // ===== USER RETRIEVAL =====
@@ -440,11 +435,7 @@ export class UserService {
    * Delete user and all related data
    */
   static async deleteUser(id: string, requestingUserId?: string): Promise<any> {
-    const session = await mongoose.startSession();
-
     try {
-      session.startTransaction();
-
       // First, check if user exists
       const userToDelete = await User.findById(id);
       if (!userToDelete) {
@@ -471,28 +462,24 @@ export class UserService {
 
       // Delete all related data first
       // 1. Delete user's research papers
-      const deletedPapers = await ResearchPaper.deleteMany(
-        { user: id },
-        { session },
-      );
+      const deletedPapers = await ResearchPaper.deleteMany({ user: id });
       console.log(`📄 Deleted ${deletedPapers.deletedCount} research papers`);
 
       // 2. Delete user's blogs
-      const deletedBlogs = await Blog.deleteMany({ author: id }, { session });
+      const deletedBlogs = await Blog.deleteMany({ author: id });
       console.log(`📝 Deleted ${deletedBlogs.deletedCount} blogs`);
 
       // 3. Remove user from author references in research papers
       const updatedPapers = await ResearchPaper.updateMany(
         { 'authorReferences.user': id },
         { $pull: { authorReferences: { user: id } } },
-        { session },
       );
       console.log(
         `👥 Removed author references from ${updatedPapers.modifiedCount} papers`,
       );
 
       // 4. Finally, delete the user completely
-      const deletedUser = await User.findByIdAndDelete(id, { session });
+      const deletedUser = await User.findByIdAndDelete(id);
 
       if (!deletedUser) {
         throw new AppError(httpStatus.NOT_FOUND, 'User not found');
@@ -502,7 +489,6 @@ export class UserService {
         `✅ User ${deletedUser.email} completely deleted from database`,
       );
 
-      await session.commitTransaction();
       return {
         message: 'User and all related data deleted successfully',
         deletedUser: {
@@ -515,11 +501,8 @@ export class UserService {
         updatedPapers: updatedPapers.modifiedCount,
       };
     } catch (err: any) {
-      await session.abortTransaction();
       console.error('❌ Error during hard delete:', err);
       throw err;
-    } finally {
-      await session.endSession();
     }
   }
 
@@ -552,11 +535,7 @@ export class UserService {
     newSuperAdminId: string,
     requestingUserId?: string,
   ): Promise<any> {
-    const session = await mongoose.startSession();
-
     try {
-      session.startTransaction();
-
       // 🛡️ PROTECTION: Only current superAdmin can replace themselves
       if (!requestingUserId) {
         throw new AppError(
@@ -606,17 +585,15 @@ export class UserService {
       const demotedSuperAdmin = await User.findByIdAndUpdate(
         requestingUserId,
         { role: 'admin' },
-        { new: true, runValidators: true, session },
+        { new: true, runValidators: true },
       );
 
       // 2. Promote new candidate to superAdmin
       const promotedSuperAdmin = await User.findByIdAndUpdate(
         newSuperAdminId,
         { role: 'superAdmin' },
-        { new: true, runValidators: true, session },
+        { new: true, runValidators: true },
       );
-
-      await session.commitTransaction();
 
       console.log(
         `✅ SuperAdmin successfully replaced: ${demotedSuperAdmin?.email} -> ${promotedSuperAdmin?.email}`,
@@ -638,11 +615,8 @@ export class UserService {
         },
       };
     } catch (err: any) {
-      await session.abortTransaction();
       console.error('❌ Error during superAdmin replacement:', err);
       throw err;
-    } finally {
-      await session.endSession();
     }
   }
 
@@ -749,11 +723,7 @@ export class UserService {
       );
       return;
     }
-    const session = await mongoose.startSession();
-
     try {
-      await session.startTransaction();
-
       // Filter authors with user ObjectIds (handle both old and new formats)
       const authorsWithUserIds = authors?.filter((author) => {
         if (typeof author === 'string') {
@@ -782,13 +752,13 @@ export class UserService {
       console.log(`🔍 Looking for users with ObjectIds:`, authorUserIds);
 
       // Get total user count for comparison
-      const totalUsers = await User.countDocuments().session(session);
+      const totalUsers = await User.countDocuments();
       console.log(`📊 Total users in database: ${totalUsers}`);
 
       // Find all users whose ObjectId matches any of the author references
       const matchingUsers = await User.find({
         _id: { $in: authorUserIds },
-      }).session(session);
+      });
 
       console.log(
         `✅ Found ${matchingUsers?.length} matching users out of ${totalUsers} total users`,
@@ -826,7 +796,7 @@ export class UserService {
           await User.findByIdAndUpdate(
             user._id,
             { $push: { publications: paperId } },
-            { session, new: true },
+            { new: true },
           );
           console.log(
             `📄 Added paper ${paperId} to user ${user.email}'s publications`,
@@ -838,16 +808,12 @@ export class UserService {
         }
       }
 
-      await session.commitTransaction();
       console.log(
         `🎉 Successfully linked paper ${paperId} to ${matchingUsers?.length} authors`,
       );
     } catch (error) {
-      await session.abortTransaction();
       console.error('❌ Error linking paper to authors:', error);
       throw error;
-    } finally {
-      await session.endSession();
     }
   }
 
@@ -855,15 +821,11 @@ export class UserService {
    * Remove a research paper from users' publications
    */
   static async removePaperFromAuthors(paperId: Types.ObjectId): Promise<void> {
-    const session = await mongoose.startSession();
-
     try {
-      await session.startTransaction();
-
       // Find all users who have this paper in their publications
       const usersWithPaper = await User.find({
         publications: paperId,
-      }).session(session);
+      });
 
       console.log(
         `🔍 Found ${usersWithPaper?.length} users with paper ${paperId}`,
@@ -876,7 +838,7 @@ export class UserService {
           await User.findByIdAndUpdate(
             user._id,
             { $pull: { publications: paperId } },
-            { session, new: true },
+            { new: true },
           );
           console.log(
             `🗑️ Removed paper ${paperId} from user ${user.email}'s publications`,
@@ -884,16 +846,12 @@ export class UserService {
         }
       }
 
-      await session.commitTransaction();
       console.log(
         `🎉 Successfully removed paper ${paperId} from ${usersWithPaper?.length} authors`,
       );
     } catch (error) {
-      await session.abortTransaction();
       console.error('❌ Error removing paper from authors:', error);
       throw error;
-    } finally {
-      await session.endSession();
     }
   }
 
@@ -912,25 +870,17 @@ export class UserService {
       | string
     >,
   ): Promise<void> {
-    const session = await mongoose.startSession();
-
     try {
-      await session.startTransaction();
-
       // First, remove the paper from all users
       await this.removePaperFromAuthors(paperId);
 
       // Then, add it to the new authors
       await this.addPaperToAuthors(paperId, newAuthors);
 
-      await session.commitTransaction();
       console.log(`🔄 Successfully updated paper ${paperId} authors`);
     } catch (error) {
-      await session.abortTransaction();
       console.error('❌ Error updating paper authors:', error);
       throw error;
-    } finally {
-      await session.endSession();
     }
   }
 }

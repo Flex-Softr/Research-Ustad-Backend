@@ -41,7 +41,7 @@ router.post(
       if (req.file) {
         const backendUrl = config.backend_url || '';
         const baseUrl = backendUrl.endsWith('/')
-          ? backendUrl.slice(0, -1)
+          ? backendUrl?.slice(0, -1)
           : backendUrl;
         req.body.imageUrl = `${baseUrl}/upload/${req.file.filename}`;
       }
@@ -64,7 +64,7 @@ router.patch(
         // Set the full URL for the uploaded image
         const backendUrl = config.backend_url || '';
         const baseUrl = backendUrl.endsWith('/')
-          ? backendUrl.slice(0, -1)
+          ? backendUrl?.slice(0, -1)
           : backendUrl;
         req.body.imageUrl = `${baseUrl}/upload/${req.file.filename}`;
       }

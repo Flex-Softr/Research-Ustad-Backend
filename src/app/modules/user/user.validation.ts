@@ -148,7 +148,7 @@ const updateResearchMemberValidationSchema = z.object({
       .optional(),
     contactNo: z
       .string()
-      .refine((val) => !val || val.length === 0 || val.length >= 10, {
+      .refine((val) => !val || val?.length === 0 || val?.length >= 10, {
         message: 'Contact number must be at least 10 digits or empty.',
       })
       .optional(),

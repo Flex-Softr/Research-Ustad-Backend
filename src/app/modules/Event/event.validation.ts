@@ -32,7 +32,7 @@ const eventValidationPost = z.object({
   }
 
   // Validate event image is not empty
-  if (data.imageUrl && data.imageUrl.trim().length === 0) {
+  if (data.imageUrl && data.imageUrl.trim()?.length === 0) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
       message: 'Event image is required',
@@ -42,7 +42,7 @@ const eventValidationPost = z.object({
 
   // Validate all speaker images are not empty
   data.speakers.forEach((speaker, index) => {
-    if (speaker.imageUrl && speaker.imageUrl.trim().length === 0) {
+    if (speaker.imageUrl && speaker.imageUrl.trim()?.length === 0) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         message: 'Speaker image is required',
@@ -80,7 +80,7 @@ const eventValidationUpdate = z.object({
   }
 
   // Validate event image is not empty if provided
-  if (data.imageUrl !== undefined && data.imageUrl.trim().length === 0) {
+  if (data.imageUrl !== undefined && data.imageUrl.trim()?.length === 0) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
       message: 'Event image is required',
@@ -91,7 +91,7 @@ const eventValidationUpdate = z.object({
   // Validate speaker images are not empty if speakers are provided
   if (data.speakers !== undefined) {
     data.speakers.forEach((speaker, index) => {
-      if (speaker.imageUrl && speaker.imageUrl.trim().length === 0) {
+      if (speaker.imageUrl && speaker.imageUrl.trim()?.length === 0) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
           message: 'Speaker image is required',

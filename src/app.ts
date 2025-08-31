@@ -37,15 +37,31 @@ io.attach(server, {
 app.use(
   cors({
     origin: (origin, callback) => {
-      if (!origin) return callback(null, true); // allow Postman or curl
-
-      if (config.frontend_urls.includes(origin)) {
+      // Allow requests with no origin (like mobile apps or curl requests)
+      if (!origin) return callback(null, true);
+      
+      // Allow your production domains
+      const allowedOrigins = [
+        'https://researchustad.org',
+        'https://www.researchustad.org',
+        'http://localhost:3000',
+        'http://localhost:3001'
+      ];
+      
+      // Also check config.frontend_urls for additional domains
+      const configOrigins = config.frontend_urls || [];
+      const allAllowedOrigins = [...allowedOrigins, ...configOrigins];
+      
+      if (allAllowedOrigins.includes(origin)) {
         callback(null, true);
       } else {
+        console.log('CORS blocked origin:', origin);
         callback(new Error('Not allowed by CORS'));
       }
     },
     credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
   }),
 );
 
@@ -58,8 +74,26 @@ app.use('/api/v1', router);
 // ✅ Make uploaded files publicly accessible
 app.use('/upload', express.static(path.join(process.cwd(), 'upload')));
 
+// Health check endpoint
 app.get('/', (req: Request, res: Response) => {
-  res.send('Hi Researchustad website !');
+  res.json({
+    message: 'ResearchUstad API is running!',
+    status: 'success',
+    timestamp: new Date().toISOString(),
+    environment: config.NODE_ENV,
+    cors: {
+      allowedOrigins: config.frontend_urls
+    }
+  });
+});
+
+// Health check for API
+app.get('/api/v1/health', (req: Request, res: Response) => {
+  res.json({
+    message: 'API is healthy',
+    status: 'success',
+    timestamp: new Date().toISOString()
+  });
 });
 
 app.use(globalErrorHandler);

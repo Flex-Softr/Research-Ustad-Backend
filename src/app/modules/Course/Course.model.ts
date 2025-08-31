@@ -40,7 +40,7 @@ const courseSchema = new Schema<Icourse>({
     validate: {
       validator: function(this: Icourse, value: string) {
         if (this.location === "Offline") {
-          return value && value.trim().length > 0;
+          return value && value.trim()?.length > 0;
         }
         return true;
       },
@@ -154,7 +154,7 @@ const courseSchema = new Schema<Icourse>({
         rating: number;
         students: number;
       }>) {
-        return instructors && instructors.length > 0;
+        return instructors && instructors?.length > 0;
       },
       message: "At least one instructor is required"
     }

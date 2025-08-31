@@ -7,8 +7,8 @@ import { UserService } from "../user/user.service";
 
 const postResearchUstad = async (body: IResearchPaper, userId: Types.ObjectId) => {
     // Process authors to set isRegisteredUser flag and validate structure
-    if (body.authors && body.authors.length > 0) {
-      body.authors = body.authors.map(author => ({
+    if (body.authors && body.authors?.length > 0) {
+      body.authors = body.authors?.map(author => ({
         ...author,
         isRegisteredUser: !!author.user
       }));
@@ -41,8 +41,8 @@ const updateResearchUstad = async (id: string, body: Partial<IResearchPaper>, us
     }
 
     // Process authors to set isRegisteredUser flag and validate structure
-    if (body.authors && body.authors.length > 0) {
-      body.authors = body.authors.map(author => {
+    if (body.authors && body.authors?.length > 0) {
+      body.authors = body?.authors?.map(author => {
         // Handle user field if it's an object or string
         let processedUser = author.user;
         if (author.user) {
@@ -67,7 +67,7 @@ const updateResearchUstad = async (id: string, body: Partial<IResearchPaper>, us
     }
 
     // Check if authors have changed
-    const authorsChanged = body.authors && JSON.stringify(body.authors) !== JSON.stringify(paper.authors);
+    const authorsChanged = body?.authors && JSON.stringify(body?.authors) !== JSON.stringify(paper.authors);
 
     // Update the paper
     const result = await ResearchPaper.findByIdAndUpdate(

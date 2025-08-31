@@ -314,19 +314,19 @@ export class UserService {
       modifiedUpdatedData.citations = citations;
     }
 
-    if (current && Object.keys(current).length) {
+    if (current && Object.keys(current)?.length) {
       for (const [key, value] of Object.entries(current)) {
         modifiedUpdatedData[`current.${key}`] = value;
       }
     }
 
-    if (education && Object.keys(education).length) {
+    if (education && Object.keys(education)?.length) {
       for (const [key, value] of Object.entries(education)) {
         modifiedUpdatedData[`education.${key}`] = value;
       }
     }
 
-    if (socialLinks && Object.keys(socialLinks).length) {
+    if (socialLinks && Object.keys(socialLinks)?.length) {
       for (const [key, value] of Object.entries(socialLinks)) {
         modifiedUpdatedData[`socialLinks.${key}`] = value;
       }
@@ -362,19 +362,19 @@ export class UserService {
       modifiedUpdatedData.citations = citations;
     }
 
-    if (current && Object.keys(current).length) {
+    if (current && Object.keys(current)?.length) {
       for (const [key, value] of Object.entries(current)) {
         modifiedUpdatedData[`current.${key}`] = value;
       }
     }
 
-    if (education && Object.keys(education).length) {
+    if (education && Object.keys(education)?.length) {
       for (const [key, value] of Object.entries(education)) {
         modifiedUpdatedData[`education.${key}`] = value;
       }
     }
 
-    if (socialLinks && Object.keys(socialLinks).length) {
+    if (socialLinks && Object.keys(socialLinks)?.length) {
       for (const [key, value] of Object.entries(socialLinks)) {
         modifiedUpdatedData[`socialLinks.${key}`] = value;
       }
@@ -527,7 +527,7 @@ export class UserService {
    * Search users by name
    */
   static async searchUsers(query: string): Promise<TUser[]> {
-    if (!query || query.trim().length < 2) {
+    if (!query || query.trim()?.length < 2) {
       return [];
     }
 
@@ -755,7 +755,7 @@ export class UserService {
       await session.startTransaction();
 
       // Filter authors with user ObjectIds (handle both old and new formats)
-      const authorsWithUserIds = authors.filter((author) => {
+      const authorsWithUserIds = authors?.filter((author) => {
         if (typeof author === 'string') {
           return false; // Old format - no user reference
         }
@@ -767,7 +767,7 @@ export class UserService {
         isRegisteredUser?: boolean;
       }>;
 
-      if (authorsWithUserIds.length === 0) {
+      if (authorsWithUserIds?.length === 0) {
         console.log(
           '📝 No authors with user references found, skipping publication linking',
         );
@@ -776,7 +776,7 @@ export class UserService {
 
       // Get all author user ObjectIds
       const authorUserIds = authorsWithUserIds
-        .filter((author) => author.user)
+        ?.filter((author) => author?.user)
         .map((author) => author.user!);
 
       console.log(`🔍 Looking for users with ObjectIds:`, authorUserIds);
@@ -791,15 +791,15 @@ export class UserService {
       }).session(session);
 
       console.log(
-        `✅ Found ${matchingUsers.length} matching users out of ${totalUsers} total users`,
+        `✅ Found ${matchingUsers?.length} matching users out of ${totalUsers} total users`,
       );
       console.log(
-        `📈 Match rate: ${((matchingUsers.length / totalUsers) * 100).toFixed(
+        `📈 Match rate: ${((matchingUsers?.length / totalUsers) * 100).toFixed(
           2,
         )}%`,
       );
 
-      if (matchingUsers.length > 0) {
+      if (matchingUsers?.length > 0) {
         console.log(`👥 Matching users:`);
         matchingUsers.forEach((user, index) => {
           console.log(
@@ -840,7 +840,7 @@ export class UserService {
 
       await session.commitTransaction();
       console.log(
-        `🎉 Successfully linked paper ${paperId} to ${matchingUsers.length} authors`,
+        `🎉 Successfully linked paper ${paperId} to ${matchingUsers?.length} authors`,
       );
     } catch (error) {
       await session.abortTransaction();
@@ -866,7 +866,7 @@ export class UserService {
       }).session(session);
 
       console.log(
-        `🔍 Found ${usersWithPaper.length} users with paper ${paperId}`,
+        `🔍 Found ${usersWithPaper?.length} users with paper ${paperId}`,
       );
 
       // Remove the paper from each user's publications array
@@ -886,7 +886,7 @@ export class UserService {
 
       await session.commitTransaction();
       console.log(
-        `🎉 Successfully removed paper ${paperId} from ${usersWithPaper.length} authors`,
+        `🎉 Successfully removed paper ${paperId} from ${usersWithPaper?.length} authors`,
       );
     } catch (error) {
       await session.abortTransaction();

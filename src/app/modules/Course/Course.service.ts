@@ -39,7 +39,7 @@ const PostCourse = async (body: Icourse, files: MulterFiles) => {
   if (files && files['file'] && files['file'][0]) {
     const backendUrl = config.backend_url || '';
     const baseUrl = backendUrl.endsWith('/')
-      ? backendUrl.slice(0, -1)
+      ? backendUrl?.slice(0, -1)
       : backendUrl;
     body.imageUrl = `${baseUrl}/upload/${files['file'][0].filename}`;
   }
@@ -49,10 +49,10 @@ const PostCourse = async (body: Icourse, files: MulterFiles) => {
     const instructorFiles = files['instructorFiles'];
     const backendUrl = config.backend_url || '';
     const baseUrl = backendUrl.endsWith('/')
-      ? backendUrl.slice(0, -1)
+      ? backendUrl?.slice(0, -1)
       : backendUrl;
 
-    body.instructors = body.instructors.map((instructor, index) => ({
+    body.instructors = body.instructors?.map((instructor, index) => ({
       ...instructor,
       imageUrl: instructorFiles[index]
         ? `${baseUrl}/upload/${instructorFiles[index].filename}`
@@ -91,7 +91,7 @@ const UpdateCourse = async (
   if (files && files['file'] && files['file'][0]) {
     const backendUrl = config.backend_url || '';
     const baseUrl = backendUrl.endsWith('/')
-      ? backendUrl.slice(0, -1)
+      ? backendUrl?.slice(0, -1)
       : backendUrl;
     body.imageUrl = `${baseUrl}/upload/${files['file'][0].filename}`;
   }
@@ -101,10 +101,10 @@ const UpdateCourse = async (
     const instructorFiles = files['instructorFiles'];
     const backendUrl = config.backend_url || '';
     const baseUrl = backendUrl.endsWith('/')
-      ? backendUrl.slice(0, -1)
+      ? backendUrl?.slice(0, -1)
       : backendUrl;
 
-    body.instructors = body.instructors.map((instructor, index) => ({
+    body.instructors = body.instructors?.map((instructor, index) => ({
       ...instructor,
       imageUrl: instructorFiles[index]
         ? `${baseUrl}/upload/${instructorFiles[index].filename}`

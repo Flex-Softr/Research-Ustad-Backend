@@ -58,7 +58,7 @@ router.post(
       const files = req.files as { [fieldname: string]: { filename: string }[] };
       if (files && files['file'] && files['file'][0]) {
         const backendUrl = config.backend_url || '';
-        const baseUrl = backendUrl.endsWith('/') ? backendUrl.slice(0, -1) : backendUrl;
+        const baseUrl = backendUrl.endsWith('/') ? backendUrl?.slice(0, -1) : backendUrl;
         req.body.imageUrl = `${baseUrl}/upload/${files['file'][0].filename}`;
       }
       
@@ -66,11 +66,11 @@ router.post(
       if (files && files['instructorFiles']) {
         const instructorFiles = files['instructorFiles'];
         const backendUrl = config.backend_url || '';
-        const baseUrl = backendUrl.endsWith('/') ? backendUrl.slice(0, -1) : backendUrl;
+        const baseUrl = backendUrl.endsWith('/') ? backendUrl?.slice(0, -1) : backendUrl;
         
         // Update instructors array with image URLs
         if (req.body.instructors && Array.isArray(req.body.instructors)) {
-          req.body.instructors = req.body.instructors.map((instructor: Instructor, index: number) => ({
+          req.body.instructors = req.body.instructors?.map((instructor: Instructor, index: number) => ({
             ...instructor,
             imageUrl: instructorFiles[index] 
               ? `${baseUrl}/upload/${instructorFiles[index].filename}`
@@ -118,7 +118,7 @@ router.patch(
       const files = req.files as { [fieldname: string]: { filename: string }[] };
       if (files && files['file'] && files['file'][0]) {
         const backendUrl = config.backend_url || '';
-        const baseUrl = backendUrl.endsWith('/') ? backendUrl.slice(0, -1) : backendUrl;
+        const baseUrl = backendUrl.endsWith('/') ? backendUrl?.slice(0, -1) : backendUrl;
         req.body.imageUrl = `${baseUrl}/upload/${files['file'][0].filename}`;
       }
       
@@ -126,11 +126,11 @@ router.patch(
       if (files && files['instructorFiles']) {
         const instructorFiles = files['instructorFiles'];
         const backendUrl = config.backend_url || '';
-        const baseUrl = backendUrl.endsWith('/') ? backendUrl.slice(0, -1) : backendUrl;
+        const baseUrl = backendUrl.endsWith('/') ? backendUrl?.slice(0, -1) : backendUrl;
         
         // Update instructors array with image URLs
         if (req.body.instructors && Array.isArray(req.body.instructors)) {
-          req.body.instructors = req.body.instructors.map((instructor: Instructor, index: number) => ({
+          req.body.instructors = req.body.instructors?.map((instructor: Instructor, index: number) => ({
             ...instructor,
             imageUrl: instructorFiles[index] 
               ? `${baseUrl}/upload/${instructorFiles[index].filename}`

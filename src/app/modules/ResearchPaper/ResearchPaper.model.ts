@@ -42,7 +42,7 @@ const ResearchPaperSchema = new Schema<IResearchPaper>(
 
 // Add validation to ensure either user ObjectId or name is provided
 ResearchPaperSchema.path('authors').validate(function(authors: IAuthor[]) {
-  if (!authors || authors.length === 0) {
+  if (!authors || authors?.length === 0) {
     return false;
   }
   

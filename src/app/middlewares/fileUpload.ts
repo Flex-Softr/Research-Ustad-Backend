@@ -12,7 +12,7 @@ export const handleFileUpload = (fieldName: string = 'file') => {
       // Handle file upload
       if (req.file) {
         const backendUrl = process.env.BACKEND_URL || '';
-        const baseUrl = backendUrl.endsWith('/') ? backendUrl.slice(0, -1) : backendUrl;
+        const baseUrl = backendUrl.endsWith('/') ? backendUrl?.slice(0, -1) : backendUrl;
         req.body.image = `${baseUrl}/upload/${req.file.filename}`;
       }
       

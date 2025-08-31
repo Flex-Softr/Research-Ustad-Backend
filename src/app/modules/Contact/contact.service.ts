@@ -90,7 +90,7 @@ export class ContactService {
               <!-- Footer -->
               <div style="border-top: 1px solid #e5e7eb; padding-top: 20px; text-align: center;">
                                  <p style="margin: 0; color: #6b7280; font-size: 12px;">
-                   Submitted on: ${new Date().toLocaleString('en-US', {
+                   Submitted on: ${new Date()?.toLocaleString('en-US', {
                      year: 'numeric',
                      month: 'short',
                      day: 'numeric',

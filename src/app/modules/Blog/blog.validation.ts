@@ -18,7 +18,7 @@ const blogValidationPost = z
   })
   .superRefine((data, ctx) => {
     // Additional validation if needed
-    if (data.title && data.title.trim().length === 0) {
+    if (data.title && data.title.trim()?.length === 0) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         message: 'Title cannot be empty',
@@ -26,7 +26,7 @@ const blogValidationPost = z
       });
     }
 
-    if (data.content && data.content.trim().length === 0) {
+    if (data.content && data.content.trim()?.length === 0) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         message: 'Content cannot be empty',
@@ -34,7 +34,7 @@ const blogValidationPost = z
       });
     }
 
-    if (data.imageUrl && data.imageUrl.trim().length === 0) {
+    if (data.imageUrl && data.imageUrl.trim()?.length === 0) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         message: 'Blog image is required',
@@ -69,7 +69,7 @@ const blogValidationUpdate = z
   })
   .superRefine((data, ctx) => {
     // Additional validation if needed
-    if (data.title !== undefined && data.title.trim().length === 0) {
+    if (data.title !== undefined && data.title.trim()?.length === 0) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         message: 'Title cannot be empty',
@@ -77,7 +77,7 @@ const blogValidationUpdate = z
       });
     }
 
-    if (data.content !== undefined && data.content.trim().length === 0) {
+    if (data.content !== undefined && data.content.trim()?.length === 0) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         message: 'Content cannot be empty',
@@ -85,7 +85,7 @@ const blogValidationUpdate = z
       });
     }
 
-    if (data.imageUrl !== undefined && data.imageUrl.trim().length === 0) {
+    if (data.imageUrl !== undefined && data.imageUrl.trim()?.length === 0) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         message: 'Blog image is required',

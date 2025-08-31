@@ -76,8 +76,8 @@ const CourseList = () => {
       <h3>Upcoming Courses</h3>
       <ul>
         {courses
-          .filter((course) => new Date(course.startDate) > new Date()) // Filtering upcoming courses
-          .map((course) => (
+          ?.filter((course) => new Date(course.startDate) > new Date()) // Filtering upcoming courses
+          ?.map((course) => (
             <li key={course._id}>
               <strong>{course.title}</strong> - {course.status}
               <span> (Starts in: {getTimeRemaining(course.startDate)})</span>
@@ -91,8 +91,8 @@ const CourseList = () => {
       <h3>Ongoing Courses</h3>
       <ul>
         {courses
-          .filter((course) => new Date(course.startDate) <= new Date()) // Filtering ongoing courses
-          .map((course) => (
+          ?.filter((course) => new Date(course.startDate) <= new Date()) // Filtering ongoing courses
+          ?.map((course) => (
             <li key={course._id}>
               <strong>{course.title}</strong> - {course.status}
               <span> (Ongoing)</span>

@@ -40,19 +40,10 @@ app.use(
       // Allow requests with no origin (like mobile apps or curl requests)
       if (!origin) return callback(null, true);
       
-      // Allow your production domains
-      const allowedOrigins = [
-        'https://researchustad.org',
-        'https://www.researchustad.org',
-        'http://localhost:3000',
-        'http://localhost:3001'
-      ];
+      // Use environment-based allowed origins
+      const allowedOrigins = config.frontend_urls || ['http://localhost:3000'];
       
-      // Also check config.frontend_urls for additional domains
-      const configOrigins = config.frontend_urls || [];
-      const allAllowedOrigins = [...allowedOrigins, ...configOrigins];
-      
-      if (allAllowedOrigins.includes(origin)) {
+      if (allowedOrigins.includes(origin)) {
         callback(null, true);
       } else {
         console.log('CORS blocked origin:', origin);

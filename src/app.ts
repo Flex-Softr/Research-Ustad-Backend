@@ -96,10 +96,14 @@ app.get('/api/v1/health', (req: Request, res: Response) => {
 app.use(globalErrorHandler);
 app.use(notFound);
 
-// Cron job
-cron.schedule('*/1 * * * *', () => {
-  updateStatus(courseModel, 'status', 'startDate');
-  updateStatus(eventModel, 'status', 'startDate', 'eventDuration');
-});
+// Cron job - TEMPORARILY DISABLED FOR DEBUGGING
+// TODO: Re-enable after fixing database persistence issue
+/*
+// cron.schedule('*/1 * * * *', () => {
+//   updateStatus(courseModel, 'status', 'startDate');
+//   updateStatus(eventModel, 'status', 'startDate', 'eventDuration');
+// });
+// */
+console.log('⚠️ CRON JOB DISABLED - This is for debugging data persistence issues');
 
 export default app;

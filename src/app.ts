@@ -43,10 +43,16 @@ app.use(
       // Use environment-based allowed origins
       const allowedOrigins = config.frontend_urls || ['http://localhost:3000'];
       
+      console.log('🔍 CORS Check:', {
+        origin,
+        allowedOrigins,
+        isAllowed: allowedOrigins.includes(origin)
+      });
+      
       if (allowedOrigins.includes(origin)) {
         callback(null, true);
       } else {
-        console.log('CORS blocked origin:', origin);
+        console.log('❌ CORS blocked origin:', origin);
         callback(new Error('Not allowed by CORS'));
       }
     },

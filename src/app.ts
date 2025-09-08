@@ -1,15 +1,11 @@
 import cors from 'cors'; // ✅ ADD THIS
 import cookieParser from 'cookie-parser';
-import cron from 'node-cron';
 import express, { Application, Request, Response } from 'express';
 import globalErrorHandler from './app/middlewares/globalErrorhandler';
 import notFound from './app/middlewares/notFound';
 import router from './app/routes';
 import * as http from 'http';
 import { io } from './app/utils/socket';
-import { courseModel } from './app/modules/Course/Course.model';
-import { eventModel } from './app/modules/Event/event.model';
-import { updateStatus } from './app/utils/RealtimeUpdate';
 import path from 'path';
 import config from './app/config/index';
 
@@ -96,12 +92,6 @@ app.get('/api/v1/health', (req: Request, res: Response) => {
 app.use(globalErrorHandler);
 app.use(notFound);
 
-// Cron job - Reduced frequency to prevent database stress
-cron.schedule('*/5 * * * *', () => {
-  console.log('🔄 Running status update cron job...');
-  updateStatus(courseModel, 'status', 'startDate');
-  updateStatus(eventModel, 'status', 'startDate', 'eventDuration');
-});
 
 
 export default app;

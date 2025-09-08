@@ -96,8 +96,9 @@ app.get('/api/v1/health', (req: Request, res: Response) => {
 app.use(globalErrorHandler);
 app.use(notFound);
 
-// Cron job
-cron.schedule('*/1 * * * *', () => {
+// Cron job - Reduced frequency to prevent database stress
+cron.schedule('*/5 * * * *', () => {
+  console.log('🔄 Running status update cron job...');
   updateStatus(courseModel, 'status', 'startDate');
   updateStatus(eventModel, 'status', 'startDate', 'eventDuration');
 });

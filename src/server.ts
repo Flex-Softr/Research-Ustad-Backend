@@ -25,7 +25,7 @@ async function main() {
     console.log('✅ Database connected successfully');
 
     console.log('🌱 Seeding super admin...');
-    seedSuperAdmin();
+    await seedSuperAdmin();
     console.log('✅ Super admin seeded');
 
     server = app.listen(config.port, () => {

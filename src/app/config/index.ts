@@ -1,8 +1,13 @@
 import dotenv from 'dotenv';
 import path from 'path';
 
-// dotenv.config({ path: path.join((process.cwd(), '.env')) });
+// Load environment variables
 dotenv.config({ path: path.join(process.cwd(), '.env') });
+
+// Fallback to system environment variables if .env file doesn't exist
+if (!process.env.DATABASE_URL) {
+  console.warn('⚠️ DATABASE_URL not found in .env file, using system environment');
+}
 
 export default {
   NODE_ENV: process.env.NODE_ENV,

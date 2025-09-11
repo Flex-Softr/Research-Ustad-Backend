@@ -58,8 +58,8 @@ app.use(
   }),
 );
 
-app.use(express.json({ limit: '50mb' })); // Increased limit for large requests
-app.use(express.urlencoded({ extended: true, limit: '50mb' })); // Increased limit
+app.use(express.json({ limit: '100mb' })); // Increased limit for large requests
+app.use(express.urlencoded({ extended: true, limit: '100mb' })); // Increased limit
 app.use(cookieParser());
 
 // application routes

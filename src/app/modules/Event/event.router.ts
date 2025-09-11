@@ -79,21 +79,37 @@ router.patch(
         req.body.imageUrl = `${baseUrl}/upload/${files['file'][0].filename}`;
       }
       
-      // Handle speaker images
-      if (files && files['speakerFiles']) {
-        const speakerFiles = files['speakerFiles'];
+      // Handle speaker images - Always process speakers array for updates
+      if (req.body.speakers && Array.isArray(req.body.speakers)) {
+        const speakerFiles = files && files['speakerFiles'] ? files['speakerFiles'] : [];
         const backendUrl = config.backend_url || '';
         const baseUrl = backendUrl.endsWith('/') ? backendUrl?.slice(0, -1) : backendUrl;
         
+        console.log('🔍 Processing speakers:', {
+          speakersCount: req.body.speakers.length,
+          speakerFilesCount: speakerFiles.length,
+          speakerFiles: speakerFiles.map(f => f.filename)
+        });
+        
         // Update speakers array with image URLs
-        if (req.body.speakers && Array.isArray(req.body.speakers)) {
-          req.body.speakers = req.body.speakers?.map((speaker: Speaker, index: number) => ({
-            ...speaker,
-            imageUrl: speakerFiles[index] 
-              ? `${baseUrl}/upload/${speakerFiles[index].filename}`
-              : speaker.imageUrl || ''
-          }));
-        }
+        req.body.speakers = req.body.speakers?.map((speaker: Speaker, index: number) => {
+          const updatedSpeaker: Partial<Speaker> = { ...speaker };
+          
+          // Only set imageUrl if there's a new file or existing imageUrl
+          if (speakerFiles[index]) {
+            updatedSpeaker.imageUrl = `${baseUrl}/upload/${speakerFiles[index].filename}`;
+            console.log(`✅ Set imageUrl for speaker ${index}:`, updatedSpeaker.imageUrl);
+          } else if (speaker.imageUrl && speaker.imageUrl.trim()) {
+            updatedSpeaker.imageUrl = speaker.imageUrl;
+            console.log(`🔄 Kept existing imageUrl for speaker ${index}:`, updatedSpeaker.imageUrl);
+          } else {
+            // Remove imageUrl field if it doesn't exist
+            delete updatedSpeaker.imageUrl;
+            console.log(`❌ No imageUrl for speaker ${index}`);
+          }
+          
+          return updatedSpeaker;
+        });
       }
     }
     next();

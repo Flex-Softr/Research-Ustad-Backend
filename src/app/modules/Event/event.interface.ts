@@ -17,7 +17,6 @@ export interface IEvent {
     speakers: Speaker[];
     imageUrl: string;
     registrationLink: string;
-    category: string;
     status: 'upcoming' | 'ongoing' | 'finished';
     eventDuration: number;
     registrationFee: number; // 0 for free events, positive number for paid events

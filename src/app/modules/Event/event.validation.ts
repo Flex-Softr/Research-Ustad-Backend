@@ -6,6 +6,12 @@ const speakerSchema = z.object({
   imageUrl: z.string().min(1, 'Speaker image is required'),
 });
 
+const speakerUpdateSchema = z.object({
+  name: z.string().min(1, 'Speaker name is required'),
+  bio: z.string().min(1, 'Speaker bio is required'),
+  imageUrl: z.string().optional(), // Make imageUrl optional for updates
+});
+
 const eventValidationPost = z.object({
   title: z.string().min(1, { message: 'Title is required' }), 
   description: z.string().min(1, { message: 'Description is required' }),
@@ -16,7 +22,6 @@ const eventValidationPost = z.object({
   imageUrl: z.string().min(1, { message: 'Event image is required' }),
   registrationLink: z.string().min(1, { message: 'Registration link is required' }),
   speakers: z.array(speakerSchema).min(1, 'At least one speaker is required'),
-  category: z.string().min(1, { message: 'Category is required' }),
   status: z.enum(['upcoming', 'ongoing', 'finished']).default('upcoming'),
   eventDuration: z.number().min(1, { message: 'Event duration is required' }),
   maxAttendees: z.number().min(1, { message: 'Max attendees is required' }),
@@ -59,10 +64,9 @@ const eventValidationUpdate = z.object({
   startDate: z.string().min(1, { message: 'Start date is required' }).optional(),
   endDate: z.string().min(1, { message: 'End date is required' }).optional(),
   location: z.string().min(1, { message: 'Location is required' }).optional(),
-  speakers: z.array(speakerSchema).optional(),
+  speakers: z.array(speakerUpdateSchema).optional(),
   imageUrl: z.string().min(1, { message: 'Event image is required' }).optional(),
   registrationLink: z.string().min(1, { message: 'Registration link is required' }).optional(),
-  category: z.string().min(1, { message: 'Category is required' }).optional(),
   status: z.enum(['upcoming', 'ongoing', 'finished']).optional(),
   eventDuration: z.number().min(1, { message: 'Event duration is required' }).optional(),
   maxAttendees: z.number().min(1, { message: 'Max attendees is required' }).optional(),
@@ -88,18 +92,8 @@ const eventValidationUpdate = z.object({
     });
   }
 
-  // Validate speaker images are not empty if speakers are provided
-  if (data.speakers !== undefined) {
-    data.speakers.forEach((speaker, index) => {
-      if (speaker.imageUrl && speaker.imageUrl.trim()?.length === 0) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: 'Speaker image is required',
-          path: ['speakers', index, 'imageUrl'],
-        });
-      }
-    });
-  }
+  // For updates, we don't validate speaker images in superRefine since imageUrl is optional
+  // The router will handle setting the correct imageUrl from uploaded files
 });
 
 export const Validationevent = {

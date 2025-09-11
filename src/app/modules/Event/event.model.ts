@@ -21,7 +21,6 @@ export const eventSchema = new Schema<IEvent>(
     speakers: { type: [speakerSchema], required: true },
     imageUrl: { type: String },
     registrationLink: { type: String, required: true },
-    category: { type: String, required: true },
     status: {
       type: String,
       enum: ['upcoming', 'ongoing', 'finished'],

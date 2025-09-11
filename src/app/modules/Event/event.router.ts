@@ -5,7 +5,7 @@ import validateRequest from '../../middlewares/validateRequest';
 import { USER_ROLE } from '../user/user.constant';
 import auth from '../../middlewares/auth';
 import { Validationevent } from './event.validation';
-import { upload } from '../../utils/upload';
+import { upload, handleMulterError } from '../../utils/upload';
 import config from '../../config';
 
 // Define speaker interface
@@ -57,8 +57,9 @@ router.post(
     next();
   },
 
-  validateRequest(Validationevent.eventValidationPost),
-  eventController.Postevent,
+      validateRequest(Validationevent.eventValidationPost),
+      handleMulterError,
+      eventController.Postevent,
 );
 router.patch(
   '/:id',
@@ -114,8 +115,9 @@ router.patch(
     }
     next();
   },
-  validateRequest(Validationevent.eventValidationUpdate),
-  eventController.Updateevent,
+      validateRequest(Validationevent.eventValidationUpdate),
+      handleMulterError,
+      eventController.Updateevent,
 );
 router.delete(
   '/:id',

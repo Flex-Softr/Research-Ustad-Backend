@@ -122,7 +122,7 @@ export const researchPaperSchema = z.object({
     volume: z.string().optional(),
     impactFactor: z.number().min(0).max(50).optional(),
     journalRank: z.string().optional(),
-    visitLink: z.string().url('Invalid URL format'),
+    visitLink: z.string().url('Invalid URL format').optional(),
     paperType: z.enum(['journal', 'conference', 'book chapter']),
     status: z
       .enum([

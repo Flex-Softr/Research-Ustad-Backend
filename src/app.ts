@@ -36,8 +36,12 @@ app.use(
       // Allow requests with no origin (like mobile apps or curl requests)
       if (!origin) return callback(null, true);
       
-      // Use environment-based allowed origins
-      const allowedOrigins = config.frontend_urls || ['http://localhost:3000'];
+      // Use environment-based allowed origins with fallbacks
+      const allowedOrigins = config.frontend_urls || [
+        'http://localhost:3000',
+        'https://researchustad.org',
+        'https://www.researchustad.org'
+      ];
       
       console.log('🔍 CORS Check:', {
         origin,
@@ -54,12 +58,20 @@ app.use(
     },
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+    allowedHeaders: [
+      'Content-Type', 
+      'Authorization', 
+      'X-Requested-With',
+      'Accept',
+      'Origin',
+      'Access-Control-Request-Method',
+      'Access-Control-Request-Headers'
+    ],
   }),
 );
 
-app.use(express.json({ limit: '200mb' })); // Increased limit for large requests
-app.use(express.urlencoded({ extended: true, limit: '200mb' })); // Increased limit
+app.use(express.json({ limit: '100mb' })); // Higher limits for VPS deployment
+app.use(express.urlencoded({ extended: true, limit: '100mb' })); // Higher limits for VPS deployment
 app.use(cookieParser());
 
 // application routes

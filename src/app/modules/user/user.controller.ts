@@ -59,7 +59,6 @@ const getAllUsers = catchAsync(async (req, res) => {
   if (fields) {
     options = { ...options, selectFields: fields as string };
   }
-
   const result = await UserService.getUsers(options);
 
   sendResponse(res, {

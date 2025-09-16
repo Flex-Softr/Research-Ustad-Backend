@@ -204,6 +204,9 @@ export class UserService {
     // Build the query
     let userQuery = User.find(query);
 
+    // Oldest to newest for consistent public ordering
+    userQuery = userQuery.sort({ createdAt: 1 });
+
     // Apply limit if specified
     if (limit) {
       userQuery = userQuery.limit(limit);
@@ -238,26 +241,30 @@ export class UserService {
 
     const users = await userQuery.exec();
     
-    // Sort users by role priority: superAdmin first, then admin, then user
+    // For public research-members endpoint or when role is filtered,
+    // return DB-sorted results directly (createdAt ascending)
+    if (type === 'research-members' || role) {
+      return users;
+    }
+
+    // Admin views: keep role-priority ordering
     const sortedUsers = users.sort((a, b) => {
       const rolePriority = {
         superAdmin: 3,
         admin: 2,
-        user: 1
-      };
-      
+        user: 1,
+      } as const;
+
       const priorityA = rolePriority[a.role as keyof typeof rolePriority] || 0;
       const priorityB = rolePriority[b.role as keyof typeof rolePriority] || 0;
-      
-      // If roles are the same, sort by fullName alphabetically
+
       if (priorityA === priorityB) {
         return a.fullName.localeCompare(b.fullName);
       }
-      
-      // Sort by role priority (descending)
+
       return priorityB - priorityA;
     });
-    
+
     return sortedUsers;
   }
 

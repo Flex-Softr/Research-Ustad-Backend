@@ -50,10 +50,10 @@ router.get(
   UserControllers.getAllUsers,
 );
 
-// Get research members (public) - excludes admin and superAdmin
+// Get research members (public) - excludes superAdmin, sorted by creation date
 router.get(
   '/research-members',
-  UserControllers.getAllUsers,
+  UserControllers.getMembersForPublic,
 );
 
 // Get platform statistics (admin only)

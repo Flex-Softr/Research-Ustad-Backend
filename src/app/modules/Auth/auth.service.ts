@@ -427,7 +427,7 @@ const forgetPassword = async (email: string) => {
             <div class="footer">
                 <div class="logo">ResearchUstad</div>
                 <p>This is an automated message, please do not reply to this email.</p>
-                <p>&copy; 2024 ResearchUstad. All rights reserved.</p>
+              
             </div>
         </div>
     </body>

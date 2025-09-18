@@ -55,6 +55,10 @@ const createResearchMemberValidationSchema = z.object({
       .optional(),
     research: z.array(z.string()).optional(),
     shortBio: z.string().optional(),
+    aboutYourSelf: z
+      .string()
+      .max(250, { message: 'About yourself must be 250 characters or less.' })
+      .optional(),
     socialLinks: z
       .object({
         google_scholar: z.string().optional(),
@@ -114,6 +118,10 @@ const createResearchMemberJsonValidationSchema = z.object({
       .optional(),
     research: z.array(z.string()).optional(),
     shortBio: z.string().optional(),
+    aboutYourSelf: z
+      .string()
+      .max(250, { message: 'About yourself must be 250 characters or less.' })
+      .optional(),
     socialLinks: z
       .object({
         google_scholar: z.string().optional(),
@@ -175,6 +183,10 @@ const updateResearchMemberValidationSchema = z.object({
       .optional(),
     research: z.array(z.string()).optional(),
     shortBio: z.string().optional(),
+    aboutYourSelf: z
+      .string()
+      .max(250, { message: 'About yourself must be 250 characters or less.' })
+      .optional(),
     socialLinks: z
       .object({
         google_scholar: z.string().optional(),

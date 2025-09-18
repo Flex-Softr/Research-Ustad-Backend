@@ -39,18 +39,15 @@ const getMe = catchAsync(async (req, res) => {
   });
 });
 
+// for admin and superAdmin data.
 const getAllUsers = catchAsync(async (req, res) => {
-  const { type, limit, fields } = req.query;
+  const { limit, fields, role } = req.query;
   
   let options: any = {};
   
-  // Check if this is a research-members request (either by type param or route path)
-  const isResearchMembersRequest = type === 'research-members' || req.path.includes('research-members');
-  
-  if (isResearchMembersRequest) {
-    options = { 
-      role: 'user' // Only include regular users
-    };
+  // Apply role filter if specified in query params
+  if (role) {
+    options.role = role;
   }
   
   if (limit) {
@@ -65,6 +62,17 @@ const getAllUsers = catchAsync(async (req, res) => {
     statusCode: httpStatus.OK,
     success: true,
     message: 'Users retrieved successfully',
+    data: result,
+  });
+});
+
+const getMembersForPublic = catchAsync(async (req, res) => {
+  const result = await UserService.getMembersForPublic();
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Members retrieved successfully',
     data: result,
   });
 });
@@ -237,6 +245,7 @@ export const UserControllers = {
   // User retrieval
   getMe,
   getAllUsers,
+  getMembersForPublic,
   getUserById,
   getPlatformStats,
   getPersonalStats,

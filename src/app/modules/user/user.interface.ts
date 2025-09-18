@@ -33,6 +33,7 @@ export interface TUser {
   };
   research?: string[];
   shortBio?: string;
+  aboutYourSelf?: string;
   citations?: number;
   socialLinks?: {
     researchgate?: string;

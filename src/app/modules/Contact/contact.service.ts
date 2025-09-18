@@ -80,9 +80,9 @@ export class ContactService {
               
               <!-- Action Button -->
               <div style="text-align: center; margin-bottom: 25px;">
-                <a href="mailto:${contact.email}?subject=Reply: ${
-                  contact.subject
-                }" style="display: inline-block; background-color: #2563eb; color: white; text-decoration: none; padding: 12px 24px; border-radius: 6px; font-weight: 500; font-size: 14px;">
+                <a href="mailto:${contact.email}?subject=${encodeURIComponent(
+                  `Reply: ${contact.subject}`,
+                )}" style="display: inline-block; background-color: #2563eb; color: white; text-decoration: none; padding: 12px 24px; border-radius: 6px; font-weight: 500; font-size: 14px;">
                   Reply to ${contact.name}
                 </a>
               </div>

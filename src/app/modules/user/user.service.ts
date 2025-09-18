@@ -52,6 +52,7 @@ export class UserService {
       },
       research: payload.research || [],
       shortBio: payload.shortBio || '',
+      aboutYourSelf: payload.aboutYourSelf || '',
       socialLinks: payload.socialLinks || {
         researchgate: '',
         google_scholar: '',
@@ -179,33 +180,21 @@ export class UserService {
   }
 
   /**
-   * Get all users with optional filtering and populated publications
+   * Get all users for admin/superAdmin views - sorted by role priority
+   * superAdmin → admin → user, then alphabetically by name
    */
   static async getUsers(options: any = {}): Promise<TUser[]> {
-    const { type, limit, fields, selectFields, excludeRoles, role } = options;
+    const { limit, fields, selectFields, role } = options;
 
     const query: any = { isDeleted: { $ne: true } };
-
-    // Apply type filter
-    if (type === 'research-members') {
-      query.role = 'user';
-    }
 
     // Apply role filter
     if (role) {
       query.role = role;
     }
 
-    // Apply exclude roles filter
-    if (excludeRoles && Array.isArray(excludeRoles)) {
-      query.role = { $nin: excludeRoles };
-    }
-
     // Build the query
     let userQuery = User.find(query);
-
-    // Oldest to newest for consistent public ordering
-    userQuery = userQuery.sort({ createdAt: 1 });
 
     // Apply limit if specified
     if (limit) {
@@ -241,13 +230,12 @@ export class UserService {
 
     const users = await userQuery.exec();
     
-    // For public research-members endpoint or when role is filtered,
-    // return DB-sorted results directly (createdAt ascending)
-    if (type === 'research-members' || role) {
+    // For specific role filtering, return DB-sorted results directly (createdAt ascending)
+    if (role) {
       return users;
     }
 
-    // Admin views: keep role-priority ordering
+    // For all users page (admin/superAdmin views), apply role-priority ordering
     const sortedUsers = users.sort((a, b) => {
       const rolePriority = {
         superAdmin: 3,
@@ -269,34 +257,54 @@ export class UserService {
   }
 
   /**
-   * Get all research members (users with designations)
+   * Get all research members (users with designations) - sorted by creation date
    */
   static async getResearchMembers(): Promise<TUser[]> {
     const users = await User.find({
       designation: { $exists: true, $ne: null },
       role: { $ne: 'superAdmin' },
-    });
+    }).sort({ createdAt: 1 }); // Sort by creation date (oldest first)
     
-    // Sort by role priority: admin first, then user, then by fullName
-    const sortedUsers = users.sort((a, b) => {
-      const rolePriority = {
-        admin: 2,
-        user: 1
-      };
-      
-      const priorityA = rolePriority[a.role as keyof typeof rolePriority] || 0;
-      const priorityB = rolePriority[b.role as keyof typeof rolePriority] || 0;
-      
-      // If roles are the same, sort by fullName alphabetically
-      if (priorityA === priorityB) {
-        return a.fullName.localeCompare(b.fullName);
-      }
-      
-      // Sort by role priority (descending)
-      return priorityB - priorityA;
-    });
-    
-    return sortedUsers;
+    return users;
+  }
+
+  /**
+   * Get members for public display - sorted by creation date (oldest first)
+   * Includes admin and user roles only, excludes superAdmin
+   */
+  static async getMembersForPublic(): Promise<TUser[]> {
+    const query: any = { 
+      isDeleted: { $ne: true },
+      role: { $nin: ['superAdmin'] } // Exclude superAdmin
+    };
+
+    const userQuery = User.find(query).sort({ createdAt: 1 }); // Oldest first
+
+    // Populate publications and blogs
+    userQuery.populate([
+      {
+        path: 'publications',
+        match: { isApproved: true },
+        select:
+          'title citations journal abstract year visitLink authors status isApproved paperType',
+        options: { sort: { year: -1 } },
+        populate: {
+          path: 'authors.user',
+          select: 'fullName email designation image',
+        },
+      },
+      {
+        path: 'blogs',
+        match: { status: 'approved' },
+        select: 'title category publishedDate imageUrl content status',
+        options: { sort: { publishedDate: -1 } },
+      },
+    ]);
+
+     // Always populate publications with limited fields (only approved papers)
+
+    const users = await userQuery.exec();
+    return users;
   }
 
   // ===== USER UPDATES =====

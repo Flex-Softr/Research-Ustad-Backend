@@ -57,7 +57,17 @@ const createResearchMemberValidationSchema = z.object({
     shortBio: z.string().optional(),
     aboutYourSelf: z
       .string()
-      .max(250, { message: 'About yourself must be 250 characters or less.' })
+      .refine(
+        (val) => {
+          if (!val || val.trim() === '') return true;
+          const wordCount = val
+            .trim()
+            .split(/\s+/)
+            .filter((word) => word.length > 0).length;
+          return wordCount <= 250;
+        },
+        { message: 'About yourself must be 250 words or less.' },
+      )
       .optional(),
     socialLinks: z
       .object({
@@ -120,7 +130,17 @@ const createResearchMemberJsonValidationSchema = z.object({
     shortBio: z.string().optional(),
     aboutYourSelf: z
       .string()
-      .max(250, { message: 'About yourself must be 250 characters or less.' })
+      .refine(
+        (val) => {
+          if (!val || val.trim() === '') return true;
+          const wordCount = val
+            .trim()
+            .split(/\s+/)
+            .filter((word) => word.length > 0).length;
+          return wordCount <= 250;
+        },
+        { message: 'About yourself must be 250 words or less.' },
+      )
       .optional(),
     socialLinks: z
       .object({
@@ -185,7 +205,17 @@ const updateResearchMemberValidationSchema = z.object({
     shortBio: z.string().optional(),
     aboutYourSelf: z
       .string()
-      .max(250, { message: 'About yourself must be 250 characters or less.' })
+      .refine(
+        (val) => {
+          if (!val || val.trim() === '') return true;
+          const wordCount = val
+            .trim()
+            .split(/\s+/)
+            .filter((word) => word.length > 0).length;
+          return wordCount <= 250;
+        },
+        { message: 'About yourself must be 250 words or less.' },
+      )
       .optional(),
     socialLinks: z
       .object({
@@ -223,7 +253,6 @@ const updateUserRoleValidationSchema = z.object({
     id: z.string().min(1, { message: 'User ID is required.' }),
   }),
 });
-
 
 // Research member deletion validation schema
 const deleteResearchMemberValidationSchema = z.object({

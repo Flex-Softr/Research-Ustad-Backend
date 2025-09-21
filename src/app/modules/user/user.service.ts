@@ -258,15 +258,16 @@ export class UserService {
 
   /**
    * Get all research members (users with designations) - sorted by creation date
-   */
-  static async getResearchMembers(): Promise<TUser[]> {
-    const users = await User.find({
-      designation: { $exists: true, $ne: null },
-      role: { $ne: 'superAdmin' },
-    }).sort({ createdAt: 1 }); // Sort by creation date (oldest first)
+  unne 
+  */
+  // static async getResearchMembers(): Promise<TUser[]> {
+  //   const users = await User.find({
+  //     designation: { $exists: true, $ne: null },
+  //     role: { $ne: 'superAdmin' },
+  //   }).sort({ createdAt: 1 }); // Sort by creation date (oldest first)
     
-    return users;
-  }
+  //   return users;
+  // }
 
   /**
    * Get members for public display - sorted by creation date (oldest first)

@@ -535,7 +535,7 @@ export class UserService {
     const users = await User.find({
       fullName: { $regex: searchRegex },
     })
-      .select('fullName email designation')
+      .select('fullName email designation image')
       .limit(10)
       .sort({ fullName: 1 });
 

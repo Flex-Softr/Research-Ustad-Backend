@@ -64,9 +64,9 @@ const createResearchMemberValidationSchema = z.object({
             .trim()
             .split(/\s+/)
             .filter((word) => word.length > 0).length;
-          return wordCount <= 250;
+          return wordCount <= 300;
         },
-        { message: 'About yourself must be 250 words or less.' },
+        { message: 'About yourself must be 300 words or less.' },
       )
       .optional(),
     socialLinks: z
@@ -137,9 +137,9 @@ const createResearchMemberJsonValidationSchema = z.object({
             .trim()
             .split(/\s+/)
             .filter((word) => word.length > 0).length;
-          return wordCount <= 250;
+          return wordCount <= 300;
         },
-        { message: 'About yourself must be 250 words or less.' },
+        { message: 'About yourself must be 300 words or less.' },
       )
       .optional(),
     socialLinks: z
@@ -212,9 +212,9 @@ const updateResearchMemberValidationSchema = z.object({
             .trim()
             .split(/\s+/)
             .filter((word) => word.length > 0).length;
-          return wordCount <= 250;
+          return wordCount <= 300;
         },
-        { message: 'About yourself must be 250 words or less.' },
+        { message: 'About yourself must be 300 words or less.' },
       )
       .optional(),
     socialLinks: z

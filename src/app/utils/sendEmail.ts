@@ -15,7 +15,7 @@ export const sendEmail = async (to: string, html: string, subject: string) => {
   });
 
   const mailOptions = {
-    from: `"ResearchUstad" <${config.email_user}>`,
+    from: `"Research Ustad" <${config.email_user}>`,
     to,
     subject,
     html,

@@ -83,7 +83,7 @@ app.use('/upload', express.static(path.join(process.cwd(), 'upload')));
 // Health check endpoint
 app.get('/', (req: Request, res: Response) => {
   res.json({
-    message: 'ResearchUstad API is running!',
+    message: 'Research Ustad API is running!',
     status: 'success',
     timestamp: new Date().toISOString(),
     environment: config.NODE_ENV,

@@ -8,6 +8,8 @@ import { ResearchPaper } from '../ResearchPaper/ResearchPaper.model';
 import { Blog } from '../Blog/blog.model';
 import { TUser } from './user.interface';
 
+
+
 export class UserService {
   // ===== USER CREATION =====
   static async createUser(
@@ -101,25 +103,106 @@ export class UserService {
     const plainPassword =
       payload.password || (config.default_password as string);
 
-    const subject = 'Welcome to ResearchUstad';
+    const subject = 'Welcome to Research Ustad';
     const emailContent = `
-     <h2 style="color: #4CAF50; text-align: center;">Welcome to ResearchUstad!</h2>
-  <p>Dear ${payload.fullName},</p>
-  <p>Congratulations! Your account has been successfully created on <strong>ResearchUstad</strong>. You now have access to our platform and can start exploring.</p>
-  <h3>Your Account Details:</h3>
-  <ul>
-    <li><strong>Email:</strong>  ${newUser.email}</li>
-    <li><strong>Password:</strong> ${plainPassword}</li>
+      <h2 style="color: #2563eb; text-align: center">
+      Welcome to Research Ustad!
+    </h2>
+    <p>Dear ${payload.fullName},</p>
+    <p>
+      Congratulations! Your account has been successfully created on
+      <strong>Research Ustad</strong>. You now have access to our platform and
+      can start exploring.
+    </p>
+    <h3>Your Account Details:</h3>
+    <ul>
+      <li><strong>Email:</strong> ${newUser.email}</li>
+      <li><strong>Password:</strong> ${plainPassword}</li>
       <li><strong>Designation:</strong> ${newUser.designation}</li>
-  </ul>
-  <p>For security reasons, we strongly recommend that you change your password immediately after logging in.</p>
+    </ul>
+    <p>
+      For security reasons, we strongly recommend that you change your password
+      immediately after logging in.
+    </p>
 
-    <p><a href="${config.frontend_urls}" style="background-color: #4CAF50; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block;">Log In</a></p>
+    <p>
+      <a
+        target="_blank"
+        href="${config.frontend_urls}/login"
+        style="
+          background-color: #2563eb;
+          color: white;
+          padding: 10px 20px;
+          margin: 1px 0;
+          text-decoration: none;
+          border-radius: 5px;
+          display: inline-block;
+        "
+        >Log In</a
+      >
+    </p>
 
-  <p>If you have any questions, feel free to reach out to our support team.</p>
+    <p>
+      If you have any questions, feel free to reach out to our support team.
+    </p>
 
-  <p>Best regards,</p>
-  <p><strong>The ResearchUstad Team</strong></p>
+    <p>&nbsp;</p>
+
+    <p style="margin: 10px 0">
+      <strong style="font-size: 16px">Best Regards,</strong>
+    </p>
+
+    <p style="margin: 4px 0">
+      <img
+        src="https://i.ibb.co.com/RG0nL1rv/Research-Ustad-Logo.png"
+        alt="Research Ustad Logo"
+        width="105"
+        height="105"
+      />
+    </p>
+
+    <p
+      style="
+        margin: 8px 0;
+        font-family: 'Times New Roman', Times, serif;
+        font-size: 14pt;
+      "
+    >
+      <strong>Research Ustad Team</strong>
+    </p>
+
+    <p
+      style="
+        margin: 4px 0;
+        font-family: 'Times New Roman', Times, serif;
+        font-size: 12pt;
+      "
+    >
+      <em>Contact:</em>
+      <a href="https://researchustad.org/" target="_blank">Research Ustad</a>
+    </p>
+
+    <p
+      style="
+        margin: 4px 0;
+        font-family: 'Times New Roman', Times, serif;
+        font-size: 12pt;
+      "
+    >
+      <em>WhatsApp:</em>
+      <a href="tel:+8801724653054">+880 1724-653054</a>
+    </p>
+
+    <p
+      style="
+        margin: 4px 0;
+        font-family: 'Times New Roman', Times, serif;
+        font-size: 12pt;
+      "
+    >
+      <em>Email:</em>
+      <a href="mailto:info@researchustad.org">info@researchustad.org</a>
+    </p>
   `;
 
     // Send email (don't block user creation if email fails)
@@ -180,8 +263,7 @@ export class UserService {
   }
 
   /**
-   * Get all users for admin/superAdmin views - sorted by role priority
-   * superAdmin → admin → user, then alphabetically by name
+   * Get all users for admin/superAdmin views - sorted by role priority superAdmin → admin → user, then alphabetically by name
    */
   static async getUsers(options: any = {}): Promise<TUser[]> {
     const { limit, fields, selectFields, role } = options;
@@ -229,7 +311,7 @@ export class UserService {
     ]);
 
     const users = await userQuery.exec();
-    
+
     // For specific role filtering, return DB-sorted results directly (createdAt ascending)
     if (role) {
       return users;
@@ -257,26 +339,13 @@ export class UserService {
   }
 
   /**
-   * Get all research members (users with designations) - sorted by creation date
-  unne 
-  */
-  // static async getResearchMembers(): Promise<TUser[]> {
-  //   const users = await User.find({
-  //     designation: { $exists: true, $ne: null },
-  //     role: { $ne: 'superAdmin' },
-  //   }).sort({ createdAt: 1 }); // Sort by creation date (oldest first)
-    
-  //   return users;
-  // }
-
-  /**
    * Get members for public display - sorted by creation date (oldest first)
    * Includes admin and user roles only, excludes superAdmin
    */
   static async getMembersForPublic(): Promise<TUser[]> {
-    const query: any = { 
+    const query: any = {
       isDeleted: { $ne: true },
-      role: { $nin: ['superAdmin'] } // Exclude superAdmin
+      role: { $nin: ['superAdmin'] }, // Exclude superAdmin
     };
 
     const userQuery = User.find(query).sort({ createdAt: 1 }); // Oldest first
@@ -302,7 +371,7 @@ export class UserService {
       },
     ]);
 
-     // Always populate publications with limited fields (only approved papers)
+    // Always populate publications with limited fields (only approved papers)
 
     const users = await userQuery.exec();
     return users;
@@ -314,7 +383,8 @@ export class UserService {
    * Update user by ID
    */
   static async updateUser(id: string, payload: Partial<TUser>): Promise<TUser> {
-    const { current, education, socialLinks, citations, ...remainingData } = payload;
+    const { current, education, socialLinks, citations, ...remainingData } =
+      payload;
 
     const modifiedUpdatedData: Record<string, unknown> = {
       ...remainingData,
@@ -362,7 +432,8 @@ export class UserService {
     email: string,
     payload: Partial<TUser>,
   ): Promise<TUser> {
-    const { current, education, socialLinks, citations, ...remainingData } = payload;
+    const { current, education, socialLinks, citations, ...remainingData } =
+      payload;
 
     const modifiedUpdatedData: Record<string, unknown> = {
       ...remainingData,

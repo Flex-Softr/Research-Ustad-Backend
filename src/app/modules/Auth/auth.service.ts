@@ -175,263 +175,119 @@ const forgetPassword = async (email: string) => {
   const subject = 'Reset Your Password - Action Required';
 
   const htmlContent = `
-    <!DOCTYPE html>
-    <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Reset Your Password</title>
-        <style>
-            * {
-                margin: 0;
-                padding: 0;
-                box-sizing: border-box;
-            }
-            
-            body {
-                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-                line-height: 1.6;
-                color: #333;
-                background-color: #f8fafc;
-            }
-            
-            .email-container {
-                max-width: 600px;
-                margin: 0 auto;
-                background-color: #ffffff;
-                border-radius: 12px;
-                overflow: hidden;
-                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            }
-            
-            .header {
-                background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-                padding: 40px 30px;
-                text-align: center;
-                color: white;
-            }
-            
-            .header h1 {
-                font-size: 28px;
-                font-weight: 700;
-                margin-bottom: 8px;
-                letter-spacing: -0.5px;
-            }
-            
-            .header p {
-                font-size: 16px;
-                opacity: 0.9;
-                font-weight: 400;
-            }
-            
-            .content {
-                padding: 40px 30px;
-                background-color: #ffffff;
-            }
-            
-            .greeting {
-                font-size: 18px;
-                font-weight: 600;
-                color: #1f2937;
-                margin-bottom: 20px;
-            }
-            
-            .message {
-                font-size: 16px;
-                color: #4b5563;
-                margin-bottom: 30px;
-                line-height: 1.7;
-            }
-            
-            .button-container {
-                text-align: center;
-                margin: 40px 0;
-            }
-            
-            .reset-button {
-                display: inline-block;
-                background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-                color: white;
-                padding: 16px 32px;
-                text-decoration: none;
-                border-radius: 8px;
-                font-weight: 600;
-                font-size: 16px;
-                text-transform: uppercase;
-                letter-spacing: 0.5px;
-                box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
-                transition: all 0.3s ease;
-                border: none;
-                cursor: pointer;
-            }
-            
-            .reset-button:hover {
-                transform: translateY(-2px);
-                box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
-            }
-            
-            .security-notice {
-                background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
-                border: 1px solid #f59e0b;
-                border-radius: 8px;
-                padding: 20px;
-                margin: 30px 0;
-            }
-            
-            .security-notice h3 {
-                color: #92400e;
-                font-size: 16px;
-                font-weight: 600;
-                margin-bottom: 12px;
-                display: flex;
-                align-items: center;
-                gap: 8px;
-            }
-            
-            .security-notice ul {
-                list-style: none;
-                padding: 0;
-            }
-            
-            .security-notice li {
-                color: #92400e;
-                font-size: 14px;
-                margin-bottom: 8px;
-                padding-left: 20px;
-                position: relative;
-            }
-            
-            .security-notice li:before {
-                content: "⚠️";
-                position: absolute;
-                left: 0;
-                top: 0;
-            }
-            
-            .fallback-link {
-                background-color: #f3f4f6;
-                border: 1px solid #e5e7eb;
-                border-radius: 8px;
-                padding: 20px;
-                margin: 30px 0;
-                text-align: center;
-            }
-            
-            .fallback-link p {
-                color: #6b7280;
-                font-size: 14px;
-                margin-bottom: 10px;
-            }
-            
-            .fallback-link a {
-                color: #10b981;
-                text-decoration: none;
-                word-break: break-all;
-                font-family: 'Courier New', monospace;
-                font-size: 12px;
-                background-color: #ffffff;
-                padding: 8px 12px;
-                border-radius: 4px;
-                border: 1px solid #e5e7eb;
-                display: inline-block;
-                max-width: 100%;
-            }
-            
-            .footer {
-                background-color: #f9fafb;
-                padding: 30px;
-                text-align: center;
-                border-top: 1px solid #e5e7eb;
-            }
-            
-            .footer p {
-                color: #6b7280;
-                font-size: 14px;
-                margin-bottom: 8px;
-            }
-            
-            .logo {
-                display: inline-block;
-                background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-                color: white;
-                padding: 8px 16px;
-                border-radius: 6px;
-                font-weight: 700;
-                font-size: 14px;
-                margin-bottom: 15px;
-            }
-            
-            @media (max-width: 600px) {
-                .email-container {
-                    margin: 10px;
-                    border-radius: 8px;
-                }
-                
-                .header, .content, .footer {
-                    padding: 20px;
-                }
-                
-                .header h1 {
-                    font-size: 24px;
-                }
-                
-                .reset-button {
-                    padding: 14px 24px;
-                    font-size: 14px;
-                }
-            }
-        </style>
-    </head>
-    <body>
-        <div class="email-container">
-            <div class="header">
-                <h1>🔐 Reset Your Password</h1>
-                <p>ResearchUstad Account Security</p>
-            </div>
-            
-            <div class="content">
-                <div class="greeting">Hello!</div>
-                
-                <div class="message">
-                    We received a request to reset your password for your ResearchUstad account. 
-                    If you didn't make this request, you can safely ignore this email.
-                </div>
-                
-                <div class="button-container">
-                    <a href="${resetUILink}" class="reset-button" target="_blank">
-                        🔑 Reset My Password
-                    </a>
-                </div>
-                
-                <div class="security-notice">
-                    <h3>🛡️ Security Notice</h3>
-                    <ul>
-                        <li>This link will expire in 10 minutes</li>
-                        <li>If you didn't request this, please ignore this email</li>
-                        <li>Never share this link with anyone</li>
-                        <li>This link is unique to your account</li>
-                    </ul>
-                </div>
-                
-                <div class="fallback-link">
-                    <p><strong>Button not working?</strong></p>
-                    <p>Copy and paste this link into your browser:</p>
-                    <a href="${resetUILink}">${resetUILink}</a>
-                </div>
-                
-                <div class="message">
-                    If you have any questions or need assistance, please don't hesitate to contact our support team.
-                </div>
-            </div>
-            
-            <div class="footer">
-                <div class="logo">ResearchUstad</div>
-                <p>This is an automated message, please do not reply to this email.</p>
-              
-            </div>
-        </div>
-    </body>
-    </html>
+      <h2 style="color: #2563eb; text-align: center">Reset Your Password</h2>
+    <p>Hello!</p>
+    <p>
+      We received a request to reset your password for your
+      <strong>Research Ustad</strong> account. If you didn't make this request,
+      you can safely ignore this email.
+    </p>
+
+    <div style="text-align: center; margin: 30px 0">
+      <a
+        target="_blank"
+        href="${resetUILink}"
+        style="
+          background-color: #2563eb;
+          color: white;
+          padding: 15px 30px;
+          text-decoration: none;
+          border-radius: 8px;
+          display: inline-block;
+          font-weight: bold;
+          font-size: 16px;
+        "
+      >
+        🔑 Reset My Password
+      </a>
+    </div>
+
+    <div
+      style="
+        background-color: #fff3cd;
+        padding: 15px;
+        border-radius: 8px;
+        margin: 25px 0;
+        border-left: 4px solid #ffc107;
+      "
+    >
+      <p style="margin: 0; color: #856404; font-size: 14px">
+        <strong>⚠️ Security Notice:</strong> This link will expire in 10
+        minutes. If you didn't request this, please ignore this email.
+      </p>
+    </div>
+
+    <p style="color: #666; font-size: 14px; margin: 20px 0">
+      <strong>Button not working?</strong> Copy and paste this link into your
+      browser:<br />
+      <a href="${resetUILink}" style="color: #2563eb; word-break: break-all"
+        >${resetUILink}</a
+      >
+    </p>
+
+    <p>
+      If you have any questions or need assistance, please don't hesitate to
+      contact our support team.
+    </p>
+
+    <p>&nbsp;</p>
+
+    <p style="margin: 10px 0">
+      <strong style="font-size: 16px">Best Regards,</strong>
+    </p>
+
+    <p style="margin: 4px 0">
+      <img
+        src="https://i.ibb.co.com/RG0nL1rv/Research-Ustad-Logo.png"
+        alt="Research Ustad Logo"
+        width="105"
+        height="105"
+        onerror="this.style.display='none'; this.nextElementSibling.style.display='block';"
+      />
+    </p>
+
+    <p
+      style="
+        margin: 8px 0;
+        font-family: 'Times New Roman', Times, serif;
+        font-size: 14pt;
+      "
+    >
+      <strong>Research Ustad Team</strong>
+    </p>
+
+    <p
+      style="
+        margin: 4px 0;
+        font-family: 'Times New Roman', Times, serif;
+        font-size: 12pt;
+      "
+    >
+      <em>Contact:</em>
+      <a href="https://researchustad.org/" target="_blank">Research Ustad</a>
+    </p>
+
+    <p
+      style="
+        margin: 4px 0;
+        font-family: 'Times New Roman', Times, serif;
+        font-size: 12pt;
+      "
+    >
+      <em>WhatsApp:</em>
+      <a href="tel:+8801724653054">+880 1724-653054</a>
+    </p>
+
+    <p
+      style="
+        margin: 4px 0;
+        font-family: 'Times New Roman', Times, serif;
+        font-size: 12pt;
+      "
+    >
+      <em>Email:</em>
+      <a href="mailto:info@researchustad.org">info@researchustad.org</a>
+    </p>
   `;
 
   await sendEmail(user.email, htmlContent, subject);

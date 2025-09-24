@@ -42,6 +42,14 @@ const createResearchMemberValidationSchema = z.object({
         inst_designation: z.string().optional(),
       })
       .optional(),
+    CurrentInstitutionAcademic: z
+      .object({
+        institution: z.string().optional(),
+        department: z.string().optional(),
+        degree: z.string().optional(),
+        inst_designation: z.string().optional(),
+      })
+      .optional(),
     education: z
       .object({
         degree: z.string().optional(),
@@ -108,6 +116,14 @@ const createResearchMemberJsonValidationSchema = z.object({
     image: z.string().optional(),
     // Research member specific fields
     current: z
+      .object({
+        institution: z.string().optional(),
+        department: z.string().optional(),
+        degree: z.string().optional(),
+        inst_designation: z.string().optional(),
+      })
+      .optional(),
+    CurrentInstitutionAcademic: z
       .object({
         institution: z.string().optional(),
         department: z.string().optional(),
@@ -183,6 +199,14 @@ const updateResearchMemberValidationSchema = z.object({
     image: z.string().optional(),
     // Research member specific fields
     current: z
+      .object({
+        institution: z.string().optional(),
+        department: z.string().optional(),
+        degree: z.string().optional(),
+        inst_designation: z.string().optional(),
+      })
+      .optional(),
+    CurrentInstitutionAcademic: z
       .object({
         institution: z.string().optional(),
         department: z.string().optional(),

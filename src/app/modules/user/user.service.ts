@@ -8,8 +8,6 @@ import { ResearchPaper } from '../ResearchPaper/ResearchPaper.model';
 import { Blog } from '../Blog/blog.model';
 import { TUser } from './user.interface';
 
-
-
 export class UserService {
   // ===== USER CREATION =====
   static async createUser(
@@ -40,6 +38,12 @@ export class UserService {
       // Research member fields
       contactNo: payload.contactNo || '',
       current: payload.current || {
+        institution: '',
+        department: '',
+        degree: '',
+        inst_designation: '',
+      },
+      CurrentInstitutionAcademic: payload.CurrentInstitutionAcademic || {
         institution: '',
         department: '',
         degree: '',
@@ -383,8 +387,14 @@ export class UserService {
    * Update user by ID
    */
   static async updateUser(id: string, payload: Partial<TUser>): Promise<TUser> {
-    const { current, education, socialLinks, citations, ...remainingData } =
-      payload;
+    const {
+      current,
+      CurrentInstitutionAcademic,
+      education,
+      socialLinks,
+      citations,
+      ...remainingData
+    } = payload;
 
     const modifiedUpdatedData: Record<string, unknown> = {
       ...remainingData,
@@ -398,6 +408,15 @@ export class UserService {
     if (current && Object.keys(current)?.length) {
       for (const [key, value] of Object.entries(current)) {
         modifiedUpdatedData[`current.${key}`] = value;
+      }
+    }
+
+    if (
+      CurrentInstitutionAcademic &&
+      Object.keys(CurrentInstitutionAcademic)?.length
+    ) {
+      for (const [key, value] of Object.entries(CurrentInstitutionAcademic)) {
+        modifiedUpdatedData[`CurrentInstitutionAcademic.${key}`] = value;
       }
     }
 
@@ -432,8 +451,14 @@ export class UserService {
     email: string,
     payload: Partial<TUser>,
   ): Promise<TUser> {
-    const { current, education, socialLinks, citations, ...remainingData } =
-      payload;
+    const {
+      current,
+      CurrentInstitutionAcademic,
+      education,
+      socialLinks,
+      citations,
+      ...remainingData
+    } = payload;
 
     const modifiedUpdatedData: Record<string, unknown> = {
       ...remainingData,
@@ -447,6 +472,15 @@ export class UserService {
     if (current && Object.keys(current)?.length) {
       for (const [key, value] of Object.entries(current)) {
         modifiedUpdatedData[`current.${key}`] = value;
+      }
+    }
+
+    if (
+      CurrentInstitutionAcademic &&
+      Object.keys(CurrentInstitutionAcademic)?.length
+    ) {
+      for (const [key, value] of Object.entries(CurrentInstitutionAcademic)) {
+        modifiedUpdatedData[`CurrentInstitutionAcademic.${key}`] = value;
       }
     }
 

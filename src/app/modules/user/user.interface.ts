@@ -24,6 +24,12 @@ export interface TUser {
     degree?: string;
     inst_designation?: string;
   };
+  CurrentInstitutionAcademic?: {
+    institution?: string;
+    department?: string;
+    degree?: string;
+    inst_designation?: string;
+  };
   education?: {
     degree?: string;
     field?: string;

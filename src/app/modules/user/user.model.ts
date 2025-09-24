@@ -65,6 +65,12 @@ const userSchema = new Schema<TUser, UserModel>(
       degree: { type: String, default: '' },
       inst_designation: { type: String, default: '' },
     },
+    CurrentInstitutionAcademic: {
+      institution: { type: String, default: '' },
+      department: { type: String, default: '' },
+      degree: { type: String, default: '' },
+      inst_designation: { type: String, default: '' },
+    },
     education: {
       degree: { type: String, default: '' },
       field: { type: String, default: '' },

@@ -21,21 +21,13 @@ export interface TUser {
   current?: {
     institution?: string;
     department?: string;
-    degree?: string;
     inst_designation?: string;
   };
   CurrentInstitutionAcademic?: {
     institution?: string;
     department?: string;
     degree?: string;
-    inst_designation?: string;
-  };
-  education?: {
-    degree?: string;
-    field?: string;
-    institution?: string;
-    status?: "Ongoing" | "Completed" | "";
-    scholarship?: string;
+    status?: "Ongoing" | "Completed";
   };
   research?: string[];
   shortBio?: string;

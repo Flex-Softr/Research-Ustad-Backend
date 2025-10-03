@@ -40,21 +40,13 @@ export class UserService {
       current: payload.current || {
         institution: '',
         department: '',
-        degree: '',
         inst_designation: '',
       },
       CurrentInstitutionAcademic: payload.CurrentInstitutionAcademic || {
         institution: '',
         department: '',
         degree: '',
-        inst_designation: '',
-      },
-      education: payload.education || {
-        degree: '',
-        field: '',
-        institution: '',
-        status: 'Completed',
-        scholarship: '',
+        status: 'Ongoing',
       },
       research: payload.research || [],
       shortBio: payload.shortBio || '',
@@ -132,7 +124,7 @@ export class UserService {
     <p>
       <a
         target="_blank"
-        href="${config.frontend_urls}/login"
+        href="${config.frontend_url}/login"
         style="
           background-color: #2563eb;
           color: white;
@@ -390,7 +382,6 @@ export class UserService {
     const {
       current,
       CurrentInstitutionAcademic,
-      education,
       socialLinks,
       citations,
       ...remainingData
@@ -417,12 +408,6 @@ export class UserService {
     ) {
       for (const [key, value] of Object.entries(CurrentInstitutionAcademic)) {
         modifiedUpdatedData[`CurrentInstitutionAcademic.${key}`] = value;
-      }
-    }
-
-    if (education && Object.keys(education)?.length) {
-      for (const [key, value] of Object.entries(education)) {
-        modifiedUpdatedData[`education.${key}`] = value;
       }
     }
 
@@ -454,7 +439,6 @@ export class UserService {
     const {
       current,
       CurrentInstitutionAcademic,
-      education,
       socialLinks,
       citations,
       ...remainingData
@@ -481,12 +465,6 @@ export class UserService {
     ) {
       for (const [key, value] of Object.entries(CurrentInstitutionAcademic)) {
         modifiedUpdatedData[`CurrentInstitutionAcademic.${key}`] = value;
-      }
-    }
-
-    if (education && Object.keys(education)?.length) {
-      for (const [key, value] of Object.entries(education)) {
-        modifiedUpdatedData[`education.${key}`] = value;
       }
     }
 

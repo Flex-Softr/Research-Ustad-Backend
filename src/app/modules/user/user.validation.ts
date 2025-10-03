@@ -38,7 +38,6 @@ const createResearchMemberValidationSchema = z.object({
       .object({
         institution: z.string().optional(),
         department: z.string().optional(),
-        degree: z.string().optional(),
         inst_designation: z.string().optional(),
       })
       .optional(),
@@ -47,18 +46,7 @@ const createResearchMemberValidationSchema = z.object({
         institution: z.string().optional(),
         department: z.string().optional(),
         degree: z.string().optional(),
-        inst_designation: z.string().optional(),
-      })
-      .optional(),
-    education: z
-      .object({
-        degree: z.string().optional(),
-        field: z.string().optional(),
-        institution: z.string().optional(),
-        status: z
-          .union([z.enum(['Ongoing', 'Completed']), z.literal('')])
-          .optional(),
-        scholarship: z.string().optional(),
+        status: z.enum(['Ongoing', 'Completed']).optional(),
       })
       .optional(),
     research: z.array(z.string()).optional(),
@@ -119,7 +107,6 @@ const createResearchMemberJsonValidationSchema = z.object({
       .object({
         institution: z.string().optional(),
         department: z.string().optional(),
-        degree: z.string().optional(),
         inst_designation: z.string().optional(),
       })
       .optional(),
@@ -128,18 +115,7 @@ const createResearchMemberJsonValidationSchema = z.object({
         institution: z.string().optional(),
         department: z.string().optional(),
         degree: z.string().optional(),
-        inst_designation: z.string().optional(),
-      })
-      .optional(),
-    education: z
-      .object({
-        degree: z.string().optional(),
-        field: z.string().optional(),
-        institution: z.string().optional(),
-        status: z
-          .union([z.enum(['Ongoing', 'Completed']), z.literal('')])
-          .optional(),
-        scholarship: z.string().optional(),
+        status: z.enum(['Ongoing', 'Completed']).optional(),
       })
       .optional(),
     research: z.array(z.string()).optional(),
@@ -202,7 +178,6 @@ const updateResearchMemberValidationSchema = z.object({
       .object({
         institution: z.string().optional(),
         department: z.string().optional(),
-        degree: z.string().optional(),
         inst_designation: z.string().optional(),
       })
       .optional(),
@@ -211,18 +186,7 @@ const updateResearchMemberValidationSchema = z.object({
         institution: z.string().optional(),
         department: z.string().optional(),
         degree: z.string().optional(),
-        inst_designation: z.string().optional(),
-      })
-      .optional(),
-    education: z
-      .object({
-        degree: z.string().optional(),
-        field: z.string().optional(),
-        institution: z.string().optional(),
-        status: z
-          .union([z.enum(['Ongoing', 'Completed']), z.literal('')])
-          .optional(),
-        scholarship: z.string().optional(),
+        status: z.enum(['Ongoing', 'Completed']).optional(),
       })
       .optional(),
     research: z.array(z.string()).optional(),

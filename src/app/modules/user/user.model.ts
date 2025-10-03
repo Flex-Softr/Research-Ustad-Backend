@@ -62,21 +62,13 @@ const userSchema = new Schema<TUser, UserModel>(
     current: {
       institution: { type: String, default: '' },
       department: { type: String, default: '' },
-      degree: { type: String, default: '' },
       inst_designation: { type: String, default: '' },
     },
     CurrentInstitutionAcademic: {
       institution: { type: String, default: '' },
       department: { type: String, default: '' },
       degree: { type: String, default: '' },
-      inst_designation: { type: String, default: '' },
-    },
-    education: {
-      degree: { type: String, default: '' },
-      field: { type: String, default: '' },
-      institution: { type: String, default: '' },
-      status: { type: String, enum: ['Ongoing', 'Completed', ''], default: '' },
-      scholarship: { type: String, default: '' },
+      status: { type: String, enum: ['Ongoing', 'Completed'], default: 'Ongoing' },
     },
     research: [{ type: String }],
     shortBio: { type: String, default: '' },

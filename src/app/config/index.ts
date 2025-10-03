@@ -22,6 +22,7 @@ export default {
   reset_pass_ui_link:
     process.env.RESET_PASS_UI_LINK || 'http://localhost:3000/reset-password',
   super_admin_password: process.env.SUPER_ADMIN_PASSWORD,
+  frontend_url: process.env.FRONTEND_URL,
   frontend_urls: process.env.FRONTEND_URLS 
     ? process.env.FRONTEND_URLS.split(',').map(url => url.trim())
     : ['http://localhost:3000'],

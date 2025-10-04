@@ -3,7 +3,7 @@ import { z } from 'zod';
 const speakerSchema = z.object({
   name: z.string().min(1, 'Speaker name is required'),
   bio: z.string().min(1, 'Speaker bio is required'),
-  imageUrl: z.string().min(1, 'Speaker image is required'),
+  imageUrl: z.string().optional(), // Make imageUrl optional for better performance
 });
 
 const speakerUpdateSchema = z.object({
@@ -19,7 +19,7 @@ const eventValidationPost = z.object({
   startDate: z.string().min(1, { message: 'Start date is required' }),
   endDate: z.string().min(1, { message: 'End date is required' }),
   location: z.string().min(1, { message: 'Location is required' }),
-  imageUrl: z.string().min(1, { message: 'Event image is required' }),
+  imageUrl: z.string().optional(), // Make main image optional for better performance
   registrationLink: z.string().min(1, { message: 'Registration link is required' }),
   speakers: z.array(speakerSchema).min(1, 'At least one speaker is required'),
   status: z.enum(['upcoming', 'ongoing', 'finished']).default('upcoming'),

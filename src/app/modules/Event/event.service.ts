@@ -18,7 +18,7 @@ const GetSingleEvent = async (id: string) => {
   return result;
 };
 
-// create event
+// create event (optimized)
 const Postevent = async (body: IEvent) => {
   const eventData = {
     ...body,
@@ -27,8 +27,10 @@ const Postevent = async (body: IEvent) => {
   };
   
   const result = await eventModel.create(eventData);
-  const event = await eventModel.find();
-  io.emit('eventUpdate', event);
+  
+  // Optimize: Only emit socket update, don't fetch all events
+  io.emit('eventUpdate', { type: 'created', eventId: result._id });
+  
   return result;
 };
 
@@ -44,8 +46,10 @@ const Updateevent = async (id: string, body: IEvent) => {
   }
   
   const result = await eventModel.findByIdAndUpdate(id, updateData, { new: true });
-  const events = await eventModel.find();
-  io.emit('eventUpdate', events);
+  
+  // Optimize: Only emit socket update, don't fetch all events
+  io.emit('eventUpdate', { type: 'updated', eventId: id });
+  
   return result;
 };
 
@@ -55,8 +59,10 @@ const Deletedevent = async (id: string) => {
   if (!result) {
     throw new AppError(404, 'This event is not found');
   }
-  const events = await eventModel.find();
-  io.emit('eventUpdate', events);
+  
+  // Optimize: Only emit socket update, don't fetch all events
+  io.emit('eventUpdate', { type: 'deleted', eventId: id });
+  
   return result;
 };
 export const eventService = {

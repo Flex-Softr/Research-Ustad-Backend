@@ -43,6 +43,13 @@ export const eventSchema = new Schema<IEvent>(
   },
   { timestamps: true },
 );
+
+// Add indexes for better performance
+eventSchema.index({ status: 1 });
+eventSchema.index({ startDate: 1 });
+eventSchema.index({ location: 1 });
+eventSchema.index({ createdAt: -1 });
+
 eventSchema.pre('findOneAndUpdate', function (next) {
   const update = this.getUpdate() as Partial<IEvent>;
   if (!update) return next();
